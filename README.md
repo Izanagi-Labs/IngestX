@@ -1,6 +1,6 @@
 # IngestX
 
-A powerful, headless data ingestion engine for tabular data (CSV and Excel) in JavaScript and TypeScript. 
+The fastest way to import and validate large CSV & Excel files in JavaScript.
 
 Ingestx is designed to handle massive files smoothly by parsing in chunks, offering built-in data validation, schema mapping, and execution control (pause, resume, cancel). Since it's completely headless, you bring your own UI and we handle the heavy lifting!
 
@@ -32,15 +32,25 @@ import { useIngestion } from 'ingestx/react';
 import type { ColumnConfig } from 'ingestx';
 
 const columnConfigs: ColumnConfig[] = [
-  { key: 'id', displayNames: ['id', 'user id'], type: 'number', validationRequired: true },
-  { key: 'email', displayNames: ['email', 'email address'], type: 'string', validationRequired: true },
-  { 
-    key: 'isActive', 
-    displayNames: ['active', 'is active'], 
-    type: 'boolean', 
-    trueValues: ['yes', 'true'], 
-    falseValues: ['no', 'false'] 
-  }
+  {
+    key: 'id',
+    displayNames: ['id', 'user id'],
+    type: 'number',
+    validationRequired: true,
+  },
+  {
+    key: 'email',
+    displayNames: ['email', 'email address'],
+    type: 'string',
+    validationRequired: true,
+  },
+  {
+    key: 'isActive',
+    displayNames: ['active', 'is active'],
+    type: 'boolean',
+    trueValues: ['yes', 'true'],
+    falseValues: ['no', 'false'],
+  },
 ];
 
 export default function Uploader() {
@@ -51,7 +61,7 @@ export default function Uploader() {
     startIngestion,
     pause,
     resume,
-    cancel
+    cancel,
   } = useIngestion({
     columnConfigs,
     chunkSize: 1000,
@@ -65,9 +75,9 @@ export default function Uploader() {
   return (
     <div>
       <input type="file" onChange={handleFileUpload} accept=".csv, .xlsx" />
-      
+
       {isProcessing && <p>Processing... {progress.toFixed(0)}%</p>}
-      
+
       {result && (
         <div>
           <p>✅ Valid Rows: {result.validRowsCount}</p>
@@ -82,38 +92,44 @@ export default function Uploader() {
 ## Core Configuration
 
 ### `ColumnConfig`
+
 The heart of Ingestx is the schema definition. You define exactly what your data should look like.
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `key` | `string` | The final key the data will be mapped to in the resulting object. |
-| `displayNames` | `string[]` | Possible header names in the uploaded file to match against. |
-| `type` | `'string' \| 'number' \| 'boolean'` | Expected data type. Ingestx will attempt to coerce and validate. |
-| `validationRequired` | `boolean` | If true, the row becomes invalid if this field is missing or fails validation. |
-| `defaultValue` | `any` | Value to use if the field is empty. |
+| Property             | Type                                | Description                                                                    |
+| -------------------- | ----------------------------------- | ------------------------------------------------------------------------------ |
+| `key`                | `string`                            | The final key the data will be mapped to in the resulting object.              |
+| `displayNames`       | `string[]`                          | Possible header names in the uploaded file to match against.                   |
+| `type`               | `'string' \| 'number' \| 'boolean'` | Expected data type. Ingestx will attempt to coerce and validate.               |
+| `validationRequired` | `boolean`                           | If true, the row becomes invalid if this field is missing or fails validation. |
+| `defaultValue`       | `any`                               | Value to use if the field is empty.                                            |
 
 #### Type-Specific Options:
+
 - **String:** `regex`, `allowedValues`
 - **Number:** `min`, `max`, `allowedValues`
 - **Boolean:** `trueValues`, `falseValues` (Strictly maps specific strings to booleans).
 
 ### Global Options
+
 You can configure global behavior when initializing the ingestion:
 
 ```ts
 const options = {
-  trimValues: true,             // Trims whitespace from all cell values
-  trimHeaders: true,            // Trims whitespace from column headers
+  trimValues: true, // Trims whitespace from all cell values
+  trimHeaders: true, // Trims whitespace from column headers
   caseInsensitiveHeaders: true, // Matches headers ignoring case
-  shouldAccumulateResult: true  // If false, results are flushed per chunk (useful for massive datasets to save memory)
-}
+  shouldAccumulateResult: true, // If false, results are flushed per chunk (useful for massive datasets to save memory)
+};
 ```
 
 ## The Output Result
+
 When ingestion completes (or pauses), the `result` object contains:
+
 - `validRows`: Array of cleanly parsed and mapped objects.
 - `invalidRows`: Array of raw objects that failed validation.
-- `errorsData`: Detailed row-wise and column-wise error messages indicating exactly *why* a row failed.
+- `errorsData`: Detailed row-wise and column-wise error messages indicating exactly _why_ a row failed.
 
 ## License
+
 MIT
