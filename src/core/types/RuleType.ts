@@ -18,7 +18,6 @@ export enum CommonRuleType {
   Optional = 'optional',
   Default = 'default',
   Refine = 'refine',
-  DefaultValues = 'defaultValues',
   Transform = 'transform',
 }
 
