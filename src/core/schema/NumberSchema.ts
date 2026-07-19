@@ -1,45 +1,12 @@
-import { BaseSchema } from "./BaseSchema";
-import { RuleType } from "../types/RuleType";
+import { NumberRules, NumberRuleType } from '../types/RuleType';
+import { CommonSchema } from './CommonSchema';
 
-export class NumberSchema extends BaseSchema {
-    // Maybe we can restrict the rule type based on the schema type
-    // readonly type = SchemaType.Number; 
-
+export class NumberSchema extends CommonSchema<number, NumberRules> {
   min(value: number, message?: string): this {
-    return this.addRule(
-      RuleType.NumberMin,
-      value,
-      message
-    );
+    return this.addRule(NumberRuleType.Min, value, message);
   }
 
   max(value: number, message?: string): this {
-    return this.addRule(
-      RuleType.NumberMax,
-      value,
-      message
-    );
-  }
-
-  required(message?: string): this {
-    return this.addRule(
-      RuleType.Required,
-      true,
-      message
-    );
-  }
-
-  optional(): this {
-    return this.addRule(
-      RuleType.Optional,
-      true
-    );
-  }
-
-  default(value: number): this {
-    return this.addRule(
-      RuleType.Default,
-      value
-    );
+    return this.addRule(NumberRuleType.Max, value, message);
   }
 }
