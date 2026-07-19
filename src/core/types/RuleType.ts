@@ -19,6 +19,7 @@ export enum CommonRuleType {
   Default = 'default',
   Refine = 'refine',
   DefaultValues = 'defaultValues',
+  Transform = 'transform',
 }
 
 export type StringRules = CommonRuleType | StringRuleType;

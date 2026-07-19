@@ -20,4 +20,8 @@ export abstract class CommonSchema<
   defaultValues(values: TValue[]): this {
     return this.addRule(CommonRuleType.DefaultValues, values);
   }
+
+  transform(transform: (value: TValue) => TValue): this {
+    return this.addRule(CommonRuleType.Transform, transform);
+  }
 }
