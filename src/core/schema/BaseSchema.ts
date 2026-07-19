@@ -1,25 +1,19 @@
-import type { Rule } from "../types/Rule";
+import type { Rule } from '../types/Rule';
 
-export abstract class BaseSchema {
-    // abstract readonly type: SchemaType;
+export abstract class BaseSchema<TRuleType> {
+  protected readonly rules: Rule<TRuleType>[] = [];
 
-    protected readonly rules: Rule[] = [];
+  _getRules(): readonly Rule<TRuleType>[] {
+    return this.rules;
+  }
 
-    protected addRule<V>(
-        type: Rule["type"],
-        value?: V,
-        message?: string
-    ): this {
-        this.rules.push({
-            type,
-            value,
-            message,
-        });
+  protected addRule(type: TRuleType, value?: unknown, message?: string): this {
+    this.rules.push({
+      type,
+      value,
+      message,
+    });
 
-        return this;
-    }
-
-    getRules(): readonly Rule[] {
-        return this.rules;
-    }
+    return this;
+  }
 }
