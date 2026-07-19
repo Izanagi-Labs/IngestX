@@ -17,8 +17,6 @@ type TypeBooleanConfig = {
   falseValues?: string[];
 }
 
-
-
 type Transformer<T = any> = (
   value: T,
   row?: Record<string, any>
