@@ -1,26 +1,29 @@
-export enum RuleType {
-    // Common
-    Required = "required",
-    Optional = "optional",
-    Nullable = "nullable",
-    Default = "default",
-    Transform = "transform",
-    Refine = "refine",
-    AllowedValues = "allowedValues",
-
-    // String
-    StringMin = "string:min",
-    StringMax = "string:max",
-    StringRegex = "string:regex",
-    StringTrim = "string:trim",
-    StringLowercase = "string:lowercase",
-    StringUppercase = "string:uppercase",
-
-    // Number
-    NumberMin = "number:min",
-    NumberMax = "number:max",
-
-    // Boolean
-    BooleanTrueValues = "boolean:trueValues",
-    BooleanFalseValues = "boolean:falseValues",
+export enum StringRuleType {
+  Min = 'string:min',
+  Max = 'string:max',
+  Regex = 'string:regex',
 }
+
+export enum NumberRuleType {
+  Min = 'number:min',
+  Max = 'number:max',
+}
+
+export enum BooleanRuleType {
+  Truthy = 'boolean:truthy',
+  Falsy = 'boolean:falsy',
+}
+
+export enum CommonRuleType {
+  Required = 'required',
+  Optional = 'optional',
+  Default = 'default',
+  Refine = 'refine',
+  DefaultValues = 'defaultValues',
+}
+
+export type StringRules = CommonRuleType | StringRuleType;
+
+export type NumberRules = CommonRuleType | NumberRuleType;
+
+export type BooleanRules = CommonRuleType | BooleanRuleType;

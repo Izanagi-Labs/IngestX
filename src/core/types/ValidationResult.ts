@@ -1,11 +1,10 @@
-import type { RuleType } from "./RuleType";
-
-export interface ValidationError {
-    rule: RuleType;
-    message: string;
+export interface ValidationError<TRuleType extends string> {
+  rule: TRuleType;
+  message: string;
 }
 
-export interface ValidationResult {
-    valid: boolean;
-    errors: ValidationError[];
+export interface ValidationResult<TRuleType extends string, TValue> {
+  value: TValue;
+  valid: boolean;
+  errors: ValidationError<TRuleType>[];
 }

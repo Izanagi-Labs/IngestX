@@ -1,7 +1,5 @@
-import type { RuleType } from "./RuleType";
-
-export interface Rule<T = unknown> {
-    type: RuleType;
-    value?: T;
-    message?: string;
+export interface Rule<TRuleType> {
+  readonly type: TRuleType;
+  readonly value?: unknown;
+  readonly message?: string;
 }
