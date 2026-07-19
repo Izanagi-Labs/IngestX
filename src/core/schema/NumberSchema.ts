@@ -9,4 +9,8 @@ export class NumberSchema extends CommonSchema<number, NumberRules> {
   max(value: number, message?: string): this {
     return this.addRule(NumberRuleType.Max, value, message);
   }
+
+  allowedValues(values: number[], message?: string): this {
+    return this.addRule(NumberRuleType.AllowedValues, values, message);
+  }
 }

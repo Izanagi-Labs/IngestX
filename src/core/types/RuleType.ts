@@ -2,11 +2,13 @@ export enum StringRuleType {
   Min = 'string:min',
   Max = 'string:max',
   Regex = 'string:regex',
+  AllowedValues = 'string:allowed-values',
 }
 
 export enum NumberRuleType {
   Min = 'number:min',
   Max = 'number:max',
+  AllowedValues = 'number:allowed-values',
 }
 
 export enum BooleanRuleType {
