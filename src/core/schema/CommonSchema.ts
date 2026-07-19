@@ -9,10 +9,6 @@ export abstract class CommonSchema<
     return this.addRule(CommonRuleType.Refine, validator, message);
   }
 
-  required(message?: string): this {
-    return this.addRule(CommonRuleType.Required, true, message);
-  }
-
   optional(): this {
     return this.addRule(CommonRuleType.Optional, true);
   }

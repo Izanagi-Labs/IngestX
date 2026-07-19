@@ -15,7 +15,6 @@ export enum BooleanRuleType {
 }
 
 export enum CommonRuleType {
-  Required = 'required',
   Optional = 'optional',
   Default = 'default',
   Refine = 'refine',
