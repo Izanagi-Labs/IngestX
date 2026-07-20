@@ -1,7 +1,7 @@
-import { NumberRules, NumberRuleType } from '../types/RuleType';
+import { NumberSchemaRule, NumberRuleType } from '../types/RuleType';
 import { CommonSchema } from './CommonSchema';
 
-export class NumberSchema extends CommonSchema<number, NumberRules> {
+export class NumberSchema extends CommonSchema<number, NumberSchemaRule> {
   min(value: number, message?: string): this {
     return this.addRule(NumberRuleType.Min, value, message);
   }
@@ -10,7 +10,7 @@ export class NumberSchema extends CommonSchema<number, NumberRules> {
     return this.addRule(NumberRuleType.Max, value, message);
   }
 
-  allowedValues(values: number[], message?: string): this {
+  allowedValues(values: readonly number[], message?: string): this {
     return this.addRule(NumberRuleType.AllowedValues, values, message);
   }
 }
