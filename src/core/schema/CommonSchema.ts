@@ -1,12 +1,11 @@
 import { BaseSchema } from './BaseSchema';
 import { CommonRuleType } from '../types/RuleType';
 
-export abstract class CommonSchema<
-  TValue,
-  TRuleType extends CommonRuleType | string,
-> extends BaseSchema<TRuleType | CommonRuleType> {
-  refine(validator: (value: TValue) => boolean, message?: string): this {
-    return this.addRule(CommonRuleType.Refine, validator, message);
+export abstract class CommonSchema<TValue, TRuleType> extends BaseSchema<
+  TRuleType | CommonRuleType
+> {
+  custom(validator: (value: TValue) => boolean, message?: string): this {
+    return this.addRule(CommonRuleType.Custom, validator, message);
   }
 
   optional(): this {
