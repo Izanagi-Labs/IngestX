@@ -19,12 +19,12 @@ export enum BooleanRuleType {
 export enum CommonRuleType {
   Optional = 'optional',
   Default = 'default',
-  Refine = 'refine',
+  Custom = 'custom',
   Transform = 'transform',
 }
 
-export type StringRules = CommonRuleType | StringRuleType;
+export type StringSchemaRule = CommonRuleType | StringRuleType;
 
-export type NumberRules = CommonRuleType | NumberRuleType;
+export type NumberSchemaRule = CommonRuleType | NumberRuleType;
 
-export type BooleanRules = CommonRuleType | BooleanRuleType;
+export type BooleanSchemaRule = CommonRuleType | BooleanRuleType;
