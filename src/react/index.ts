@@ -1,8 +1,14 @@
-import { useState, useRef, useCallback } from "react";
-import { ColumnConfig, FinalOutput, IngestionController, IngestionOptions, ErrorsData } from "../types";
-import { processRowsInChunks } from "../core/processRowsInChunks";
-import { normalizeHeaders } from "../core/normalizeHeaders";
-import { parseCsvToRows, parseExcelToRows } from "../adapters";
+import { useState, useRef, useCallback } from 'react';
+import {
+  ColumnConfig,
+  FinalOutput,
+  IngestionController,
+  IngestionOptions,
+  ErrorsData,
+} from '../types';
+import { processRowsInChunks } from '../core/processRowsInChunks';
+import { normalizeHeaders } from '../core/normalizeHeaders';
+import { parseCsvToRows, parseExcelToRows } from '../adapters';
 
 type UseIngestionOptions = {
   columnConfigs: ColumnConfig[];
@@ -10,7 +16,11 @@ type UseIngestionOptions = {
   options?: IngestionOptions;
 };
 
-export function useIngestion({ columnConfigs, chunkSize = 500, options }: UseIngestionOptions) {
+export function useIngestion({
+  columnConfigs,
+  chunkSize = 500,
+  options,
+}: UseIngestionOptions) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -50,7 +60,7 @@ export function useIngestion({ columnConfigs, chunkSize = 500, options }: UseIng
 
       if (!file) {
         setIsProcessing(false);
-        setError("No file provided.");
+        setError('No file provided.');
         return;
       }
 
@@ -64,33 +74,41 @@ export function useIngestion({ columnConfigs, chunkSize = 500, options }: UseIng
           parsedRows = await parseExcelToRows(buffer);
         } else {
           setIsProcessing(false);
-          setError("Unsupported file format. Please upload a CSV or Excel file.");
+          setError(
+            'Unsupported file format. Please upload a CSV or Excel file.',
+          );
           return;
         }
       } catch (err: any) {
         setIsProcessing(false);
-        setError("Error parsing file: " + err.message);
+        setError('Error parsing file: ' + err.message);
         return;
       }
 
       if (parsedRows.length === 0) {
         setIsProcessing(false);
-        setError("No rows provided for processing.");
+        setError('No rows provided for processing.');
         return;
       }
 
       // Validate Headers
       const sentHeaders = Object.keys(parsedRows[0]);
-      const { normalizedRows, headersMismatch } = normalizeHeaders(sentHeaders, columnConfigs, options);
+      const { normalizedRows, headersMismatch } = normalizeHeaders(
+        sentHeaders,
+        columnConfigs,
+        options,
+      );
 
       if (headersMismatch) {
-        setError("Headers mismatch");
+        setError('Headers mismatch');
         setIsProcessing(false);
         // Could return headersMismatch here via state if needed by UI
         return { headersMismatch } as { headersMismatch: any };
       }
 
-      const rowsToProcess = normalizedRows ? normalizedRows(parsedRows) : parsedRows;
+      const rowsToProcess = normalizedRows
+        ? normalizedRows(parsedRows)
+        : parsedRows;
       const totalRows = rowsToProcess.length;
       let processedCount = 0;
       let cumulativeValidCount = 0;
@@ -100,19 +118,31 @@ export function useIngestion({ columnConfigs, chunkSize = 500, options }: UseIng
       let cumulativeInvalidRows: Record<string, any>[] = [];
       let cumulativeErrorsData: ErrorsData = { rowWiseErrors: [] };
 
+      const shouldAccumulateResult = options?.shouldAccumulateResult !== false;
+
       const handleChunkProcessed = async (chunkResult: FinalOutput) => {
         cumulativeValidCount += chunkResult.validRows.length;
         cumulativeInvalidCount += chunkResult.invalidRows.length;
-        processedCount += chunkResult.validRows.length + chunkResult.invalidRows.length;
+        processedCount +=
+          chunkResult.validRows.length + chunkResult.invalidRows.length;
 
-        if (options?.shouldAccumulateResult) {
-          cumulativeValidRows = [...cumulativeValidRows, ...chunkResult.validRows];
+        if (shouldAccumulateResult) {
+          cumulativeValidRows = [
+            ...cumulativeValidRows,
+            ...chunkResult.validRows,
+          ];
         }
-        if (options?.shouldAccumulateResult) {
-          cumulativeInvalidRows = [...cumulativeInvalidRows, ...chunkResult.invalidRows];
+        if (shouldAccumulateResult) {
+          cumulativeInvalidRows = [
+            ...cumulativeInvalidRows,
+            ...chunkResult.invalidRows,
+          ];
           cumulativeErrorsData = {
             ...chunkResult.errorsData,
-            rowWiseErrors: [...cumulativeErrorsData.rowWiseErrors, ...chunkResult.errorsData.rowWiseErrors]
+            rowWiseErrors: [
+              ...cumulativeErrorsData.rowWiseErrors,
+              ...chunkResult.errorsData.rowWiseErrors,
+            ],
           };
         }
 
@@ -123,9 +153,15 @@ export function useIngestion({ columnConfigs, chunkSize = 500, options }: UseIng
           totalRows,
           validRowsCount: cumulativeValidCount,
           invalidRowsCount: cumulativeInvalidCount,
-          validRows: options?.shouldAccumulateResult ? cumulativeValidRows : chunkResult.validRows,
-          invalidRows: options?.shouldAccumulateResult ? cumulativeInvalidRows : chunkResult.invalidRows,
-          errorsData: options?.shouldAccumulateResult ? cumulativeErrorsData : chunkResult.errorsData,
+          validRows: shouldAccumulateResult
+            ? cumulativeValidRows
+            : chunkResult.validRows,
+          invalidRows: shouldAccumulateResult
+            ? cumulativeInvalidRows
+            : chunkResult.invalidRows,
+          errorsData: shouldAccumulateResult
+            ? cumulativeErrorsData
+            : chunkResult.errorsData,
         });
 
         // Let the event loop breathe to allow React renders
@@ -142,18 +178,20 @@ export function useIngestion({ columnConfigs, chunkSize = 500, options }: UseIng
           options,
         });
 
-        if (!controllerRef.current.isCancelled && options?.shouldAccumulateResult) {
+        if (!controllerRef.current.isCancelled && shouldAccumulateResult) {
           setResult(output);
         }
         if (!controllerRef.current.isCancelled) {
           setIsProcessing(false);
         }
       } catch (err: any) {
-        setError(err.message || "An error occurred during ingestion processing.");
+        setError(
+          err.message || 'An error occurred during ingestion processing.',
+        );
         setIsProcessing(false);
       }
     },
-    [columnConfigs, chunkSize, options]
+    [columnConfigs, chunkSize, options],
   );
 
   return {
@@ -168,4 +206,3 @@ export function useIngestion({ columnConfigs, chunkSize = 500, options }: UseIng
     error,
   };
 }
-
