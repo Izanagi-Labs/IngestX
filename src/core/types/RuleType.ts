@@ -3,6 +3,7 @@ export enum StringRuleType {
   Max = 'string:max',
   Regex = 'string:regex',
   AllowedValues = 'string:allowed-values',
+  caseSensitive = 'string:case-sensitive',
 }
 
 export enum NumberRuleType {
@@ -14,6 +15,7 @@ export enum NumberRuleType {
 export enum BooleanRuleType {
   Truthy = 'boolean:truthy',
   Falsy = 'boolean:falsy',
+  caseSensitive = 'string:case-sensitive',
 }
 
 export enum CommonRuleType {
