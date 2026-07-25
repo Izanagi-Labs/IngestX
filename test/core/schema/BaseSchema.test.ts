@@ -15,7 +15,7 @@ class TestSchema extends BaseSchema<TestRuleType> {
     value?: unknown,
     message?: string,
   ): this {
-    return this.addRule(type, value, message);
+    return this.addRule({ type, value, message });
   }
 }
 
