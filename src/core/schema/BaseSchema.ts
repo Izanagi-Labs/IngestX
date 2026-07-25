@@ -10,13 +10,8 @@ export abstract class BaseSchema<TRuleType> {
     return this.rules;
   }
 
-  protected addRule(type: TRuleType, value?: unknown, message?: string): this {
-    this.rules.push({
-      type,
-      value,
-      message,
-    });
-
+  protected addRule(rule: Rule<TRuleType>): this {
+    this.rules.push(rule);
     return this;
   }
 }
