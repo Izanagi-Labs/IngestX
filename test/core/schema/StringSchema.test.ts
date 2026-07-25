@@ -10,7 +10,11 @@ describe('StringSchema', () => {
         schema.min(5);
         const rules = schema._getRules();
         expect(rules).toHaveLength(1);
-        expect(rules[0]).toEqual({ type: StringRuleType.Min, value: 5, message: undefined });
+        expect(rules[0]).toEqual({
+          type: StringRuleType.Min,
+          value: 5,
+          message: undefined,
+        });
       });
 
       it('stores the optional custom message', () => {
@@ -18,7 +22,11 @@ describe('StringSchema', () => {
         schema.min(5, 'Minimum is 5');
         const rules = schema._getRules();
         expect(rules).toHaveLength(1);
-        expect(rules[0]).toEqual({ type: StringRuleType.Min, value: 5, message: 'Minimum is 5' });
+        expect(rules[0]).toEqual({
+          type: StringRuleType.Min,
+          value: 5,
+          message: 'Minimum is 5',
+        });
       });
 
       it('works correctly without a custom message', () => {
@@ -35,7 +43,11 @@ describe('StringSchema', () => {
         schema.max(10);
         const rules = schema._getRules();
         expect(rules).toHaveLength(1);
-        expect(rules[0]).toEqual({ type: StringRuleType.Max, value: 10, message: undefined });
+        expect(rules[0]).toEqual({
+          type: StringRuleType.Max,
+          value: 10,
+          message: undefined,
+        });
       });
 
       it('stores the optional custom message', () => {
@@ -43,7 +55,11 @@ describe('StringSchema', () => {
         schema.max(10, 'Maximum is 10');
         const rules = schema._getRules();
         expect(rules).toHaveLength(1);
-        expect(rules[0]).toEqual({ type: StringRuleType.Max, value: 10, message: 'Maximum is 10' });
+        expect(rules[0]).toEqual({
+          type: StringRuleType.Max,
+          value: 10,
+          message: 'Maximum is 10',
+        });
       });
 
       it('works correctly without a custom message', () => {
@@ -60,7 +76,11 @@ describe('StringSchema', () => {
         schema.allowedValues([1, 2]);
         const rules = schema._getRules();
         expect(rules).toHaveLength(1);
-        expect(rules[0]).toEqual({ type: StringRuleType.AllowedValues, value: [1, 2], message: undefined });
+        expect(rules[0]).toEqual({
+          type: StringRuleType.AllowedValues,
+          value: [1, 2],
+          message: undefined,
+        });
       });
 
       it('stores the optional custom message', () => {
@@ -68,7 +88,11 @@ describe('StringSchema', () => {
         schema.allowedValues([1, 2], 'Must be 1 or 2');
         const rules = schema._getRules();
         expect(rules).toHaveLength(1);
-        expect(rules[0]).toEqual({ type: StringRuleType.AllowedValues, value: [1, 2], message: 'Must be 1 or 2' });
+        expect(rules[0]).toEqual({
+          type: StringRuleType.AllowedValues,
+          value: [1, 2],
+          message: 'Must be 1 or 2',
+        });
       });
 
       it('works correctly without a custom message', () => {
@@ -86,7 +110,11 @@ describe('StringSchema', () => {
         schema.regex(pattern);
         const rules = schema._getRules();
         expect(rules).toHaveLength(1);
-        expect(rules[0]).toEqual({ type: StringRuleType.Regex, value: pattern, message: undefined });
+        expect(rules[0]).toEqual({
+          type: StringRuleType.Regex,
+          value: pattern,
+          message: undefined,
+        });
       });
 
       it('stores the optional custom message', () => {
@@ -95,7 +123,11 @@ describe('StringSchema', () => {
         schema.regex(pattern, 'Must match test');
         const rules = schema._getRules();
         expect(rules).toHaveLength(1);
-        expect(rules[0]).toEqual({ type: StringRuleType.Regex, value: pattern, message: 'Must match test' });
+        expect(rules[0]).toEqual({
+          type: StringRuleType.Regex,
+          value: pattern,
+          message: 'Must match test',
+        });
       });
 
       it('works correctly without a custom message', () => {
@@ -112,7 +144,11 @@ describe('StringSchema', () => {
         schema.caseSensitive();
         const rules = schema._getRules();
         expect(rules).toHaveLength(1);
-        expect(rules[0]).toEqual({ type: StringRuleType.caseSensitive, value: true, message: undefined });
+        expect(rules[0]).toEqual({
+          type: StringRuleType.CaseSensitive,
+          value: true,
+          message: undefined,
+        });
       });
 
       it('works correctly (does not accept custom message)', () => {
@@ -136,12 +172,7 @@ describe('StringSchema', () => {
 
     it('supports chaining with all other methods', () => {
       const schema = new StringSchema();
-      schema
-        .min(1)
-        .max(10)
-        .allowedValues([1, 2])
-        .regex(/test/)
-        .caseSensitive();
+      schema.min(1).max(10).allowedValues([1, 2]).regex(/test/).caseSensitive();
 
       expect(schema._getRules()).toHaveLength(5);
     });
@@ -159,7 +190,7 @@ describe('StringSchema', () => {
       expect(rules[1].type).toBe(StringRuleType.Max);
       expect(rules[2].type).toBe(StringRuleType.AllowedValues);
       expect(rules[3].type).toBe(StringRuleType.Regex);
-      expect(rules[4].type).toBe(StringRuleType.caseSensitive);
+      expect(rules[4].type).toBe(StringRuleType.CaseSensitive);
     });
   });
 
@@ -174,19 +205,32 @@ describe('StringSchema', () => {
     it('preserves order for multiple calls to the same method', () => {
       const schema = new StringSchema().min(5).min(10);
       const rules = schema._getRules();
-      expect(rules[0]).toEqual({ type: StringRuleType.Min, value: 5, message: undefined });
-      expect(rules[1]).toEqual({ type: StringRuleType.Min, value: 10, message: undefined });
+      expect(rules[0]).toEqual({
+        type: StringRuleType.Min,
+        value: 5,
+        message: undefined,
+      });
+      expect(rules[1]).toEqual({
+        type: StringRuleType.Min,
+        value: 10,
+        message: undefined,
+      });
     });
 
     it('preserves insertion order for different rule types', () => {
-      const schema = new StringSchema().caseSensitive().regex(/a/).allowedValues([1]).max(2).min(1);
+      const schema = new StringSchema()
+        .caseSensitive()
+        .regex(/a/)
+        .allowedValues([1])
+        .max(2)
+        .min(1);
       const rules = schema._getRules();
-      expect(rules.map(r => r.type)).toEqual([
-        StringRuleType.caseSensitive,
+      expect(rules.map((r) => r.type)).toEqual([
+        StringRuleType.CaseSensitive,
         StringRuleType.Regex,
         StringRuleType.AllowedValues,
         StringRuleType.Max,
-        StringRuleType.Min
+        StringRuleType.Min,
       ]);
     });
   });
@@ -241,7 +285,9 @@ describe('StringSchema', () => {
       });
 
       it('handles large values correctly', () => {
-        const schema = new StringSchema().min(Number.MAX_SAFE_INTEGER).max(Number.MAX_VALUE);
+        const schema = new StringSchema()
+          .min(Number.MAX_SAFE_INTEGER)
+          .max(Number.MAX_VALUE);
         const rules = schema._getRules();
         expect(rules[0].value).toBe(Number.MAX_SAFE_INTEGER);
         expect(rules[1].value).toBe(Number.MAX_VALUE);
@@ -337,11 +383,11 @@ describe('StringSchema', () => {
           .regex(/a/)
           .caseSensitive()
           .allowedValues([1]);
-        
+
         const rules = schema._getRules();
         expect(rules).toHaveLength(3);
         expect(rules[0].type).toBe(StringRuleType.Regex);
-        expect(rules[1].type).toBe(StringRuleType.caseSensitive);
+        expect(rules[1].type).toBe(StringRuleType.CaseSensitive);
         expect(rules[2].type).toBe(StringRuleType.AllowedValues);
       });
 
@@ -350,11 +396,11 @@ describe('StringSchema', () => {
           .caseSensitive()
           .min(1)
           .caseSensitive();
-        
+
         const rules = schema._getRules();
-        expect(rules[0].type).toBe(StringRuleType.caseSensitive);
+        expect(rules[0].type).toBe(StringRuleType.CaseSensitive);
         expect(rules[1].type).toBe(StringRuleType.Min);
-        expect(rules[2].type).toBe(StringRuleType.caseSensitive);
+        expect(rules[2].type).toBe(StringRuleType.CaseSensitive);
       });
     });
   });
@@ -364,7 +410,7 @@ describe('StringSchema', () => {
       const originalArray = [1, 2, 3];
       const arrayCopy = [...originalArray];
       const schema = new StringSchema().allowedValues(originalArray);
-      
+
       expect(originalArray).toEqual(arrayCopy);
       expect(schema._getRules()[0].value).toBe(originalArray);
     });
@@ -373,7 +419,7 @@ describe('StringSchema', () => {
       const pattern = /test/g;
       const lastIndex = pattern.lastIndex;
       const schema = new StringSchema().regex(pattern);
-      
+
       expect(pattern.lastIndex).toBe(lastIndex);
       expect(schema._getRules()[0].value).toBe(pattern);
     });
@@ -381,10 +427,10 @@ describe('StringSchema', () => {
     it('previously registered rules remain unchanged after adding more rules', () => {
       const schema = new StringSchema().min(5);
       const rulesFirstSnapshot = [...schema._getRules()];
-      
+
       schema.max(10).caseSensitive();
       const rulesSecondSnapshot = schema._getRules();
-      
+
       expect(rulesSecondSnapshot[0]).toEqual(rulesFirstSnapshot[0]);
       expect(rulesSecondSnapshot[0]).toBe(rulesFirstSnapshot[0]);
     });
@@ -398,18 +444,18 @@ describe('StringSchema', () => {
         .allowedValues([3])
         .regex(/a/)
         .caseSensitive();
-      
+
       expect(schema._getRules()).toHaveLength(5);
     });
 
     it('Rule objects have the expected shape', () => {
       const schema = new StringSchema().min(5, 'msg');
       const rule = schema._getRules()[0];
-      
+
       expect(rule).toHaveProperty('type');
       expect(rule).toHaveProperty('value');
       expect(rule).toHaveProperty('message');
-      
+
       const keys = Object.keys(rule);
       expect(keys.includes('type')).toBe(true);
       expect(keys.includes('value')).toBe(true);
@@ -424,7 +470,7 @@ describe('StringSchema', () => {
         .regex(pattern)
         .allowedValues([4])
         .caseSensitive();
-        
+
       const rules = schema._getRules();
       expect(rules[0].value).toBe(1);
       expect(rules[1].value).toBe(2);
@@ -439,8 +485,8 @@ describe('StringSchema', () => {
         .max(2, 'max msg')
         .regex(/a/, 'regex msg')
         .allowedValues([4], 'allowed msg')
-        .caseSensitive(); 
-        
+        .caseSensitive();
+
       const rules = schema._getRules();
       expect(rules[0].message).toBe('min msg');
       expect(rules[1].message).toBe('max msg');
@@ -456,13 +502,13 @@ describe('StringSchema', () => {
         .regex(/a/)
         .allowedValues([4])
         .caseSensitive();
-        
+
       const rules = schema._getRules();
       expect(rules[0].type).toBe(StringRuleType.Min);
       expect(rules[1].type).toBe(StringRuleType.Max);
       expect(rules[2].type).toBe(StringRuleType.Regex);
       expect(rules[3].type).toBe(StringRuleType.AllowedValues);
-      expect(rules[4].type).toBe(StringRuleType.caseSensitive);
+      expect(rules[4].type).toBe(StringRuleType.CaseSensitive);
     });
   });
 
@@ -471,7 +517,7 @@ describe('StringSchema', () => {
       const schema = new StringSchema();
       schema.min(1).min(2);
       const rules = schema._getRules();
-      
+
       expect(rules).toHaveLength(2);
       expect(rules[0].value).toBe(1);
       expect(rules[1].value).toBe(2);
@@ -480,7 +526,7 @@ describe('StringSchema', () => {
     it('incorrect rule order does not occur', () => {
       const schema = new StringSchema().max(10).min(5);
       const rules = schema._getRules();
-      
+
       expect(rules[0].type).toBe(StringRuleType.Max);
       expect(rules[1].type).toBe(StringRuleType.Min);
     });
@@ -488,9 +534,9 @@ describe('StringSchema', () => {
     it('incorrect message assignment does not occur', () => {
       const schema = new StringSchema().min(5, 'has message').max(10);
       const rules = schema._getRules();
-      
+
       expect(rules[0].message).toBe('has message');
-      expect(rules[1].message).toBeUndefined(); 
+      expect(rules[1].message).toBeUndefined();
     });
 
     it('incorrect rule type does not occur', () => {
@@ -500,24 +546,24 @@ describe('StringSchema', () => {
         .regex(/a/)
         .allowedValues([1])
         .caseSensitive();
-        
-      const ruleTypes = schema._getRules().map(r => r.type);
-      
+
+      const ruleTypes = schema._getRules().map((r) => r.type);
+
       const expectedTypes = [
         StringRuleType.Min,
         StringRuleType.Max,
         StringRuleType.Regex,
         StringRuleType.AllowedValues,
-        StringRuleType.caseSensitive
+        StringRuleType.CaseSensitive,
       ];
-      
+
       expect(ruleTypes).toEqual(expectedTypes);
     });
 
     it('accidental mutation of stored values does not leak across instances', () => {
       const schema1 = new StringSchema().min(1);
       const schema2 = new StringSchema().min(2);
-      
+
       expect(schema1._getRules()[0].value).toBe(1);
       expect(schema2._getRules()[0].value).toBe(2);
     });
