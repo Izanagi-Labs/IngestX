@@ -3,14 +3,26 @@ import { CommonSchema } from './CommonSchema';
 
 export class NumberSchema extends CommonSchema<number, NumberSchemaRule> {
   min(value: number, message?: string): this {
-    return this.addRule(NumberRuleType.Min, value, message);
+    return this.addRule({
+      type: NumberRuleType.Min,
+      value,
+      message,
+    });
   }
 
   max(value: number, message?: string): this {
-    return this.addRule(NumberRuleType.Max, value, message);
+    return this.addRule({
+      type: NumberRuleType.Max,
+      value,
+      message,
+    });
   }
 
   allowedValues(values: readonly number[], message?: string): this {
-    return this.addRule(NumberRuleType.AllowedValues, values, message);
+    return this.addRule({
+      type: NumberRuleType.AllowedValues,
+      value: values,
+      message,
+    });
   }
 }
