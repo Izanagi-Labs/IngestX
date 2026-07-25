@@ -10,7 +10,11 @@ describe('BooleanSchema', () => {
         schema.truthy(['yes', '1']);
         const rules = schema._getRules();
         expect(rules).toHaveLength(1);
-        expect(rules[0]).toEqual({ type: BooleanRuleType.Truthy, value: ['yes', '1'], message: undefined });
+        expect(rules[0]).toEqual({
+          type: BooleanRuleType.Truthy,
+          value: ['yes', '1'],
+          message: undefined,
+        });
       });
 
       it('stores the optional custom message', () => {
@@ -18,7 +22,11 @@ describe('BooleanSchema', () => {
         schema.truthy(['yes'], 'Must be truthy');
         const rules = schema._getRules();
         expect(rules).toHaveLength(1);
-        expect(rules[0]).toEqual({ type: BooleanRuleType.Truthy, value: ['yes'], message: 'Must be truthy' });
+        expect(rules[0]).toEqual({
+          type: BooleanRuleType.Truthy,
+          value: ['yes'],
+          message: 'Must be truthy',
+        });
       });
 
       it('works correctly without a custom message', () => {
@@ -35,7 +43,11 @@ describe('BooleanSchema', () => {
         schema.falsy(['no', '0']);
         const rules = schema._getRules();
         expect(rules).toHaveLength(1);
-        expect(rules[0]).toEqual({ type: BooleanRuleType.Falsy, value: ['no', '0'], message: undefined });
+        expect(rules[0]).toEqual({
+          type: BooleanRuleType.Falsy,
+          value: ['no', '0'],
+          message: undefined,
+        });
       });
 
       it('stores the optional custom message', () => {
@@ -43,7 +55,11 @@ describe('BooleanSchema', () => {
         schema.falsy(['no'], 'Must be falsy');
         const rules = schema._getRules();
         expect(rules).toHaveLength(1);
-        expect(rules[0]).toEqual({ type: BooleanRuleType.Falsy, value: ['no'], message: 'Must be falsy' });
+        expect(rules[0]).toEqual({
+          type: BooleanRuleType.Falsy,
+          value: ['no'],
+          message: 'Must be falsy',
+        });
       });
 
       it('works correctly without a custom message', () => {
@@ -60,7 +76,11 @@ describe('BooleanSchema', () => {
         schema.caseSensitive();
         const rules = schema._getRules();
         expect(rules).toHaveLength(1);
-        expect(rules[0]).toEqual({ type: BooleanRuleType.caseSensitive, value: true, message: undefined });
+        expect(rules[0]).toEqual({
+          type: BooleanRuleType.CaseSensitive,
+          value: true,
+          message: undefined,
+        });
       });
 
       it('works correctly (does not accept custom message)', () => {
@@ -97,7 +117,7 @@ describe('BooleanSchema', () => {
 
       const rules = schema._getRules();
       expect(rules[0].type).toBe(BooleanRuleType.Truthy);
-      expect(rules[1].type).toBe(BooleanRuleType.caseSensitive);
+      expect(rules[1].type).toBe(BooleanRuleType.CaseSensitive);
       expect(rules[2].type).toBe(BooleanRuleType.Falsy);
     });
   });
@@ -113,15 +133,26 @@ describe('BooleanSchema', () => {
     it('preserves order for multiple calls to the same method', () => {
       const schema = new BooleanSchema().truthy(['yes']).truthy(['1']);
       const rules = schema._getRules();
-      expect(rules[0]).toEqual({ type: BooleanRuleType.Truthy, value: ['yes'], message: undefined });
-      expect(rules[1]).toEqual({ type: BooleanRuleType.Truthy, value: ['1'], message: undefined });
+      expect(rules[0]).toEqual({
+        type: BooleanRuleType.Truthy,
+        value: ['yes'],
+        message: undefined,
+      });
+      expect(rules[1]).toEqual({
+        type: BooleanRuleType.Truthy,
+        value: ['1'],
+        message: undefined,
+      });
     });
 
     it('preserves insertion order for different rule types', () => {
-      const schema = new BooleanSchema().caseSensitive().falsy(['no']).truthy(['yes']);
+      const schema = new BooleanSchema()
+        .caseSensitive()
+        .falsy(['no'])
+        .truthy(['yes']);
       const rules = schema._getRules();
-      expect(rules.map(r => r.type)).toEqual([
-        BooleanRuleType.caseSensitive,
+      expect(rules.map((r) => r.type)).toEqual([
+        BooleanRuleType.CaseSensitive,
         BooleanRuleType.Falsy,
         BooleanRuleType.Truthy,
       ]);
@@ -250,11 +281,11 @@ describe('BooleanSchema', () => {
           .truthy(['yes'])
           .caseSensitive()
           .falsy(['no']);
-        
+
         const rules = schema._getRules();
         expect(rules).toHaveLength(3);
         expect(rules[0].type).toBe(BooleanRuleType.Truthy);
-        expect(rules[1].type).toBe(BooleanRuleType.caseSensitive);
+        expect(rules[1].type).toBe(BooleanRuleType.CaseSensitive);
         expect(rules[2].type).toBe(BooleanRuleType.Falsy);
       });
 
@@ -263,11 +294,11 @@ describe('BooleanSchema', () => {
           .caseSensitive()
           .truthy(['yes'])
           .caseSensitive();
-        
+
         const rules = schema._getRules();
-        expect(rules[0].type).toBe(BooleanRuleType.caseSensitive);
+        expect(rules[0].type).toBe(BooleanRuleType.CaseSensitive);
         expect(rules[1].type).toBe(BooleanRuleType.Truthy);
-        expect(rules[2].type).toBe(BooleanRuleType.caseSensitive);
+        expect(rules[2].type).toBe(BooleanRuleType.CaseSensitive);
       });
     });
   });
@@ -277,7 +308,7 @@ describe('BooleanSchema', () => {
       const originalArray = ['yes', '1'];
       const arrayCopy = [...originalArray];
       const schema = new BooleanSchema().truthy(originalArray);
-      
+
       expect(originalArray).toEqual(arrayCopy);
       expect(schema._getRules()[0].value).toBe(originalArray);
     });
@@ -286,7 +317,7 @@ describe('BooleanSchema', () => {
       const originalArray = ['no', '0'];
       const arrayCopy = [...originalArray];
       const schema = new BooleanSchema().falsy(originalArray);
-      
+
       expect(originalArray).toEqual(arrayCopy);
       expect(schema._getRules()[0].value).toBe(originalArray);
     });
@@ -294,10 +325,10 @@ describe('BooleanSchema', () => {
     it('previously registered rules remain unchanged after adding more rules', () => {
       const schema = new BooleanSchema().truthy(['yes']);
       const rulesFirstSnapshot = [...schema._getRules()];
-      
+
       schema.falsy(['no']).caseSensitive();
       const rulesSecondSnapshot = schema._getRules();
-      
+
       expect(rulesSecondSnapshot[0]).toEqual(rulesFirstSnapshot[0]);
       expect(rulesSecondSnapshot[0]).toBe(rulesFirstSnapshot[0]);
     });
@@ -309,18 +340,18 @@ describe('BooleanSchema', () => {
         .truthy(['yes'])
         .falsy(['no'])
         .caseSensitive();
-      
+
       expect(schema._getRules()).toHaveLength(3);
     });
 
     it('Rule objects have the expected shape', () => {
       const schema = new BooleanSchema().truthy(['yes'], 'msg');
       const rule = schema._getRules()[0];
-      
+
       expect(rule).toHaveProperty('type');
       expect(rule).toHaveProperty('value');
       expect(rule).toHaveProperty('message');
-      
+
       const keys = Object.keys(rule);
       expect(keys.includes('type')).toBe(true);
       expect(keys.includes('value')).toBe(true);
@@ -332,7 +363,7 @@ describe('BooleanSchema', () => {
         .truthy(['yes'])
         .falsy(['no'])
         .caseSensitive();
-        
+
       const rules = schema._getRules();
       expect(rules[0].value).toEqual(['yes']);
       expect(rules[1].value).toEqual(['no']);
@@ -343,8 +374,8 @@ describe('BooleanSchema', () => {
       const schema = new BooleanSchema()
         .truthy(['yes'], 'truthy msg')
         .falsy(['no'], 'falsy msg')
-        .caseSensitive(); 
-        
+        .caseSensitive();
+
       const rules = schema._getRules();
       expect(rules[0].message).toBe('truthy msg');
       expect(rules[1].message).toBe('falsy msg');
@@ -356,11 +387,11 @@ describe('BooleanSchema', () => {
         .truthy(['yes'])
         .falsy(['no'])
         .caseSensitive();
-        
+
       const rules = schema._getRules();
       expect(rules[0].type).toBe(BooleanRuleType.Truthy);
       expect(rules[1].type).toBe(BooleanRuleType.Falsy);
-      expect(rules[2].type).toBe(BooleanRuleType.caseSensitive);
+      expect(rules[2].type).toBe(BooleanRuleType.CaseSensitive);
     });
   });
 
@@ -369,7 +400,7 @@ describe('BooleanSchema', () => {
       const schema = new BooleanSchema();
       schema.truthy(['yes']).truthy(['1']);
       const rules = schema._getRules();
-      
+
       expect(rules).toHaveLength(2);
       expect(rules[0].value).toEqual(['yes']);
       expect(rules[1].value).toEqual(['1']);
@@ -378,17 +409,19 @@ describe('BooleanSchema', () => {
     it('incorrect rule order does not occur', () => {
       const schema = new BooleanSchema().falsy(['no']).truthy(['yes']);
       const rules = schema._getRules();
-      
+
       expect(rules[0].type).toBe(BooleanRuleType.Falsy);
       expect(rules[1].type).toBe(BooleanRuleType.Truthy);
     });
 
     it('incorrect message assignment does not occur', () => {
-      const schema = new BooleanSchema().truthy(['yes'], 'has message').falsy(['no']);
+      const schema = new BooleanSchema()
+        .truthy(['yes'], 'has message')
+        .falsy(['no']);
       const rules = schema._getRules();
-      
+
       expect(rules[0].message).toBe('has message');
-      expect(rules[1].message).toBeUndefined(); 
+      expect(rules[1].message).toBeUndefined();
     });
 
     it('incorrect rule type does not occur', () => {
@@ -396,35 +429,33 @@ describe('BooleanSchema', () => {
         .truthy(['yes'])
         .falsy(['no'])
         .caseSensitive();
-        
-      const ruleTypes = schema._getRules().map(r => r.type);
-      
+
+      const ruleTypes = schema._getRules().map((r) => r.type);
+
       const expectedTypes = [
         BooleanRuleType.Truthy,
         BooleanRuleType.Falsy,
-        BooleanRuleType.caseSensitive
+        BooleanRuleType.CaseSensitive,
       ];
-      
+
       expect(ruleTypes).toEqual(expectedTypes);
     });
 
     it('accidental mutation of stored arrays does not leak across instances', () => {
       const schema1 = new BooleanSchema().truthy(['yes']);
       const schema2 = new BooleanSchema().truthy(['1']);
-      
+
       expect(schema1._getRules()[0].value).toEqual(['yes']);
       expect(schema2._getRules()[0].value).toEqual(['1']);
     });
 
     it('accidental sharing of mutable references between rules does not occur incorrectly', () => {
       const sharedArray = ['yes', 'no'];
-      const schema = new BooleanSchema()
-        .truthy(sharedArray)
-        .falsy(sharedArray);
-        
+      const schema = new BooleanSchema().truthy(sharedArray).falsy(sharedArray);
+
       const rules = schema._getRules();
-      
-      // Both point to the same array reference, which is expected based on implementation, 
+
+      // Both point to the same array reference, which is expected based on implementation,
       // but ensure that they are treated as separate rules logically.
       expect(rules[0].value).toBe(sharedArray);
       expect(rules[1].value).toBe(sharedArray);

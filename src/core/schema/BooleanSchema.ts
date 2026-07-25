@@ -14,14 +14,25 @@ import { CommonSchema } from './CommonSchema';
 // will fail validation, meaning it will be a invalid row
 export class BooleanSchema extends CommonSchema<boolean, BooleanRuleType> {
   truthy(values: string[], message?: string): this {
-    return this.addRule(BooleanRuleType.Truthy, values, message);
+    return this.addRule({
+      type: BooleanRuleType.Truthy,
+      value: values,
+      message,
+    });
   }
 
   falsy(values: string[], message?: string): this {
-    return this.addRule(BooleanRuleType.Falsy, values, message);
+    return this.addRule({
+      type: BooleanRuleType.Falsy,
+      value: values,
+      message,
+    });
   }
 
   caseSensitive(): this {
-    return this.addRule(BooleanRuleType.caseSensitive, true);
+    return this.addRule({
+      type: BooleanRuleType.CaseSensitive,
+      value: true,
+    });
   }
 }
