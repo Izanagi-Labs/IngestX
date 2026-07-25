@@ -43,7 +43,6 @@ describe('CommonSchema', () => {
       expect(rules[0]).toStrictEqual({
         type: CommonRuleType.Optional,
         value: true,
-        message: undefined,
       });
     });
   });
@@ -60,7 +59,6 @@ describe('CommonSchema', () => {
       expect(rules[0]).toStrictEqual({
         type: CommonRuleType.Default,
         value: 'test_value',
-        message: undefined,
       });
 
       // Support for other primitives
@@ -74,19 +72,16 @@ describe('CommonSchema', () => {
       expect(rules[1]).toStrictEqual({
         type: CommonRuleType.Default,
         value: 42,
-        message: undefined,
       });
 
       expect(rules[2]).toStrictEqual({
         type: CommonRuleType.Default,
         value: true,
-        message: undefined,
       });
 
       expect(rules[3]).toStrictEqual({
         type: CommonRuleType.Default,
         value: null,
-        message: undefined,
       });
     });
   });
@@ -105,7 +100,6 @@ describe('CommonSchema', () => {
       expect(rules[0]).toStrictEqual({
         type: CommonRuleType.Transform,
         value: transformer,
-        message: undefined,
       });
     });
   });
@@ -129,13 +123,11 @@ describe('CommonSchema', () => {
       expect(rules[0]).toStrictEqual({
         type: CommonRuleType.Optional,
         value: true,
-        message: undefined,
       });
 
       expect(rules[1]).toStrictEqual({
         type: CommonRuleType.Default,
         value: 'default_val',
-        message: undefined,
       });
 
       expect(rules[2]).toStrictEqual({
@@ -147,7 +139,6 @@ describe('CommonSchema', () => {
       expect(rules[3]).toStrictEqual({
         type: CommonRuleType.Transform,
         value: transformer,
-        message: undefined,
       });
     });
   });
@@ -196,13 +187,11 @@ describe('CommonSchema', () => {
       expect(rules[0]).toStrictEqual({
         type: CommonRuleType.Transform,
         value: transform1,
-        message: undefined,
       });
 
       expect(rules[1]).toStrictEqual({
         type: CommonRuleType.Transform,
         value: transform2,
-        message: undefined,
       });
     });
   });
@@ -228,7 +217,6 @@ describe('CommonSchema', () => {
       expect(currentRules[1]).toStrictEqual({
         type: CommonRuleType.Optional,
         value: true,
-        message: undefined,
       });
     });
   });

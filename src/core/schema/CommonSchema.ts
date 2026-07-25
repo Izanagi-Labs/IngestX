@@ -5,18 +5,31 @@ export abstract class CommonSchema<TValue, TRuleType> extends BaseSchema<
   TRuleType | CommonRuleType
 > {
   custom(validator: (value: TValue) => boolean, message?: string): this {
-    return this.addRule(CommonRuleType.Custom, validator, message);
+    return this.addRule({
+      type: CommonRuleType.Custom,
+      value: validator,
+      message,
+    });
   }
 
   optional(): this {
-    return this.addRule(CommonRuleType.Optional, true);
+    return this.addRule({
+      type: CommonRuleType.Optional,
+      value: true,
+    });
   }
 
   default(value: TValue): this {
-    return this.addRule(CommonRuleType.Default, value);
+    return this.addRule({
+      type: CommonRuleType.Default,
+      value,
+    });
   }
 
   transform(transform: (value: TValue) => TValue): this {
-    return this.addRule(CommonRuleType.Transform, transform);
+    return this.addRule({
+      type: CommonRuleType.Transform,
+      value: transform,
+    });
   }
 }
