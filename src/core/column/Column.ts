@@ -1,14 +1,15 @@
 import { BaseSchema } from '../schema/BaseSchema';
 import { ColumnConfig } from '../types/Column';
+import { RuleType } from '../types/RuleType';
 
-export class Column<TValue> {
+export class Column {
   readonly key: string;
   readonly name: string;
-  readonly schema: BaseSchema<TValue>;
+  readonly schema: BaseSchema<RuleType>;
   readonly duplicatesAllowed: boolean;
   readonly matchHeader?: (header: string) => boolean;
 
-  constructor(config: ColumnConfig<TValue>) {
+  constructor(config: ColumnConfig) {
     this.key = config.key;
     this.name = config.name;
     this.schema = config.schema;
