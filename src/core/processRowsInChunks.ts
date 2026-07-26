@@ -33,7 +33,6 @@ export async function processRowsInChunks({
       await wait(100);
     }
 
-    // Break if cancelled inside pause loop
     if (ingestionController.isCancelled) {
       break;
     }
