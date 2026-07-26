@@ -1,6 +1,6 @@
 {
   "name": "@parallelbytes/ingestx",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "High performance CSV and Excel ingestion library for React and Node.js",
   "type": "module",
   "main": "./dist/index.cjs",
