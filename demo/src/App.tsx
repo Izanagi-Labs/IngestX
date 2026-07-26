@@ -1,5 +1,20 @@
 import { useState } from 'react';
-import { Box, Container, Typography, CssBaseline, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton, useMediaQuery, useTheme } from '@mui/material';
+import { Analytics } from '@vercel/analytics/react';
+import {
+  Box,
+  Container,
+  Typography,
+  CssBaseline,
+  Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  IconButton,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useIngestion } from '@parallelbytes/ingestx/react';
 import type { ColumnConfig } from '@parallelbytes/ingestx';
@@ -14,17 +29,45 @@ import type { DemoConfig } from './types';
 
 // Dummy column configs for the demo
 const initialColumnConfigs: ColumnConfig[] = [
-  { key: 'id', displayNames: ['id', 'user_id', 'ID'], type: 'number', validationRequired: true },
-  { key: 'name', displayNames: ['name', 'full name', 'Name'], type: 'string', validationRequired: true },
-  { key: 'email', displayNames: ['email', 'email address', 'Email'], type: 'string', validationRequired: true },
-  { key: 'department', displayNames: ['department', 'dept', 'Department'], type: 'string', validationRequired: false },
-  { key: 'status', displayNames: ['status', 'Status'], type: 'string', validationRequired: false },
+  {
+    key: 'id',
+    displayNames: ['id', 'user_id', 'ID'],
+    type: 'number',
+    validationRequired: true,
+  },
+  {
+    key: 'name',
+    displayNames: ['name', 'full name', 'Name'],
+    type: 'string',
+    validationRequired: true,
+  },
+  {
+    key: 'email',
+    displayNames: ['email', 'email address', 'Email'],
+    type: 'string',
+    validationRequired: true,
+  },
+  {
+    key: 'department',
+    displayNames: ['department', 'dept', 'Department'],
+    type: 'string',
+    validationRequired: false,
+  },
+  {
+    key: 'status',
+    displayNames: ['status', 'Status'],
+    type: 'string',
+    validationRequired: false,
+  },
 ];
 
 export default function App() {
   const [file, setFile] = useState<File | null>(null);
   const [asyncProcessing, setAsyncProcessing] = useState(false);
-  const [headersMismatch, setHeadersMismatch] = useState<{ headersRequired: string[]; headersSent: string[] } | null>(null);
+  const [headersMismatch, setHeadersMismatch] = useState<{
+    headersRequired: string[];
+    headersSent: string[];
+  } | null>(null);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -49,7 +92,7 @@ export default function App() {
     startIngestion,
     pause,
     resume,
-    cancel
+    cancel,
   } = useIngestion({
     columnConfigs: ingestionConfig.columnConfigs,
     chunkSize: ingestionConfig.chunkSize,
@@ -57,8 +100,8 @@ export default function App() {
       trimValues: ingestionConfig.options.trimValues,
       trimHeaders: ingestionConfig.options.trimHeaders,
       caseInsensitiveHeaders: ingestionConfig.options.caseInsensitiveHeaders,
-      shouldAccumulateResult: ingestionConfig.options.shouldAccumulateResult
-    }
+      shouldAccumulateResult: ingestionConfig.options.shouldAccumulateResult,
+    },
   });
 
   const handleFileDrop = (droppedFile: File) => {
@@ -78,6 +121,7 @@ export default function App() {
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f4f6f8' }}>
       <CssBaseline />
+      <Analytics />
 
       <ConfigurationSidebar
         config={ingestionConfig}
@@ -89,16 +133,44 @@ export default function App() {
 
       <Box sx={{ flexGrow: 1, height: '100vh', overflowY: 'auto', pb: 8 }}>
         {/* Header */}
-        <Paper elevation={0} sx={{ p: 2, mb: 4, borderRadius: 0, borderBottom: '1px solid #e0e0e0' }}>
-          <Container maxWidth="lg" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 40 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2,
+            mb: 4,
+            borderRadius: 0,
+            borderBottom: '1px solid #e0e0e0',
+          }}
+        >
+          <Container
+            maxWidth="lg"
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              minHeight: 40,
+            }}
+          >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               {!sidebarOpen && (
-                <IconButton edge="start" color="inherit" aria-label="menu" onClick={() => setSidebarOpen(true)} sx={{ mr: 1 }}>
+                <IconButton
+                  edge="start"
+                  color="inherit"
+                  aria-label="menu"
+                  onClick={() => setSidebarOpen(true)}
+                  sx={{ mr: 1 }}
+                >
                   <MenuIcon />
                 </IconButton>
               )}
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>IngestX</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ border: '1px solid #ccc', borderRadius: 4, px: 1 }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                IngestX
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ border: '1px solid #ccc', borderRadius: 4, px: 1 }}
+              >
                 CSV & Excel Processing Engine
               </Typography>
             </Box>
@@ -111,11 +183,15 @@ export default function App() {
               Ingest Massive CSV & Excel Files Without Losing Control
             </Typography>
             <Typography variant="h6" color="text.secondary">
-              Validate, transform, pause, resume, and process datasets with granular control.
+              Validate, transform, pause, resume, and process datasets with
+              granular control.
             </Typography>
           </Box>
 
-          <Paper elevation={0} sx={{ p: 4, borderRadius: 2, border: '1px solid #e0e0e0', mb: 4 }}>
+          <Paper
+            elevation={0}
+            sx={{ p: 4, borderRadius: 2, border: '1px solid #e0e0e0', mb: 4 }}
+          >
             <UploadSection onFileDrop={handleFileDrop} selectedFile={file} />
 
             <Box sx={{ mt: 4, pt: 4, borderTop: '1px solid #e0e0e0' }}>
@@ -161,33 +237,73 @@ export default function App() {
           )}
 
           {/* Headers Mismatch Modal */}
-          <Dialog open={!!headersMismatch} onClose={() => setHeadersMismatch(null)} maxWidth="sm" fullWidth>
-            <DialogTitle sx={{ color: 'error.main', fontWeight: 'bold' }}>Headers Mismatch</DialogTitle>
+          <Dialog
+            open={!!headersMismatch}
+            onClose={() => setHeadersMismatch(null)}
+            maxWidth="sm"
+            fullWidth
+          >
+            <DialogTitle sx={{ color: 'error.main', fontWeight: 'bold' }}>
+              Headers Mismatch
+            </DialogTitle>
             <DialogContent dividers>
               <Typography gutterBottom>
-                The uploaded file is missing some required headers. Please check your file and try again.
+                The uploaded file is missing some required headers. Please check
+                your file and try again.
               </Typography>
 
-              <Typography variant="subtitle1" sx={{ mt: 2, fontWeight: 'bold' }}>Missing Required Headers:</Typography>
+              <Typography
+                variant="subtitle1"
+                sx={{ mt: 2, fontWeight: 'bold' }}
+              >
+                Missing Required Headers:
+              </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
                 {headersMismatch?.headersRequired.map((header) => (
-                  <Box key={header} sx={{ px: 2, py: 0.5, bgcolor: '#ffebee', color: '#c62828', borderRadius: 1, border: '1px solid #ef9a9a' }}>
+                  <Box
+                    key={header}
+                    sx={{
+                      px: 2,
+                      py: 0.5,
+                      bgcolor: '#ffebee',
+                      color: '#c62828',
+                      borderRadius: 1,
+                      border: '1px solid #ef9a9a',
+                    }}
+                  >
                     {header}
                   </Box>
                 ))}
               </Box>
 
-              <Typography variant="subtitle1" sx={{ mt: 3, fontWeight: 'bold' }}>Headers Found in File:</Typography>
+              <Typography
+                variant="subtitle1"
+                sx={{ mt: 3, fontWeight: 'bold' }}
+              >
+                Headers Found in File:
+              </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
                 {headersMismatch?.headersSent.map((header, idx) => (
-                  <Box key={idx} sx={{ px: 2, py: 0.5, bgcolor: '#f5f5f5', color: '#424242', borderRadius: 1, border: '1px solid #e0e0e0' }}>
+                  <Box
+                    key={idx}
+                    sx={{
+                      px: 2,
+                      py: 0.5,
+                      bgcolor: '#f5f5f5',
+                      color: '#424242',
+                      borderRadius: 1,
+                      border: '1px solid #e0e0e0',
+                    }}
+                  >
                     {header}
                   </Box>
                 ))}
               </Box>
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => setHeadersMismatch(null)} color="inherit">Close</Button>
+              <Button onClick={() => setHeadersMismatch(null)} color="inherit">
+                Close
+              </Button>
             </DialogActions>
           </Dialog>
         </Container>
