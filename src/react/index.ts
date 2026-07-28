@@ -8,7 +8,7 @@ import {
 } from '../types';
 import { processRowsInChunks } from '../core/processRowsInChunks';
 import { normalizeHeaders } from '../core/normalizeHeaders';
-import { parseCsvToRows, parseExcelToRows } from '../adapters';
+import { parseCsvToRows, parseExcelToRows } from '../core/parser';
 
 type UseIngestionOptions = {
   columnConfigs: ColumnConfig[];

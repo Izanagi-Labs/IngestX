@@ -1,11 +1,16 @@
-import { ColumnConfig, FinalOutput, IngestionController, IngestionOptions } from "../types";
-import { processRowsInChunks } from "../core/processRowsInChunks";
-import { normalizeHeaders } from "../core/normalizeHeaders";
-import { parseCsvToRows, parseExcelToRows } from "../adapters";
+import {
+  ColumnConfig,
+  FinalOutput,
+  IngestionController,
+  IngestionOptions,
+} from '../types';
+import { processRowsInChunks } from '../core/processRowsInChunks';
+import { normalizeHeaders } from '../core/normalizeHeaders';
+import { parseCsvToRows, parseExcelToRows } from '../core/parser';
 
 type NodeIngestionOptions = {
   fileContent: string | any;
-  fileType?: "csv" | "xlsx" | "xls";
+  fileType?: 'csv' | 'xlsx' | 'xls';
   columnConfigs: ColumnConfig[];
   chunkSize?: number;
   onChunkProcessed?: (result: FinalOutput) => Promise<void>;
@@ -18,41 +23,49 @@ type NodeIngestionOptions = {
  */
 export async function ingestFileNode({
   fileContent,
-  fileType = "csv",
+  fileType = 'csv',
   columnConfigs,
   chunkSize = 500,
-  onChunkProcessed = async () => { },
+  onChunkProcessed = async () => {},
   ingestionController = { isPaused: false, isCancelled: false },
   options,
-}: NodeIngestionOptions): Promise<FinalOutput | { error: string; headersMismatch?: any }> {
+}: NodeIngestionOptions): Promise<
+  FinalOutput | { error: string; headersMismatch?: any }
+> {
   try {
     // 1. Parse File
     let parsedRows: Record<string, any>[] = [];
-    if (fileType === "csv") {
+    if (fileType === 'csv') {
       parsedRows = await parseCsvToRows(fileContent);
-    } else if (fileType === "xlsx" || fileType === "xls") {
+    } else if (fileType === 'xlsx' || fileType === 'xls') {
       parsedRows = await parseExcelToRows(fileContent);
     } else {
-      return { error: "Unsupported file type specified." };
+      return { error: 'Unsupported file type specified.' };
     }
 
     if (parsedRows.length === 0) {
-      return { error: "No rows found or parsed successfully." };
+      return { error: 'No rows found or parsed successfully.' };
     }
 
     // 2. Validate Headers
     const sentHeaders = Object.keys(parsedRows[0] || {});
-    const { normalizedRows, headersMismatch } = normalizeHeaders(sentHeaders, columnConfigs, options);
+    const { normalizedRows, headersMismatch } = normalizeHeaders(
+      sentHeaders,
+      columnConfigs,
+      options,
+    );
 
     if (headersMismatch) {
       return {
-        error: "Headers mismatch",
-        headersMismatch
+        error: 'Headers mismatch',
+        headersMismatch,
       };
     }
 
     // 3. Normalize row keys
-    const rowsToProcess = normalizedRows ? normalizedRows(parsedRows) : parsedRows;
+    const rowsToProcess = normalizedRows
+      ? normalizedRows(parsedRows)
+      : parsedRows;
 
     // 4. Process in Chunks
     const finalOutput = await processRowsInChunks({
@@ -66,6 +79,8 @@ export async function ingestFileNode({
 
     return finalOutput;
   } catch (error: any) {
-    return { error: error.message || "Failed to process file in Node environment." };
+    return {
+      error: error.message || 'Failed to process file in Node environment.',
+    };
   }
 }
