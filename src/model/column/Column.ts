@@ -1,6 +1,6 @@
 import { BaseSchema } from '../schema/BaseSchema';
-import { ColumnConfig } from '../types/Column';
-import { RuleType } from '../types/RuleType';
+import { ColumnConfig } from './types';
+import { RuleType } from '../schema/types';
 
 export class Column {
   readonly key: string;

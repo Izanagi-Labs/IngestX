@@ -1,4 +1,4 @@
-import { NumberSchemaRule, NumberRuleType } from '../types/RuleType';
+import { NumberSchemaRule, NumberRuleType } from './types';
 import { CommonSchema } from './CommonSchema';
 
 export class NumberSchema extends CommonSchema<number, NumberSchemaRule> {

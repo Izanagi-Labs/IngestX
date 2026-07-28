@@ -1,4 +1,4 @@
-import { StringSchemaRule, StringRuleType } from '../types/RuleType';
+import { StringSchemaRule, StringRuleType } from './types';
 import { CommonSchema } from './CommonSchema';
 
 export class StringSchema extends CommonSchema<number, StringSchemaRule> {

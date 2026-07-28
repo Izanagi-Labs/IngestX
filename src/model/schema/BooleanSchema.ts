@@ -1,4 +1,4 @@
-import { BooleanRuleType } from '../types/RuleType';
+import { BooleanRuleType } from './types';
 import { CommonSchema } from './CommonSchema';
 
 // true and false (even upper or any case) are valid values in all cases
