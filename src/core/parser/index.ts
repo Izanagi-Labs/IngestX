@@ -1,2 +1,1 @@
-export { parseCsvToRows } from './csvParser';
-export { parseExcelToRows } from './excelParser';
+export { createParser } from './createParser';
