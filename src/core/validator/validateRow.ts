@@ -1,34 +1,48 @@
-import { ColumnConfig } from '../../model/column/types';
-import { RowValidationResult, ValidationContext } from './types';
+import type { RowValidationResult, ValidationContext } from './types';
 import { executeRules } from './executeRules';
+import { ColumnConfig } from '../../model';
 
-export function validateRow<TRow extends Record<string, unknown> = Record<string, unknown>>(
-  row: TRow,
+export interface ResolvedColumn {
+  header: string; // File/CSV/Excel header to read value from
+  column: ColumnConfig; // IngestX schema column
+}
+
+export function validateRow<
+  TRow extends Record<string, unknown> = Record<string, unknown>,
+>(
+  row: Record<string, unknown>,
   rowIndex: number,
-  columns: ColumnConfig[],
+  columns: readonly ResolvedColumn[],
 ): RowValidationResult<TRow> {
-  const context: ValidationContext = { rowIndex, row };
+  const context: ValidationContext = {
+    rowIndex,
+    row,
+  };
+
   const validatedData: Record<string, unknown> = {};
   const errors: RowValidationResult<TRow>['errors'] = {};
-  let isValid = true;
 
-  for (const column of columns) {
-    const rawValue = row[column.key] !== undefined ? row[column.key] : row[column.name];
+  let valid = true;
 
-    const rules = column.schema._getRules();
+  for (const resolvedColumn of columns) {
+    const { column, header } = resolvedColumn;
 
-    const fieldResult = executeRules(rawValue, rules, context);
-
-    if (!fieldResult.valid) {
-      isValid = false;
-      errors[column.key] = fieldResult.errors;
-    }
+    const fieldResult = executeRules(
+      row[header],
+      column.schema._getRules(),
+      context,
+    );
 
     validatedData[column.key] = fieldResult.value;
+
+    if (!fieldResult.valid) {
+      valid = false;
+      errors[column.key] = fieldResult.errors;
+    }
   }
 
   return {
-    valid: isValid,
+    valid,
     rowIndex,
     data: validatedData as TRow,
     errors,

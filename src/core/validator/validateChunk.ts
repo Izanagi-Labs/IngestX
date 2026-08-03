@@ -2,10 +2,17 @@ import { ColumnConfig } from '../../model/column/types';
 import { ChunkValidationResult, RowValidationResult } from './types';
 import { validateRow } from './validateRow';
 
-export function validateChunk<TRow extends Record<string, unknown> = Record<string, unknown>>(
+export interface ResolvedColumn {
+  header: string; // File/CSV/Excel header to read value from
+  column: ColumnConfig; // IngestX schema column
+}
+
+export function validateChunk<
+  TRow extends Record<string, unknown> = Record<string, unknown>,
+>(
   chunk: TRow[],
   startIndex: number,
-  columns: ColumnConfig[],
+  columns: ResolvedColumn[],
 ): ChunkValidationResult<TRow> {
   const validRows: RowValidationResult<TRow>[] = [];
   const invalidRows: RowValidationResult<TRow>[] = [];

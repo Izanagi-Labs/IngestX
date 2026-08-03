@@ -35,13 +35,6 @@ export function executeCommonRule(
       }
       break;
   }
-
-  // Handle required check if the value is empty
-  // We do this inside executeRules or common executor?
-  // Wait, if it's empty, and we process all rules sequentially, where does the 'Required' check belong?
-  // We can do it here for Optional type, but 'Optional' rule just marks it as optional.
-  // Actually, checking empty state should probably be handled by the orchestrator so it can short-circuit cleanly, OR we can handle it in the orchestrator before delegating to type-specific rules.
-  // The user prompt said: common.ts is responsible for: Optional, Default, Transform, Custom, Required/empty value handling.
 }
 
 export function handleEmptyValue({

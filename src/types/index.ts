@@ -1,30 +1,27 @@
 type TypeStringConfig = {
-  type: "string";
+  type: 'string';
   allowedValues?: string[];
   regex?: string;
-}
+};
 
 type TypeNumberConfig = {
-  type: "number";
+  type: 'number';
   min?: number;
   max?: number;
   allowedValues?: number[];
-}
+};
 
 type TypeBooleanConfig = {
-  type: "boolean";
+  type: 'boolean';
   trueValues?: string[];
   falseValues?: string[];
-}
+};
 
-type Transformer<T = any> = (
-  value: T,
-  row?: Record<string, any>
-) => T
+type Transformer<T = any> = (value: T, row?: Record<string, any>) => T;
 
 type Validator<T = any> = (
   value: T,
-  row?: Record<string, any>
+  row?: Record<string, any>,
 ) => [boolean, string?];
 
 type BaseColumnConfig = {
@@ -34,15 +31,14 @@ type BaseColumnConfig = {
   defaultValue?: string | number | boolean;
   isDuplicatesAllowed?: boolean;
   fallbackToDefaultValue?: boolean; // if true and value validation fails use default value
-  transform?: Transformer
+  transform?: Transformer;
   customValidation?: Validator; // if false record will be rejected
-}
+};
 
-export type ColumnConfig = 
+export type ColumnConfig =
   | (BaseColumnConfig & TypeStringConfig)
   | (BaseColumnConfig & TypeNumberConfig)
   | (BaseColumnConfig & TypeBooleanConfig);
-
 
 export type IngestionController = {
   isPaused: boolean;
@@ -66,12 +62,12 @@ export type ErrorsData = {
   rowWiseErrors: RowValidationError[];
 };
 
-export type FinalOutput = {
+export type FinalOutput<TRow = Record<string, any>> = {
   totalRows: number;
   validRowsCount: number;
   invalidRowsCount: number;
-  validRows: Record<string, any>[];
-  invalidRows: Record<string, any>[];
+  validRows: TRow[];
+  invalidRows: TRow[];
   errorsData: ErrorsData;
 };
 
@@ -82,11 +78,11 @@ export type IngestionOptions = {
   caseInsensitiveHeaders?: boolean;
 };
 
-export type ProcessRowsInChunksOptions = {
-  rows: Record<string, any>[];
+export type ProcessRowsInChunksOptions<TRow = Record<string, any>> = {
+  rows: TRow[];
   columnConfigs: ColumnConfig[];
   chunkSize: number;
-  onChunkProcessed: (result: FinalOutput) => Promise<void>;
+  onChunkProcessed: (result: FinalOutput<TRow>) => Promise<void>;
   ingestionController: IngestionController;
   options?: IngestionOptions;
 };

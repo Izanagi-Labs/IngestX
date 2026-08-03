@@ -11,7 +11,7 @@ import {
   RuleExecutionState,
   ValidationContext,
 } from './types';
-import { executeCommonRule, handleEmptyValue } from './executors/common';
+import { executeCommonRule } from './executors/common';
 import { executeStringRule } from './executors/string';
 import { executeNumberRule } from './executors/number';
 import { executeBooleanRule } from './executors/boolean';
@@ -25,64 +25,121 @@ export function executeRules(
     value,
     errors: [],
     stop: false,
+    caseSensitive: false,
   };
 
-  const isOptional = rules.some((r) => r.type === CommonRuleType.Optional);
-  let emptyChecked = false;
+  for (const rule of rules) {
+    if (
+      rule.type === StringRuleType.CaseSensitive ||
+      rule.type === BooleanRuleType.CaseSensitive
+    ) {
+      state.caseSensitive = rule.value as boolean;
+    }
+  }
+
+  // ------------------------------------
+  // Phase 1 - Default
+  // ------------------------------------
 
   for (const rule of rules) {
+    if (rule.type !== CommonRuleType.Default) {
+      continue;
+    }
+
+    executeCommonRule(rule, state, context);
+
     if (state.stop) {
       break;
     }
+  }
 
-    // Before executing any type-specific or custom rules, verify empty state
-    if (
-      !emptyChecked &&
-      rule.type !== CommonRuleType.Optional &&
-      rule.type !== CommonRuleType.Default &&
-      rule.type !== CommonRuleType.Transform
-    ) {
-      handleEmptyValue({ state, isOptional });
-      emptyChecked = true;
+  // ------------------------------------
+  // Phase 2 - Transform
+  // ------------------------------------
+
+  if (!state.stop) {
+    for (const rule of rules) {
+      if (rule.type !== CommonRuleType.Transform) {
+        continue;
+      }
+
+      executeCommonRule(rule, state, context);
 
       if (state.stop) {
         break;
       }
     }
+  }
 
-    switch (rule.type) {
-      case CommonRuleType.Optional:
-      case CommonRuleType.Default:
-      case CommonRuleType.Transform:
-      case CommonRuleType.Custom:
-        executeCommonRule(rule, state, context);
-        break;
+  // ------------------------------------
+  // Phase 3 - Optional
+  // ------------------------------------
 
-      case StringRuleType.Min:
-      case StringRuleType.Max:
-      case StringRuleType.Regex:
-      case StringRuleType.AllowedValues:
-      case StringRuleType.CaseSensitive:
-        executeStringRule(rule, state, context);
-        break;
+  if (!state.stop) {
+    for (const rule of rules) {
+      if (rule.type !== CommonRuleType.Optional) {
+        continue;
+      }
 
-      case NumberRuleType.Min:
-      case NumberRuleType.Max:
-      case NumberRuleType.AllowedValues:
-        executeNumberRule(rule, state, context);
-        break;
+      executeCommonRule(rule, state, context);
 
-      case BooleanRuleType.Truthy:
-      case BooleanRuleType.Falsy:
-      case BooleanRuleType.CaseSensitive:
-        executeBooleanRule(rule, state, context);
+      if (state.stop) {
         break;
+      }
     }
   }
 
-  // If there were only CommonRules (e.g. no type-specific rules) and we haven't checked empty yet
-  if (!emptyChecked) {
-    handleEmptyValue({ state, isOptional });
+  // ------------------------------------
+  // Phase 4 - Type Rules
+  // ------------------------------------
+
+  if (!state.stop) {
+    for (const rule of rules) {
+      switch (rule.type) {
+        // String
+        case StringRuleType.Min:
+        case StringRuleType.Max:
+        case StringRuleType.Regex:
+        case StringRuleType.AllowedValues:
+          executeStringRule(rule, state, context);
+          break;
+
+        // Number
+        case NumberRuleType.Min:
+        case NumberRuleType.Max:
+        case NumberRuleType.AllowedValues:
+          executeNumberRule(rule, state, context);
+          break;
+
+        // Boolean
+        case BooleanRuleType.Truthy:
+        case BooleanRuleType.Falsy:
+          executeBooleanRule(rule, state, context);
+          break;
+      }
+
+      if (state.stop) {
+        break;
+      }
+    }
+  }
+
+  // ------------------------------------
+  // Phase 5 - Custom
+  // ------------------------------------
+
+  if (!state.stop) {
+    for (const rule of rules) {
+      if (rule.type !== CommonRuleType.Custom) {
+        continue;
+      }
+
+      executeCommonRule(rule, state, context);
+
+      if (state.stop) {
+        break;
+      }
+    }
   }
 
   return {

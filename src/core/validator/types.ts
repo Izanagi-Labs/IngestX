@@ -5,6 +5,7 @@ export interface RuleExecutionState {
   value: unknown;
   errors: ValidationError<RuleType>[];
   stop: boolean;
+  caseSensitive?: boolean;
 }
 
 export interface ValidationContext {

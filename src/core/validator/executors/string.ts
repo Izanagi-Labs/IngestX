@@ -9,6 +9,7 @@ export function executeStringRule(
   _context: ValidationContext,
 ): void {
   const currentValue = state.value as string;
+  const isCaseSensitive = state.caseSensitive ?? false;
 
   switch (rule.type) {
     case StringRuleType.Min:
@@ -45,15 +46,23 @@ export function executeStringRule(
       break;
 
     case StringRuleType.AllowedValues:
-      if (Array.isArray(rule.value) && !rule.value.includes(currentValue)) {
-        state.errors.push(
-          createError(rule.type, rule.message || `Value not allowed`),
-        );
-      }
-      break;
+      if (Array.isArray(rule.value)) {
+        const matches = rule.value.some((allowedValue) => {
+          if (isCaseSensitive) {
+            return allowedValue === currentValue;
+          }
+          return (
+            typeof allowedValue === 'string' &&
+            allowedValue.toLowerCase() === currentValue.toLowerCase()
+          );
+        });
 
-    case StringRuleType.CaseSensitive:
-      // Handled in conjunction with other operations usually, or just skipped if not a direct validation.
+        if (!matches) {
+          state.errors.push(
+            createError(rule.type, rule.message || `Value not allowed`),
+          );
+        }
+      }
       break;
   }
 }
