@@ -2,7 +2,7 @@ import type { RowValidationResult, ValidationContext } from './types';
 import { executeRules } from './executeRules';
 import { ColumnConfig } from '../../model';
 
-export interface ResolvedColumn {
+interface ResolvedColumn {
   header: string; // File/CSV/Excel header to read value from
   column: ColumnConfig; // IngestX schema column
 }
