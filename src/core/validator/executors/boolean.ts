@@ -3,46 +3,46 @@ import {
   RuleType,
   BooleanRuleType,
 } from '../../../model/schema/types/RuleType';
-import { RuleExecutionState, ValidationContext } from '../types';
+import { RuleExecutionState } from '../types';
 import { createError } from '../utils';
 
 export function executeBooleanRule(
-  rule: Rule<RuleType>,
+  rules: readonly Rule<RuleType>[],
   state: RuleExecutionState,
-  _context: ValidationContext,
 ): void {
+  if (typeof state.value !== 'string') {
+    return;
+  }
+
   const currentValue = state.value;
   const isCaseSensitive = state.caseSensitive ?? false;
 
-  switch (rule.type) {
-    case BooleanRuleType.Truthy:
-      if (Array.isArray(rule.value) && typeof currentValue === 'string') {
-        const matches = rule.value.some((val) =>
-          isCaseSensitive
-            ? val === currentValue
-            : val.toLowerCase() === currentValue.toLowerCase(),
-        );
-        if (!matches) {
-          state.errors.push(
-            createError(rule.type, rule.message || `Value is not truthy`),
-          );
-        }
-      }
-      break;
+  const normalize = (value: string) =>
+    isCaseSensitive ? value : value.toLowerCase();
 
-    case BooleanRuleType.Falsy:
-      if (Array.isArray(rule.value) && typeof currentValue === 'string') {
-        const matches = rule.value.some((val) =>
-          isCaseSensitive
-            ? val === currentValue
-            : val.toLowerCase() === currentValue.toLowerCase(),
-        );
-        if (!matches) {
-          state.errors.push(
-            createError(rule.type, rule.message || `Value is not falsy`),
-          );
-        }
-      }
-      break;
+  const truthyRule = rules.find((r) => r.type === BooleanRuleType.Truthy);
+  const falsyRule = rules.find((r) => r.type === BooleanRuleType.Falsy);
+
+  const allowed = new Set<string>();
+
+  if (truthyRule && Array.isArray(truthyRule.value)) {
+    truthyRule.value.forEach((v) => allowed.add(normalize(v)));
+  } else {
+    allowed.add(normalize('true'));
+  }
+
+  if (falsyRule && Array.isArray(falsyRule.value)) {
+    falsyRule.value.forEach((v) => allowed.add(normalize(v)));
+  } else {
+    allowed.add(normalize('false'));
+  }
+
+  if (!allowed.has(normalize(currentValue))) {
+    state.errors.push(
+      createError(
+        BooleanRuleType.Truthy,
+        'Expected value to be a valid boolean',
+      ),
+    );
   }
 }
