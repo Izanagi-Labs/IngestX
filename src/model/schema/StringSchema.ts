@@ -26,10 +26,10 @@ export class StringSchema extends CommonSchema<number, StringSchemaRule> {
     });
   }
 
-  caseSensitive(): this {
+  caseSensitive(value: boolean = false): this {
     return this.addRule({
       type: StringRuleType.CaseSensitive,
-      value: true,
+      value,
     });
   }
 }

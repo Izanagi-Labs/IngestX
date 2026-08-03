@@ -29,10 +29,10 @@ export class BooleanSchema extends CommonSchema<boolean, BooleanRuleType> {
     });
   }
 
-  caseSensitive(): this {
+  caseSensitive(value: boolean = false): this {
     return this.addRule({
       type: BooleanRuleType.CaseSensitive,
-      value: true,
+      value,
     });
   }
 }
