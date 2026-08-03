@@ -110,17 +110,22 @@ export function executeRules(
         case NumberRuleType.AllowedValues:
           executeNumberRule(rule, state, context);
           break;
-
-        // Boolean
-        case BooleanRuleType.Truthy:
-        case BooleanRuleType.Falsy:
-          executeBooleanRule(rule, state, context);
-          break;
       }
 
       if (state.stop) {
         break;
       }
+    }
+
+    // Boolean
+    if (
+      rules.some(
+        (rule) =>
+          rule.type === BooleanRuleType.Truthy ||
+          rule.type === BooleanRuleType.Falsy,
+      )
+    ) {
+      executeBooleanRule(rules, state);
     }
   }
 
