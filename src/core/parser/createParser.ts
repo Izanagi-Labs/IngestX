@@ -1,5 +1,5 @@
-import { CSVParser } from './CsvParserClass';
-import { ExcelParser } from './ExcelParserClass';
+import { CSVParser } from './CsvParser';
+import { ExcelParser } from './ExcelParser';
 
 export function createParser(file: File, worker?: boolean) {
   const extension = file.name.split('.').pop()?.toLowerCase();
