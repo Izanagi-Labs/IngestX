@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { NumberSchema } from '../../../src/core/schema/NumberSchema';
-import { NumberRuleType } from '../../../src/core/types/RuleType';
+import { NumberSchema, NumberRuleType } from '../../../src/model';
 
 describe('NumberSchema', () => {
   describe('Rule Creation', () => {

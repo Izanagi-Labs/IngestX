@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { BaseSchema } from '../../../src/core/schema/BaseSchema';
+import { BaseSchema } from '../../../src/model';
 
 // Dummy rule types for testing
 enum TestRuleType {

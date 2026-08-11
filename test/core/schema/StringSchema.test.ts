@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { StringSchema } from '../../../src/core/schema/StringSchema';
-import { StringRuleType } from '../../../src/core/types/RuleType';
+import { StringSchema, StringRuleType } from '../../../src/model';
 
 describe('StringSchema', () => {
   describe('1. Rule Registration', () => {
@@ -141,7 +140,7 @@ describe('StringSchema', () => {
     describe('caseSensitive', () => {
       it('registers the correct rule type and value', () => {
         const schema = new StringSchema();
-        schema.caseSensitive();
+        schema.caseSensitive(true);
         const rules = schema._getRules();
         expect(rules).toHaveLength(1);
         expect(rules[0]).toEqual({
@@ -153,7 +152,7 @@ describe('StringSchema', () => {
 
       it('works correctly (does not accept custom message)', () => {
         const schema = new StringSchema();
-        schema.caseSensitive();
+        schema.caseSensitive(true);
         const rules = schema._getRules();
         expect(rules[0].message).toBeUndefined();
       });
@@ -167,12 +166,12 @@ describe('StringSchema', () => {
       expect(schema.max(10)).toBe(schema);
       expect(schema.allowedValues([1])).toBe(schema);
       expect(schema.regex(/a/)).toBe(schema);
-      expect(schema.caseSensitive()).toBe(schema);
+      expect(schema.caseSensitive(true)).toBe(schema);
     });
 
     it('supports chaining with all other methods', () => {
       const schema = new StringSchema();
-      schema.min(1).max(10).allowedValues([1, 2]).regex(/test/).caseSensitive();
+      schema.min(1).max(10).allowedValues([1, 2]).regex(/test/).caseSensitive(true);
 
       expect(schema._getRules()).toHaveLength(5);
     });
@@ -183,7 +182,7 @@ describe('StringSchema', () => {
         .max(10)
         .allowedValues([1, 2])
         .regex(/test/)
-        .caseSensitive();
+        .caseSensitive(true);
 
       const rules = schema._getRules();
       expect(rules[0].type).toBe(StringRuleType.Min);
@@ -219,7 +218,7 @@ describe('StringSchema', () => {
 
     it('preserves insertion order for different rule types', () => {
       const schema = new StringSchema()
-        .caseSensitive()
+        .caseSensitive(true)
         .regex(/a/)
         .allowedValues([1])
         .max(2)
@@ -374,14 +373,14 @@ describe('StringSchema', () => {
 
     describe('caseSensitive', () => {
       it('registers the rule with value true', () => {
-        const schema = new StringSchema().caseSensitive();
+        const schema = new StringSchema().caseSensitive(true);
         expect(schema._getRules()[0].value).toBe(true);
       });
 
       it('can coexist with regex and allowedValues', () => {
         const schema = new StringSchema()
           .regex(/a/)
-          .caseSensitive()
+          .caseSensitive(true)
           .allowedValues([1]);
 
         const rules = schema._getRules();
@@ -393,9 +392,9 @@ describe('StringSchema', () => {
 
       it('multiple calls preserve insertion order', () => {
         const schema = new StringSchema()
-          .caseSensitive()
+          .caseSensitive(true)
           .min(1)
-          .caseSensitive();
+          .caseSensitive(true);
 
         const rules = schema._getRules();
         expect(rules[0].type).toBe(StringRuleType.CaseSensitive);
@@ -428,7 +427,7 @@ describe('StringSchema', () => {
       const schema = new StringSchema().min(5);
       const rulesFirstSnapshot = [...schema._getRules()];
 
-      schema.max(10).caseSensitive();
+      schema.max(10).caseSensitive(true);
       const rulesSecondSnapshot = schema._getRules();
 
       expect(rulesSecondSnapshot[0]).toEqual(rulesFirstSnapshot[0]);
@@ -443,7 +442,7 @@ describe('StringSchema', () => {
         .max(2)
         .allowedValues([3])
         .regex(/a/)
-        .caseSensitive();
+        .caseSensitive(true);
 
       expect(schema._getRules()).toHaveLength(5);
     });
@@ -469,7 +468,7 @@ describe('StringSchema', () => {
         .max(2)
         .regex(pattern)
         .allowedValues([4])
-        .caseSensitive();
+        .caseSensitive(true);
 
       const rules = schema._getRules();
       expect(rules[0].value).toBe(1);
@@ -485,7 +484,7 @@ describe('StringSchema', () => {
         .max(2, 'max msg')
         .regex(/a/, 'regex msg')
         .allowedValues([4], 'allowed msg')
-        .caseSensitive();
+        .caseSensitive(true);
 
       const rules = schema._getRules();
       expect(rules[0].message).toBe('min msg');
@@ -501,7 +500,7 @@ describe('StringSchema', () => {
         .max(2)
         .regex(/a/)
         .allowedValues([4])
-        .caseSensitive();
+        .caseSensitive(true);
 
       const rules = schema._getRules();
       expect(rules[0].type).toBe(StringRuleType.Min);
@@ -545,7 +544,7 @@ describe('StringSchema', () => {
         .max(1)
         .regex(/a/)
         .allowedValues([1])
-        .caseSensitive();
+        .caseSensitive(true);
 
       const ruleTypes = schema._getRules().map((r) => r.type);
 

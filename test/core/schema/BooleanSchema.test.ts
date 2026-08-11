@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { BooleanSchema } from '../../../src/core/schema/BooleanSchema';
-import { BooleanRuleType } from '../../../src/core/types/RuleType';
+import { BooleanSchema, BooleanRuleType } from '../../../src/model';
 
 describe('BooleanSchema', () => {
   describe('1. Rule Registration', () => {
@@ -73,7 +72,7 @@ describe('BooleanSchema', () => {
     describe('caseSensitive', () => {
       it('registers the correct rule type and value', () => {
         const schema = new BooleanSchema();
-        schema.caseSensitive();
+        schema.caseSensitive(true);
         const rules = schema._getRules();
         expect(rules).toHaveLength(1);
         expect(rules[0]).toEqual({
@@ -85,7 +84,7 @@ describe('BooleanSchema', () => {
 
       it('works correctly (does not accept custom message)', () => {
         const schema = new BooleanSchema();
-        schema.caseSensitive();
+        schema.caseSensitive(true);
         const rules = schema._getRules();
         expect(rules[0].message).toBeUndefined();
       });
@@ -97,14 +96,14 @@ describe('BooleanSchema', () => {
       const schema = new BooleanSchema();
       expect(schema.truthy(['yes'])).toBe(schema);
       expect(schema.falsy(['no'])).toBe(schema);
-      expect(schema.caseSensitive()).toBe(schema);
+      expect(schema.caseSensitive(true)).toBe(schema);
     });
 
     it('supports chaining with all other methods', () => {
       const schema = new BooleanSchema()
         .truthy(['yes'])
         .falsy(['no'])
-        .caseSensitive();
+        .caseSensitive(true);
 
       expect(schema._getRules()).toHaveLength(3);
     });
@@ -112,7 +111,7 @@ describe('BooleanSchema', () => {
     it('preserves chain order', () => {
       const schema = new BooleanSchema()
         .truthy(['yes'])
-        .caseSensitive()
+        .caseSensitive(true)
         .falsy(['no']);
 
       const rules = schema._getRules();
@@ -147,7 +146,7 @@ describe('BooleanSchema', () => {
 
     it('preserves insertion order for different rule types', () => {
       const schema = new BooleanSchema()
-        .caseSensitive()
+        .caseSensitive(true)
         .falsy(['no'])
         .truthy(['yes']);
       const rules = schema._getRules();
@@ -272,14 +271,14 @@ describe('BooleanSchema', () => {
 
     describe('caseSensitive', () => {
       it('registers the rule with value true', () => {
-        const schema = new BooleanSchema().caseSensitive();
+        const schema = new BooleanSchema().caseSensitive(true);
         expect(schema._getRules()[0].value).toBe(true);
       });
 
       it('can coexist with truthy and falsy rules', () => {
         const schema = new BooleanSchema()
           .truthy(['yes'])
-          .caseSensitive()
+          .caseSensitive(true)
           .falsy(['no']);
 
         const rules = schema._getRules();
@@ -291,9 +290,9 @@ describe('BooleanSchema', () => {
 
       it('multiple calls preserve insertion order', () => {
         const schema = new BooleanSchema()
-          .caseSensitive()
+          .caseSensitive(true)
           .truthy(['yes'])
-          .caseSensitive();
+          .caseSensitive(true);
 
         const rules = schema._getRules();
         expect(rules[0].type).toBe(BooleanRuleType.CaseSensitive);
@@ -326,7 +325,7 @@ describe('BooleanSchema', () => {
       const schema = new BooleanSchema().truthy(['yes']);
       const rulesFirstSnapshot = [...schema._getRules()];
 
-      schema.falsy(['no']).caseSensitive();
+      schema.falsy(['no']).caseSensitive(true);
       const rulesSecondSnapshot = schema._getRules();
 
       expect(rulesSecondSnapshot[0]).toEqual(rulesFirstSnapshot[0]);
@@ -339,7 +338,7 @@ describe('BooleanSchema', () => {
       const schema = new BooleanSchema()
         .truthy(['yes'])
         .falsy(['no'])
-        .caseSensitive();
+        .caseSensitive(true);
 
       expect(schema._getRules()).toHaveLength(3);
     });
@@ -362,7 +361,7 @@ describe('BooleanSchema', () => {
       const schema = new BooleanSchema()
         .truthy(['yes'])
         .falsy(['no'])
-        .caseSensitive();
+        .caseSensitive(true);
 
       const rules = schema._getRules();
       expect(rules[0].value).toEqual(['yes']);
@@ -374,7 +373,7 @@ describe('BooleanSchema', () => {
       const schema = new BooleanSchema()
         .truthy(['yes'], 'truthy msg')
         .falsy(['no'], 'falsy msg')
-        .caseSensitive();
+        .caseSensitive(true);
 
       const rules = schema._getRules();
       expect(rules[0].message).toBe('truthy msg');
@@ -386,7 +385,7 @@ describe('BooleanSchema', () => {
       const schema = new BooleanSchema()
         .truthy(['yes'])
         .falsy(['no'])
-        .caseSensitive();
+        .caseSensitive(true);
 
       const rules = schema._getRules();
       expect(rules[0].type).toBe(BooleanRuleType.Truthy);
@@ -428,7 +427,7 @@ describe('BooleanSchema', () => {
       const schema = new BooleanSchema()
         .truthy(['yes'])
         .falsy(['no'])
-        .caseSensitive();
+        .caseSensitive(true);
 
       const ruleTypes = schema._getRules().map((r) => r.type);
 
