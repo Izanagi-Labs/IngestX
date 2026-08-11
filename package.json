@@ -43,7 +43,8 @@
     "dev": "vite build --watch",
     "test": "vitest",
     "demo": "cd demo && yarn dev",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "benchmark": "npx tsx benchmarks/excelParser.benchmark.ts"
   },
   "peerDependencies": {
     "react": ">=18"
