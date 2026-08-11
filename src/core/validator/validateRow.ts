@@ -1,16 +1,9 @@
 import type { RowValidationResult, ValidationContext } from './types';
 import { executeRules } from './executeRules';
-import { ColumnConfig } from '../../model';
+import { ResolvedColumn } from '../headers/types';
 
-interface ResolvedColumn {
-  header: string; // File/CSV/Excel header to read value from
-  column: ColumnConfig; // IngestX schema column
-}
-
-export function validateRow<
-  TRow extends Record<string, unknown> = Record<string, unknown>,
->(
-  row: Record<string, unknown>,
+export function validateRow<TRow>(
+  row: Record<string, string>,
   rowIndex: number,
   columns: readonly ResolvedColumn[],
 ): RowValidationResult<TRow> {

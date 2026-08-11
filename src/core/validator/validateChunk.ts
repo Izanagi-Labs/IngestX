@@ -1,16 +1,9 @@
-import { ColumnConfig } from '../../model/column/types';
+import { ResolvedColumn } from '../headers/types';
 import { ChunkValidationResult, RowValidationResult } from './types';
 import { validateRow } from './validateRow';
 
-export interface ResolvedColumn {
-  header: string; // File/CSV/Excel header to read value from
-  column: ColumnConfig; // IngestX schema column
-}
-
-export function validateChunk<
-  TRow extends Record<string, unknown> = Record<string, unknown>,
->(
-  chunk: TRow[],
+export function validateChunk<TRow>(
+  chunk: Record<string, string>[],
   startIndex: number,
   columns: ResolvedColumn[],
 ): ChunkValidationResult<TRow> {
