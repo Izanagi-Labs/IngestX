@@ -14,8 +14,14 @@ export function executeBooleanRule(
     return;
   }
 
-  const currentValue = state.value;
+  let currentValue = state.value as string;
   const isCaseSensitive = state.caseSensitive ?? false;
+  const trim = state.trim ?? false;
+
+  if (trim) {
+    currentValue = currentValue.trim();
+    state.value = currentValue;
+  }
 
   const normalize = (value: string) =>
     isCaseSensitive ? value : value.toLowerCase();
