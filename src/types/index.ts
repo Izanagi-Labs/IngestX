@@ -58,7 +58,6 @@ export type HeadersMismatch = {
 };
 
 export type ErrorsData = {
-  headersMismatch?: HeadersMismatch;
   rowWiseErrors: RowValidationError[];
 };
 

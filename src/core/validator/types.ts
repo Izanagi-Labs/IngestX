@@ -13,6 +13,7 @@ export interface RuleExecutionState {
   errors: ValidationError<RuleWithValidationType>[];
   stop: boolean;
   caseSensitive?: boolean;
+  trim?: boolean;
 }
 
 export interface ValidationContext {

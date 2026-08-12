@@ -23,6 +23,7 @@ export enum CommonRuleType {
   Default = 'default',
   Custom = 'custom',
   Transform = 'transform',
+  Trim = 'trim',
 }
 
 export type StringSchemaRule = CommonRuleType | StringRuleType;
