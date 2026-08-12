@@ -44,7 +44,8 @@
     "test": "vitest",
     "demo": "cd demo && yarn dev",
     "format": "prettier --write .",
-    "benchmark": "npx tsx benchmarks/excelParser.benchmark.ts"
+    "format:check": "prettier --check .",
+    "benchmark": "npx tsx benchmarks/excelParser.benchmark.ts && npx tsx benchmarks/csvParser.benchmark.ts"
   },
   "peerDependencies": {
     "react": ">=18"
@@ -58,6 +59,7 @@
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.56.0",
+    "eslint-config-prettier": "^10.1.8",
     "jsdom": "^29.1.1",
     "prettier": "^3.2.5",
     "react": "^19.2.6",

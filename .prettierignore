@@ -1,7 +1,11 @@
 node_modules
 dist
 build
-.git
 coverage
+.vite
+.cache
+*.min.js
+pnpm-lock.yaml
 yarn.lock
+.git
 *.log
