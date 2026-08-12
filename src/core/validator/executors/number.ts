@@ -12,7 +12,16 @@ export function executeNumberRule(
   state: RuleExecutionState,
   _context: ValidationContext,
 ): void {
-  const currentValue = Number(state.value);
+  let stringifiedValue = state.value as string;
+  const trim = state.trim ?? false;
+
+  let currentValue = Number(stringifiedValue);
+
+  if (trim) {
+    stringifiedValue = stringifiedValue.trim();
+    currentValue = Number(stringifiedValue);
+    state.value = currentValue;
+  }
 
   if (!Number.isFinite(currentValue)) {
     state.errors.push(
