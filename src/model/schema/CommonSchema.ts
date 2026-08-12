@@ -32,4 +32,11 @@ export abstract class CommonSchema<TValue, TRuleType> extends BaseSchema<
       value: transform,
     });
   }
+
+  trim(): this {
+    return this.addRule({
+      type: CommonRuleType.Trim,
+      value: true,
+    });
+  }
 }
