@@ -8,8 +8,14 @@ export function executeStringRule(
   state: RuleExecutionState,
   _context: ValidationContext,
 ): void {
-  const currentValue = state.value as string;
+  let currentValue = state.value as string;
   const isCaseSensitive = state.caseSensitive ?? false;
+  const trim = state.trim ?? false;
+
+  if (trim) {
+    currentValue = currentValue.trim();
+    state.value = currentValue;
+  }
 
   switch (rule.type) {
     case StringRuleType.Min:
