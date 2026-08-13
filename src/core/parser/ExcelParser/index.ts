@@ -1,4 +1,4 @@
-import { Parser, RowsAndHeaders } from '../types';
+import { Parser, RowsAndHeaders } from "../types";
 
 export class ExcelParser implements Parser {
   constructor(
@@ -7,8 +7,8 @@ export class ExcelParser implements Parser {
   ) {}
 
   async *parse(): AsyncGenerator<RowsAndHeaders> {
-    const worker = new Worker(new URL('./excel.worker.ts', import.meta.url), {
-      type: 'module',
+    const worker = new Worker(new URL("./excel.worker.ts", import.meta.url), {
+      type: "module",
     });
 
     worker.postMessage({
@@ -24,17 +24,17 @@ export class ExcelParser implements Parser {
       const message = event.data;
 
       switch (message.type) {
-        case 'chunk':
+        case "chunk":
           if (!done) {
             queue.push(message.payload);
           }
           break;
 
-        case 'done':
+        case "done":
           done = true;
           break;
 
-        case 'error':
+        case "error":
           done = true;
           workerError = new Error(message.error);
           break;
