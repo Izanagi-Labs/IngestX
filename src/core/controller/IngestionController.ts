@@ -1,4 +1,5 @@
-import { IngestionStatus } from './types';
+import { IngestionStatus } from "./types";
+import { IngestionCancelledError } from "../errors";
 
 export class IngestionController {
   private status = IngestionStatus.Idle;
@@ -46,7 +47,7 @@ export class IngestionController {
 
   throwIfCancelled(): void {
     if (this.status === IngestionStatus.Cancelled) {
-      throw new Error('Ingestion cancelled.');
+      throw new IngestionCancelledError();
     }
   }
 
