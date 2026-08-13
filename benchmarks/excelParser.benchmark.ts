@@ -1,17 +1,19 @@
-import { ExcelParser } from '../src/core/parser/ExcelParser';
-import { RowsAndHeaders } from '../src/core/parser';
+import { ExcelParser } from "../src/core/parser/ExcelParser";
+import { RowsAndHeaders } from "../src/core/parser";
 
 // A barebones mock worker that doesn't depend on Vitest/JSDOM
 class BenchmarkMockWorker {
   public onmessage: ((ev: any) => any) | null = null;
   public onmessageerror: ((ev: any) => any) | null = null;
   public onerror: ((ev: any) => any) | null = null;
-  
+
   public terminate() {}
   public postMessage() {}
   public addEventListener() {}
   public removeEventListener() {}
-  public dispatchEvent() { return true; }
+  public dispatchEvent() {
+    return true;
+  }
 
   // Simulates worker posting message back to main thread
   public send(data: any) {
@@ -29,14 +31,20 @@ let activeWorker: BenchmarkMockWorker | null = null;
   }
 };
 
-const formatNumber = (num: number) => new Intl.NumberFormat().format(Math.floor(num));
+const formatNumber = (num: number) =>
+  new Intl.NumberFormat().format(Math.floor(num));
 const formatBytes = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 
-async function runBenchmark(name: string, numRows: number, columns: number, chunkSize: number) {
+async function runBenchmark(
+  name: string,
+  numRows: number,
+  columns: number,
+  chunkSize: number,
+) {
   console.log(`Benchmark\n--------------------------------`);
   console.log(`${name}`);
   console.log(`Rows:\n${formatNumber(numRows)}\n`);
-  
+
   const numChunks = Math.ceil(numRows / chunkSize);
   console.log(`Chunks:\n${formatNumber(numChunks)}\n`);
 
@@ -53,24 +61,24 @@ async function runBenchmark(name: string, numRows: number, columns: number, chun
     return { startIndex, headers, rows };
   };
 
-  const mockFile = new File(['dummy'], 'test.xlsx');
-  
+  const mockFile = new File(["dummy"], "test.xlsx");
+
   // Force garbage collection before measuring if possible
   if (global.gc) {
     global.gc();
   }
-  
+
   const memBefore = process.memoryUsage().heapUsed;
 
   const parser = new ExcelParser(mockFile as any, chunkSize);
   const generator = parser.parse();
-  
+
   // Start the generator
   const p1 = generator.next();
-  
+
   // Allow microtasks to process so ExcelParser creates the worker
-  await new Promise(resolve => setTimeout(resolve, 0));
-  
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
   if (!activeWorker) throw new Error("Worker not created");
   const worker = activeWorker;
 
@@ -79,15 +87,15 @@ async function runBenchmark(name: string, numRows: number, columns: number, chun
   // Producer simulation - dispatch async to avoid blocking event loop
   const dispatchChunks = async () => {
     for (let i = 0; i < numChunks; i++) {
-      worker.send({ type: 'chunk', payload: generateChunk(i * chunkSize) });
+      worker.send({ type: "chunk", payload: generateChunk(i * chunkSize) });
       // yield to event loop every few chunks to prevent blocking and allow consumer to drain
       if (i % 20 === 0) {
-        await new Promise(resolve => setTimeout(resolve, 0));
+        await new Promise((resolve) => setTimeout(resolve, 0));
       }
     }
-    worker.send({ type: 'done' });
+    worker.send({ type: "done" });
   };
-  
+
   dispatchChunks();
 
   // Consumer loop
@@ -96,13 +104,13 @@ async function runBenchmark(name: string, numRows: number, columns: number, chun
   if (firstResult.value) {
     count += firstResult.value.rows.length;
   }
-  
+
   for await (const chunk of generator) {
     count += chunk.rows.length;
   }
 
   const elapsed = performance.now() - startTime;
-  
+
   if (global.gc) {
     global.gc();
   }
@@ -119,19 +127,19 @@ async function runBenchmark(name: string, numRows: number, columns: number, chun
   if (count !== numRows) {
     console.error(`ERROR: Expected ${numRows} rows, but got ${count}.`);
   }
-  
+
   // cleanup
   activeWorker = null;
 }
 
 async function main() {
   console.log("Starting IngestX Parser Benchmarks...\n");
-  
+
   await runBenchmark("Benchmark 1", 1_000_000, 10, 5000);
   await runBenchmark("Benchmark 2", 5_000_000, 10, 10000);
   await runBenchmark("Benchmark 3", 10_000_000, 10, 20000);
   await runBenchmark("Benchmark 4 - Wide dataset", 500_000, 250, 5000);
-  
+
   console.log("Benchmarks complete.");
 }
 
