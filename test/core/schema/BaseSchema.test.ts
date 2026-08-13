@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest';
-import { BaseSchema } from '../../../src/model';
+import { describe, it, expect } from "vitest";
+import { BaseSchema } from "../../../src/model";
 
 // Dummy rule types for testing
 enum TestRuleType {
-  RuleA = 'rule_a',
-  RuleB = 'rule_b',
-  RuleC = 'rule_c',
+  RuleA = "rule_a",
+  RuleB = "rule_b",
+  RuleC = "rule_c",
 }
 
 // Test implementation of the abstract BaseSchema
@@ -19,13 +19,13 @@ class TestSchema extends BaseSchema<TestRuleType> {
   }
 }
 
-describe('BaseSchema', () => {
-  it('should contain zero rules when empty', () => {
+describe("BaseSchema", () => {
+  it("should contain zero rules when empty", () => {
     const schema = new TestSchema();
     expect(schema._getRules()).toHaveLength(0);
   });
 
-  it('should store a rule using addRule()', () => {
+  it("should store a rule using addRule()", () => {
     const schema = new TestSchema();
     schema.addTestRule(TestRuleType.RuleA);
 
@@ -34,7 +34,7 @@ describe('BaseSchema', () => {
     expect(rules[0].type).toBe(TestRuleType.RuleA);
   });
 
-  it('should return this from addRule() for fluent chaining', () => {
+  it("should return this from addRule() for fluent chaining", () => {
     const schema = new TestSchema();
     const result = schema.addTestRule(TestRuleType.RuleA);
     expect(result).toBe(schema);
@@ -44,11 +44,11 @@ describe('BaseSchema', () => {
     expect(schema._getRules()).toHaveLength(3);
   });
 
-  it('should preserve type, value, and message exactly', () => {
+  it("should preserve type, value, and message exactly", () => {
     const schema = new TestSchema();
 
-    const objValue = { foo: 'bar' };
-    schema.addTestRule(TestRuleType.RuleA, 'test-value', 'Custom message');
+    const objValue = { foo: "bar" };
+    schema.addTestRule(TestRuleType.RuleA, "test-value", "Custom message");
     schema.addTestRule(TestRuleType.RuleB, objValue); // no message
     schema.addTestRule(TestRuleType.RuleC); // no value or message
 
@@ -56,8 +56,8 @@ describe('BaseSchema', () => {
 
     expect(rules[0]).toEqual({
       type: TestRuleType.RuleA,
-      value: 'test-value',
-      message: 'Custom message',
+      value: "test-value",
+      message: "Custom message",
     });
 
     expect(rules[1]).toEqual({
@@ -73,7 +73,7 @@ describe('BaseSchema', () => {
     });
   });
 
-  it('should not overwrite previous rules on multiple calls', () => {
+  it("should not overwrite previous rules on multiple calls", () => {
     const schema = new TestSchema();
 
     schema.addTestRule(TestRuleType.RuleA, 1);
@@ -85,7 +85,7 @@ describe('BaseSchema', () => {
     expect(rules[1].value).toBe(2);
   });
 
-  it('should preserve insertion order', () => {
+  it("should preserve insertion order", () => {
     const schema = new TestSchema();
 
     schema.addTestRule(TestRuleType.RuleB);
@@ -99,7 +99,7 @@ describe('BaseSchema', () => {
     expect(rules[2].type).toBe(TestRuleType.RuleC);
   });
 
-  it('should return every stored rule via _getRules()', () => {
+  it("should return every stored rule via _getRules()", () => {
     const schema = new TestSchema();
 
     schema.addTestRule(TestRuleType.RuleA);

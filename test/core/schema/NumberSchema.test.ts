@@ -1,9 +1,9 @@
-import { describe, expect, it } from 'vitest';
-import { NumberSchema, NumberRuleType } from '../../../src/model';
+import { describe, expect, it } from "vitest";
+import { NumberSchema, NumberRuleType } from "../../../src/model";
 
-describe('NumberSchema', () => {
-  describe('Rule Creation', () => {
-    it('min() adds the correct rule with value', () => {
+describe("NumberSchema", () => {
+  describe("Rule Creation", () => {
+    it("min() adds the correct rule with value", () => {
       const schema = new NumberSchema();
       schema.min(5);
       const rules = schema._getRules();
@@ -15,18 +15,18 @@ describe('NumberSchema', () => {
       });
     });
 
-    it('min() adds the correct rule with value and custom message', () => {
+    it("min() adds the correct rule with value and custom message", () => {
       const schema = new NumberSchema();
-      schema.min(5, 'Must be at least 5');
+      schema.min(5, "Must be at least 5");
       const rules = schema._getRules();
       expect(rules[0]).toEqual({
         type: NumberRuleType.Min,
         value: 5,
-        message: 'Must be at least 5',
+        message: "Must be at least 5",
       });
     });
 
-    it('max() adds the correct rule with value', () => {
+    it("max() adds the correct rule with value", () => {
       const schema = new NumberSchema();
       schema.max(10);
       const rules = schema._getRules();
@@ -37,18 +37,18 @@ describe('NumberSchema', () => {
       });
     });
 
-    it('max() adds the correct rule with value and custom message', () => {
+    it("max() adds the correct rule with value and custom message", () => {
       const schema = new NumberSchema();
-      schema.max(10, 'Must be at most 10');
+      schema.max(10, "Must be at most 10");
       const rules = schema._getRules();
       expect(rules[0]).toEqual({
         type: NumberRuleType.Max,
         value: 10,
-        message: 'Must be at most 10',
+        message: "Must be at most 10",
       });
     });
 
-    it('allowedValues() adds the correct rule with value', () => {
+    it("allowedValues() adds the correct rule with value", () => {
       const schema = new NumberSchema();
       schema.allowedValues([1, 2, 3]);
       const rules = schema._getRules();
@@ -59,20 +59,20 @@ describe('NumberSchema', () => {
       });
     });
 
-    it('allowedValues() adds the correct rule with value and custom message', () => {
+    it("allowedValues() adds the correct rule with value and custom message", () => {
       const schema = new NumberSchema();
-      schema.allowedValues([1, 2, 3], 'Must be 1, 2, or 3');
+      schema.allowedValues([1, 2, 3], "Must be 1, 2, or 3");
       const rules = schema._getRules();
       expect(rules[0]).toEqual({
         type: NumberRuleType.AllowedValues,
         value: [1, 2, 3],
-        message: 'Must be 1, 2, or 3',
+        message: "Must be 1, 2, or 3",
       });
     });
   });
 
-  describe('Chaining', () => {
-    it('returns the same schema instance', () => {
+  describe("Chaining", () => {
+    it("returns the same schema instance", () => {
       const schema = new NumberSchema();
       const returnedSchema1 = schema.min(5);
       const returnedSchema2 = returnedSchema1.max(10);
@@ -85,7 +85,7 @@ describe('NumberSchema', () => {
       expect(returnedSchema3).toBe(schema);
     });
 
-    it('supports fluent chaining with other methods', () => {
+    it("supports fluent chaining with other methods", () => {
       const schema = new NumberSchema()
         .min(0)
         .max(100)
@@ -95,8 +95,8 @@ describe('NumberSchema', () => {
     });
   });
 
-  describe('Rule Ordering', () => {
-    it('stores rules in the order they were added', () => {
+  describe("Rule Ordering", () => {
+    it("stores rules in the order they were added", () => {
       const schema = new NumberSchema().max(10).min(0).allowedValues([5]);
       const rules = schema._getRules();
 
@@ -105,7 +105,7 @@ describe('NumberSchema', () => {
       expect(rules[2].type).toBe(NumberRuleType.AllowedValues);
     });
 
-    it('preserves insertion order when multiple calls to the same method are made', () => {
+    it("preserves insertion order when multiple calls to the same method are made", () => {
       const schema = new NumberSchema().min(5).min(10).min(15);
       const rules = schema._getRules();
 
@@ -128,8 +128,8 @@ describe('NumberSchema', () => {
     });
   });
 
-  describe('Multiple Rules', () => {
-    it('allows multiple different rules to coexist correctly', () => {
+  describe("Multiple Rules", () => {
+    it("allows multiple different rules to coexist correctly", () => {
       const schema = new NumberSchema()
         .min(1)
         .max(10)
@@ -144,29 +144,29 @@ describe('NumberSchema', () => {
       ]);
     });
 
-    it('ensures adding one rule does not modify previous rules', () => {
-      const schema = new NumberSchema().min(5, 'min msg');
+    it("ensures adding one rule does not modify previous rules", () => {
+      const schema = new NumberSchema().min(5, "min msg");
       const rulesAfterMin = [...schema._getRules()];
 
-      schema.max(10, 'max msg');
+      schema.max(10, "max msg");
       const rulesAfterMax = schema._getRules();
 
       expect(rulesAfterMax[0]).toEqual(rulesAfterMin[0]);
       expect(rulesAfterMax[0]).toEqual({
         type: NumberRuleType.Min,
         value: 5,
-        message: 'min msg',
+        message: "min msg",
       });
       expect(rulesAfterMax[1]).toEqual({
         type: NumberRuleType.Max,
         value: 10,
-        message: 'max msg',
+        message: "max msg",
       });
     });
   });
 
-  describe('Edge Cases', () => {
-    it('handles zero correctly', () => {
+  describe("Edge Cases", () => {
+    it("handles zero correctly", () => {
       const schema = new NumberSchema().min(0).max(0).allowedValues([0]);
       const rules = schema._getRules();
       expect(rules[0].value).toBe(0);
@@ -174,7 +174,7 @@ describe('NumberSchema', () => {
       expect(rules[2].value).toEqual([0]);
     });
 
-    it('handles negative numbers correctly', () => {
+    it("handles negative numbers correctly", () => {
       const schema = new NumberSchema()
         .min(-10)
         .max(-5)
@@ -185,7 +185,7 @@ describe('NumberSchema', () => {
       expect(rules[2].value).toEqual([-7, -8]);
     });
 
-    it('handles decimal numbers correctly', () => {
+    it("handles decimal numbers correctly", () => {
       const schema = new NumberSchema().min(1.5).max(3.14).allowedValues([2.5]);
       const rules = schema._getRules();
       expect(rules[0].value).toBe(1.5);
@@ -193,7 +193,7 @@ describe('NumberSchema', () => {
       expect(rules[2].value).toEqual([2.5]);
     });
 
-    it('handles Infinity correctly', () => {
+    it("handles Infinity correctly", () => {
       const schema = new NumberSchema()
         .min(Infinity)
         .max(Infinity)
@@ -204,7 +204,7 @@ describe('NumberSchema', () => {
       expect(rules[2].value).toEqual([Infinity]);
     });
 
-    it('handles -Infinity correctly', () => {
+    it("handles -Infinity correctly", () => {
       const schema = new NumberSchema()
         .min(-Infinity)
         .max(-Infinity)
@@ -215,7 +215,7 @@ describe('NumberSchema', () => {
       expect(rules[2].value).toEqual([-Infinity]);
     });
 
-    it('handles Number.MAX_SAFE_INTEGER correctly', () => {
+    it("handles Number.MAX_SAFE_INTEGER correctly", () => {
       const schema = new NumberSchema()
         .min(Number.MAX_SAFE_INTEGER)
         .max(Number.MAX_SAFE_INTEGER)
@@ -226,7 +226,7 @@ describe('NumberSchema', () => {
       expect(rules[2].value).toEqual([Number.MAX_SAFE_INTEGER]);
     });
 
-    it('handles Number.MIN_SAFE_INTEGER correctly', () => {
+    it("handles Number.MIN_SAFE_INTEGER correctly", () => {
       const schema = new NumberSchema()
         .min(Number.MIN_SAFE_INTEGER)
         .max(Number.MIN_SAFE_INTEGER)
@@ -237,21 +237,21 @@ describe('NumberSchema', () => {
       expect(rules[2].value).toEqual([Number.MIN_SAFE_INTEGER]);
     });
 
-    it('handles duplicate values in allowedValues', () => {
+    it("handles duplicate values in allowedValues", () => {
       const schema = new NumberSchema().allowedValues([1, 1, 2, 2, 3]);
       const rules = schema._getRules();
       expect(rules[0].value).toEqual([1, 1, 2, 2, 3]);
     });
 
-    it('handles empty allowedValues array', () => {
+    it("handles empty allowedValues array", () => {
       const schema = new NumberSchema().allowedValues([]);
       const rules = schema._getRules();
       expect(rules[0].value).toEqual([]);
     });
   });
 
-  describe('Immutability', () => {
-    it('ensures values passed into allowedValues are not mutated by the schema', () => {
+  describe("Immutability", () => {
+    it("ensures values passed into allowedValues are not mutated by the schema", () => {
       const schema = new NumberSchema();
       const originalArray = Object.freeze([1, 2, 3]);
 
@@ -264,8 +264,8 @@ describe('NumberSchema', () => {
     });
   });
 
-  describe('Internal Consistency', () => {
-    it('_getRules() returns all rules correctly', () => {
+  describe("Internal Consistency", () => {
+    it("_getRules() returns all rules correctly", () => {
       const schema = new NumberSchema().min(1).max(2);
       const rules = schema._getRules();
       expect(rules).toHaveLength(2);
@@ -273,16 +273,16 @@ describe('NumberSchema', () => {
       expect(rules[1].type).toBe(NumberRuleType.Max);
     });
 
-    it('Rule objects have the expected shape', () => {
-      const schema = new NumberSchema().min(1, 'message');
+    it("Rule objects have the expected shape", () => {
+      const schema = new NumberSchema().min(1, "message");
       const rules = schema._getRules();
-      expect(rules[0]).toHaveProperty('type');
-      expect(rules[0]).toHaveProperty('value');
-      expect(rules[0]).toHaveProperty('message');
+      expect(rules[0]).toHaveProperty("type");
+      expect(rules[0]).toHaveProperty("value");
+      expect(rules[0]).toHaveProperty("message");
       expect(Object.keys(rules[0]).length).toBe(3);
     });
 
-    it('Rule types are correct', () => {
+    it("Rule types are correct", () => {
       const schema = new NumberSchema().min(1).max(2).allowedValues([3]);
       const rules = schema._getRules();
       expect(rules[0].type).toBe(NumberRuleType.Min);
@@ -291,8 +291,8 @@ describe('NumberSchema', () => {
     });
   });
 
-  describe('Regression Tests', () => {
-    it('preserves rule integrity if multiple schemas are instantiated', () => {
+  describe("Regression Tests", () => {
+    it("preserves rule integrity if multiple schemas are instantiated", () => {
       const schema1 = new NumberSchema().min(1);
       const schema2 = new NumberSchema().min(2);
 
@@ -300,7 +300,7 @@ describe('NumberSchema', () => {
       expect(schema2._getRules()[0].value).toBe(2);
     });
 
-    it('can handle chained methods without state bleed', () => {
+    it("can handle chained methods without state bleed", () => {
       const schema1 = new NumberSchema();
       const schema2 = new NumberSchema();
 
@@ -314,7 +314,7 @@ describe('NumberSchema', () => {
       expect(schema2._getRules()[0].type).toBe(NumberRuleType.Max);
     });
 
-    it('does not incorrectly share array references between rules', () => {
+    it("does not incorrectly share array references between rules", () => {
       const schema = new NumberSchema();
       const arr1 = [1, 2];
       const arr2 = [3, 4];
