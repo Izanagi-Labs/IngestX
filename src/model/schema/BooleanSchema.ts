@@ -1,5 +1,5 @@
-import { BooleanRuleType } from './types';
-import { CommonSchema } from './CommonSchema';
+import { BooleanRuleType } from "./types";
+import { CommonSchema } from "./CommonSchema";
 
 export class BooleanSchema extends CommonSchema<boolean, BooleanRuleType> {
   truthy(values: string[], message?: string): this {

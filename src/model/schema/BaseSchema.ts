@@ -1,4 +1,4 @@
-import type { Rule } from './types';
+import type { Rule } from "./types";
 
 export abstract class BaseSchema<TRuleType> {
   protected readonly rules: Rule<TRuleType>[] = [];

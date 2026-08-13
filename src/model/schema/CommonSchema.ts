@@ -1,5 +1,5 @@
-import { BaseSchema } from './BaseSchema';
-import { CommonRuleType } from './types';
+import { BaseSchema } from "./BaseSchema";
+import { CommonRuleType } from "./types";
 
 export abstract class CommonSchema<TValue, TRuleType> extends BaseSchema<
   TRuleType | CommonRuleType

@@ -1,5 +1,5 @@
-import { NumberSchemaRule, NumberRuleType } from './types';
-import { CommonSchema } from './CommonSchema';
+import { NumberSchemaRule, NumberRuleType } from "./types";
+import { CommonSchema } from "./CommonSchema";
 
 export class NumberSchema extends CommonSchema<number, NumberSchemaRule> {
   min(value: number, message?: string): this {

@@ -1,5 +1,5 @@
 export enum SchemaType {
-  String = 'string',
-  Number = 'number',
-  Boolean = 'boolean',
+  String = "string",
+  Number = "number",
+  Boolean = "boolean",
 }
