@@ -1,29 +1,29 @@
 export enum StringRuleType {
-  Min = 'string:min',
-  Max = 'string:max',
-  Regex = 'string:regex',
-  AllowedValues = 'string:allowed-values',
-  CaseSensitive = 'string:case-sensitive',
+  Min = "string:min",
+  Max = "string:max",
+  Regex = "string:regex",
+  AllowedValues = "string:allowed-values",
+  CaseSensitive = "string:case-sensitive",
 }
 
 export enum NumberRuleType {
-  Min = 'number:min',
-  Max = 'number:max',
-  AllowedValues = 'number:allowed-values',
+  Min = "number:min",
+  Max = "number:max",
+  AllowedValues = "number:allowed-values",
 }
 
 export enum BooleanRuleType {
-  Truthy = 'boolean:truthy',
-  Falsy = 'boolean:falsy',
-  CaseSensitive = 'boolean:case-sensitive',
+  Truthy = "boolean:truthy",
+  Falsy = "boolean:falsy",
+  CaseSensitive = "boolean:case-sensitive",
 }
 
 export enum CommonRuleType {
-  Optional = 'optional',
-  Default = 'default',
-  Custom = 'custom',
-  Transform = 'transform',
-  Trim = 'trim',
+  Optional = "optional",
+  Default = "default",
+  Custom = "custom",
+  Transform = "transform",
+  Trim = "trim",
 }
 
 export type StringSchemaRule = CommonRuleType | StringRuleType;
