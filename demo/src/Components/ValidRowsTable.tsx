@@ -1,7 +1,7 @@
-import { Box, Typography, Paper } from '@mui/material';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { useMemo } from 'react';
-import type { GridColDef } from '@mui/x-data-grid';
+import { Box, Typography, Paper } from "@mui/material";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { useMemo } from "react";
+import type { GridColDef } from "@mui/x-data-grid";
 
 interface ValidRowsTableProps {
   rows: any[];
@@ -27,11 +27,14 @@ export default function ValidRowsTable({ rows }: ValidRowsTableProps) {
   }, [rows]);
 
   return (
-    <Paper elevation={0} sx={{ p: 3, border: '1px solid #e0e0e0', borderRadius: 2 }}>
-      <Typography variant="h6" sx={{ fontWeight: 'bold' }} gutterBottom>
+    <Paper
+      elevation={0}
+      sx={{ p: 3, border: "1px solid #e0e0e0", borderRadius: 2 }}
+    >
+      <Typography variant="h6" sx={{ fontWeight: "bold" }} gutterBottom>
         Valid Rows
       </Typography>
-      <Box sx={{ height: 400, width: '100%', mt: 2 }}>
+      <Box sx={{ height: 400, width: "100%", mt: 2 }}>
         <DataGrid
           rows={rowsWithIds}
           columns={columns}
