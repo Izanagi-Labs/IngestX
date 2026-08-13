@@ -1,11 +1,11 @@
-import { Rule } from '../../../model/schema/types/Rule';
-import { CommonRuleType, RuleType } from '../../../model/schema/types/RuleType';
+import { Rule } from "../../../model/schema/types/Rule";
+import { CommonRuleType, RuleType } from "../../../model/schema/types/RuleType";
 import {
   RuleExecutionState,
   ValidationContext,
   ValidationErrorType,
-} from '../types';
-import { createError, isEmpty } from '../utils';
+} from "../types";
+import { createError, isEmpty } from "../utils";
 
 export function handleEmptyValue({
   state,
@@ -19,7 +19,7 @@ export function handleEmptyValue({
       state.stop = true;
     } else {
       state.errors.push(
-        createError(ValidationErrorType.Required, 'Value is required'),
+        createError(ValidationErrorType.Required, "Value is required"),
       );
       state.stop = true;
     }
@@ -39,7 +39,7 @@ export function executeCommonRule(
       break;
 
     case CommonRuleType.Transform:
-      if (typeof rule.value === 'function') {
+      if (typeof rule.value === "function") {
         state.value = rule.value(state.value, context.row);
       }
       break;
@@ -49,13 +49,13 @@ export function executeCommonRule(
       break;
 
     case CommonRuleType.Custom:
-      if (typeof rule.value === 'function') {
+      if (typeof rule.value === "function") {
         const [isValid, customMessage] = rule.value(state.value, context.row);
         if (!isValid) {
           state.errors.push(
             createError(
               rule.type,
-              customMessage || rule.message || 'Custom validation failed',
+              customMessage || rule.message || "Custom validation failed",
             ),
           );
         }

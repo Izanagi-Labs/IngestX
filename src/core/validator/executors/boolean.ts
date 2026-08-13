@@ -1,16 +1,16 @@
-import { Rule } from '../../../model/schema/types/Rule';
+import { Rule } from "../../../model/schema/types/Rule";
 import {
   RuleType,
   BooleanRuleType,
-} from '../../../model/schema/types/RuleType';
-import { RuleExecutionState } from '../types';
-import { createError } from '../utils';
+} from "../../../model/schema/types/RuleType";
+import { RuleExecutionState } from "../types";
+import { createError } from "../utils";
 
 export function executeBooleanRule(
   rules: readonly Rule<RuleType>[],
   state: RuleExecutionState,
 ): void {
-  if (typeof state.value !== 'string') {
+  if (typeof state.value !== "string") {
     return;
   }
 
@@ -34,20 +34,20 @@ export function executeBooleanRule(
   if (truthyRule && Array.isArray(truthyRule.value)) {
     truthyRule.value.forEach((v) => allowed.add(normalize(v)));
   } else {
-    allowed.add(normalize('true'));
+    allowed.add(normalize("true"));
   }
 
   if (falsyRule && Array.isArray(falsyRule.value)) {
     falsyRule.value.forEach((v) => allowed.add(normalize(v)));
   } else {
-    allowed.add(normalize('false'));
+    allowed.add(normalize("false"));
   }
 
   if (!allowed.has(normalize(currentValue))) {
     state.errors.push(
       createError(
         BooleanRuleType.Truthy,
-        'Expected value to be a valid boolean',
+        "Expected value to be a valid boolean",
       ),
     );
   }

@@ -1,7 +1,7 @@
-import { Rule } from '../../../model/schema/types/Rule';
-import { RuleType, StringRuleType } from '../../../model/schema/types/RuleType';
-import { RuleExecutionState, ValidationContext } from '../types';
-import { createError } from '../utils';
+import { Rule } from "../../../model/schema/types/Rule";
+import { RuleType, StringRuleType } from "../../../model/schema/types/RuleType";
+import { RuleExecutionState, ValidationContext } from "../types";
+import { createError } from "../utils";
 
 export function executeStringRule(
   rule: Rule<RuleType>,
@@ -58,7 +58,7 @@ export function executeStringRule(
             return allowedValue === currentValue;
           }
           return (
-            typeof allowedValue === 'string' &&
+            typeof allowedValue === "string" &&
             allowedValue.toLowerCase() === currentValue.toLowerCase()
           );
         });

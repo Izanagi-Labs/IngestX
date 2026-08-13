@@ -1,6 +1,6 @@
-import { ResolvedColumn } from '../headers/types';
-import { ChunkValidationResult, RowValidationResult } from './types';
-import { validateRow } from './validateRow';
+import { ResolvedColumn } from "../headers/types";
+import { ChunkValidationResult, RowValidationResult } from "./types";
+import { validateRow } from "./validateRow";
 
 export function validateChunk<TRow>(
   chunk: Record<string, string>[],

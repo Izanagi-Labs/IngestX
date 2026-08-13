@@ -1,6 +1,6 @@
-import type { RowValidationResult, ValidationContext } from './types';
-import { executeRules } from './executeRules';
-import { ResolvedColumn } from '../headers/types';
+import type { RowValidationResult, ValidationContext } from "./types";
+import { executeRules } from "./executeRules";
+import { ResolvedColumn } from "../headers/types";
 
 export function validateRow<TRow>(
   row: Record<string, string>,
@@ -13,7 +13,7 @@ export function validateRow<TRow>(
   };
 
   const validatedData: Record<string, unknown> = {};
-  const errors: RowValidationResult<TRow>['errors'] = {};
+  const errors: RowValidationResult<TRow>["errors"] = {};
 
   let valid = true;
 

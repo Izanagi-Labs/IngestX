@@ -1,9 +1,9 @@
-import { RuleType } from '../../model/schema/types/RuleType';
-import { ValidationError } from '../../model/schema/types/ValidationResult';
+import { RuleType } from "../../model/schema/types/RuleType";
+import { ValidationError } from "../../model/schema/types/ValidationResult";
 
 export enum ValidationErrorType {
-  InvalidType = 'invalid_type',
-  Required = 'required',
+  InvalidType = "invalid_type",
+  Required = "required",
 }
 
 export type RuleWithValidationType = RuleType | ValidationErrorType;

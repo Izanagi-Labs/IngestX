@@ -1,11 +1,11 @@
-import { Rule } from '../../../model/schema/types/Rule';
-import { RuleType, NumberRuleType } from '../../../model/schema/types/RuleType';
+import { Rule } from "../../../model/schema/types/Rule";
+import { RuleType, NumberRuleType } from "../../../model/schema/types/RuleType";
 import {
   RuleExecutionState,
   ValidationContext,
   ValidationErrorType,
-} from '../types';
-import { createError } from '../utils';
+} from "../types";
+import { createError } from "../utils";
 
 export function executeNumberRule(
   rule: Rule<RuleType>,
@@ -27,7 +27,7 @@ export function executeNumberRule(
     state.errors.push(
       createError(
         ValidationErrorType.InvalidType,
-        'Expected value to be a valid number',
+        "Expected value to be a valid number",
       ),
     );
 

@@ -1,20 +1,20 @@
-import { Rule } from '../../model/schema/types/Rule';
+import { Rule } from "../../model/schema/types/Rule";
 import {
   RuleType,
   CommonRuleType,
   StringRuleType,
   NumberRuleType,
   BooleanRuleType,
-} from '../../model/schema/types/RuleType';
+} from "../../model/schema/types/RuleType";
 import {
   FieldValidationResult,
   RuleExecutionState,
   ValidationContext,
-} from './types';
-import { executeCommonRule } from './executors/common';
-import { executeStringRule } from './executors/string';
-import { executeNumberRule } from './executors/number';
-import { executeBooleanRule } from './executors/boolean';
+} from "./types";
+import { executeCommonRule } from "./executors/common";
+import { executeStringRule } from "./executors/string";
+import { executeNumberRule } from "./executors/number";
+import { executeBooleanRule } from "./executors/boolean";
 
 export function executeRules(
   value: unknown,
