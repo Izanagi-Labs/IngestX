@@ -1,5 +1,5 @@
-import Papa from 'papaparse';
-import { Parser, RowsAndHeaders } from '../types';
+import Papa from "papaparse";
+import { Parser, RowsAndHeaders } from "../types";
 
 export class CSVParser implements Parser {
   constructor(
