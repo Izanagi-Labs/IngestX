@@ -1,15 +1,15 @@
-import { CSVParser } from './CsvParser';
-import { ExcelParser } from './ExcelParser';
+import { CSVParser } from "./CsvParser";
+import { ExcelParser } from "./ExcelParser";
 
 export function createParser(file: File, worker?: boolean) {
-  const extension = file.name.split('.').pop()?.toLowerCase();
+  const extension = file.name.split(".").pop()?.toLowerCase();
 
   switch (extension) {
-    case 'csv':
+    case "csv":
       return new CSVParser(file, worker).parse();
 
-    case 'xlsx':
-    case 'xls':
+    case "xlsx":
+    case "xls":
       return new ExcelParser(file).parse();
 
     default:

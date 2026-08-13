@@ -1,2 +1,2 @@
-export { createParser } from './createParser';
-export type { RowsAndHeaders } from './types';
+export { createParser } from "./createParser";
+export type { RowsAndHeaders } from "./types";
