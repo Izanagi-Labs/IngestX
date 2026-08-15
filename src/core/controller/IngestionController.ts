@@ -5,6 +5,11 @@ export class IngestionController {
   private status = IngestionStatus.Idle;
 
   private resumeResolver: (() => void) | null = null;
+  private cancelListeners: (() => void)[] = [];
+
+  onCancel(callback: () => void): void {
+    this.cancelListeners.push(callback);
+  }
 
   start(): void {
     this.status = IngestionStatus.Running;
@@ -29,6 +34,14 @@ export class IngestionController {
 
   cancel(): void {
     this.status = IngestionStatus.Cancelled;
+
+    for (const listener of this.cancelListeners) {
+      try {
+        listener();
+      } catch (e) {
+        console.error("Error in cancel listener", e);
+      }
+    }
 
     // Wake the processing loop if it's waiting.
     this.resumeResolver?.();
