@@ -1,25 +1,47 @@
 import * as XLSX from "xlsx";
 
+let rows: Record<string, unknown>[] = [];
+let headers: string[] = [];
+let currentOffset = 0;
+let chunkSize = 0;
+let initialized = false;
+
 self.onmessage = async (event) => {
-  const { file, chunkSize } = event.data;
+  const message = event.data;
 
   try {
-    const buffer = await file.arrayBuffer();
+    if (message.type === "init") {
+      const { file, chunkSize: size } = message;
+      chunkSize = size;
+      currentOffset = 0;
 
-    const workbook = XLSX.read(buffer, {
-      type: "array",
-    });
+      const buffer = await file.arrayBuffer();
 
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const workbook = XLSX.read(buffer, {
+        type: "array",
+      });
 
-    const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
-      defval: "",
-    });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-    const headers = rows.length ? Object.keys(rows[0]) : [];
+      rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
+        defval: "",
+      });
 
-    for (let i = 0; i < rows.length; i += chunkSize) {
-      const chunk = rows.slice(i, i + chunkSize);
+      headers = rows.length ? Object.keys(rows[0]) : [];
+      initialized = true;
+
+      self.postMessage({ type: "ready" });
+    } else if (message.type === "next") {
+      if (!initialized) return;
+
+      if (currentOffset >= rows.length) {
+        self.postMessage({
+          type: "done",
+        });
+        return;
+      }
+
+      const chunk = rows.slice(currentOffset, currentOffset + chunkSize);
 
       const parsedRows = chunk.map((row) => {
         const result: Record<string, string> = {};
@@ -36,14 +58,12 @@ self.onmessage = async (event) => {
         payload: {
           headers,
           rows: parsedRows,
-          startIndex: i,
+          startIndex: currentOffset,
         },
       });
-    }
 
-    self.postMessage({
-      type: "done",
-    });
+      currentOffset += chunkSize;
+    }
   } catch (error) {
     self.postMessage({
       type: "error",

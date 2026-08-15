@@ -53,6 +53,7 @@ describe("ExcelParser", () => {
         .next()
         .catch(() => {});
       expect(activeWorker?.postMessage).toHaveBeenCalledWith({
+        type: "init",
         file: mockFile,
         chunkSize: 10000,
       });
