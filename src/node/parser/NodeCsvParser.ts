@@ -326,25 +326,7 @@ export class NodeCsvParser implements Parser {
     return Math.min(this.fileStream.bytesRead, fileSize);
   }
 
-  private get lastKnownHeaders(): string[] {
-    /*
-     * Once headers are resolved, this promise has already completed.
-     * Keep the header values separately instead of trying to synchronously
-     * inspect the promise.
-     */
-    return this.headers;
-  }
-
   private headers: string[] = [];
-
-  private resolveHeaderState(headers: string[]): void {
-    this.headers = headers;
-
-    if (!this.headersResolved) {
-      this.headersResolved = true;
-      this.resolveHeaders(headers);
-    }
-  }
 
   private resumeParser(): void {
     if (this.aborted || this.completed || !this.parserHandle) {

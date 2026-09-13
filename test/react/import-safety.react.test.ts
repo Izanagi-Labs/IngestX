@@ -7,13 +7,17 @@ describe("React Import Safety (SSR)", () => {
   it("can import the built react module in a pure Node process without DOM/Vite leaks", () => {
     const builtPath = path.resolve(__dirname, "../../dist/react.js");
     if (!fs.existsSync(builtPath)) {
-      console.warn("Skipping React import-safety test because dist/react.js does not exist yet. Run `npm run build` first.");
+      console.warn(
+        "Skipping React import-safety test because dist/react.js does not exist yet. Run `npm run build` first.",
+      );
       return;
     }
 
     const testScriptPath = path.resolve(__dirname, "temp-react-import-test.js");
-    
-    fs.writeFileSync(testScriptPath, `
+
+    fs.writeFileSync(
+      testScriptPath,
+      `
       // Strict verification of pure node context
       if (typeof window !== "undefined") {
         console.error("FAIL: window is defined");
@@ -35,7 +39,8 @@ describe("React Import Safety (SSR)", () => {
         console.error("FAIL: Error importing:", err);
         process.exit(1);
       });
-    `);
+    `,
+    );
 
     try {
       const output = execSync(`node ${testScriptPath}`, { encoding: "utf-8" });

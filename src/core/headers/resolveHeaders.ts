@@ -33,8 +33,10 @@ export function resolveHeaders(
     });
   }
 
-  const resolvedHeaderNames = new Set(resolvedColumns.map(rc => rc.header));
-  const unexpected = headers.filter((header) => !resolvedHeaderNames.has(header));
+  const resolvedHeaderNames = new Set(resolvedColumns.map((rc) => rc.header));
+  const unexpected = headers.filter(
+    (header) => !resolvedHeaderNames.has(header),
+  );
 
   if (missing.length || unexpected.length) {
     return {

@@ -21,10 +21,10 @@ describe("E2E: Progress", () => {
     await ingestion.result;
 
     expect(events.length).toBeGreaterThan(0);
-    
+
     // First event should be initializing
     expect(events[0].phase).toBe("initializing");
-    
+
     // Last event should be completed
     const lastEvent = events[events.length - 1];
     expect(lastEvent.phase).toBe("completed");
@@ -61,7 +61,7 @@ describe("E2E: Progress", () => {
     await ingestion.result;
 
     expect(events.length).toBeGreaterThan(0);
-    
+
     expect(events[0].phase).toBe("initializing");
     const lastEvent = events[events.length - 1];
     expect(lastEvent.phase).toBe("completed");
@@ -73,10 +73,10 @@ describe("E2E: Progress", () => {
       }
       expect(p.basis).toBe("rows");
     });
-    
+
     // Excel knows total rows (1 header + 4 rows = 5 rows materialised in sheet, or 4 data rows, check if it's > 0)
     expect(lastEvent.totalRows).toBeGreaterThan(0);
-    
+
     const completedEvents = events.filter((e) => e.phase === "completed");
     expect(completedEvents.length).toBe(1);
   });
@@ -87,7 +87,7 @@ describe("E2E: Progress", () => {
     ];
 
     const file = generateCSV(["ID"], [[1], [2], [3], [4]]);
-    
+
     let chunkCount = 0;
     let progressCount = 0;
 

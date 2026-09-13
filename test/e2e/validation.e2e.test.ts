@@ -30,7 +30,7 @@ describe("E2E: Validation & Header Mismatch", () => {
         ["A", 30, "true"], // Invalid: Name too short
         ["Bob", 12, "true"], // Invalid: Age too young
         ["Charlie", 40, "not-a-boolean"], // Invalid: not a boolean
-      ]
+      ],
     );
 
     const ingestion = ingest({
@@ -46,7 +46,7 @@ describe("E2E: Validation & Header Mismatch", () => {
     expect(data?.invalidRowsCount).toBe(3);
 
     expect(data?.invalidRows.length).toBe(3);
-    
+
     // The first invalid row should be "A", 30, "true"
     expect(data?.invalidRows[0]).toMatchObject({
       name: "A",
@@ -69,9 +69,7 @@ describe("E2E: Validation & Header Mismatch", () => {
 
     const file = generateCSV(
       ["Name", "Email"], // Missing 'Age'
-      [
-        ["Alice", "alice@example.com"],
-      ]
+      [["Alice", "alice@example.com"]],
     );
 
     const ingestion = ingest({
@@ -84,7 +82,9 @@ describe("E2E: Validation & Header Mismatch", () => {
 
     expect(status).toBe("failed");
     expect(error?.type).toBe(IngestionErrorType.HEADER_MISMATCH);
-    expect(error?.message).toContain("File headers do not match the expected schema.");
+    expect(error?.message).toContain(
+      "File headers do not match the expected schema.",
+    );
   });
 
   it("respects matchHeader for header variations", async () => {
@@ -97,12 +97,7 @@ describe("E2E: Validation & Header Mismatch", () => {
       },
     ];
 
-    const file = generateCSV(
-      ["Full Name"],
-      [
-        ["Alice"],
-      ]
-    );
+    const file = generateCSV(["Full Name"], [["Alice"]]);
 
     const ingestion = ingest({
       file,

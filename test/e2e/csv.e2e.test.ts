@@ -24,7 +24,7 @@ describe("E2E: CSV Happy Path", () => {
         ["Alice", 30],
         ["Bob", 25],
         ["Charlie", 40],
-      ]
+      ],
     );
 
     const ingestion = ingest({

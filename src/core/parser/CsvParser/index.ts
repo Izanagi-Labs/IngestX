@@ -71,7 +71,7 @@ export class CSVParser implements Parser {
         }
 
         headers = meta.fields ?? [];
-        
+
         if (!this.headersResolvedFlag) {
           this.resolveHeaders(headers);
           this.headersResolvedFlag = true;

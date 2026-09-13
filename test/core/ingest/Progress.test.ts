@@ -44,7 +44,7 @@ describe("ProgressTracker Lifecycle and Features", () => {
     expect(phases).toContain("initializing");
     expect(phases).toContain("parsing");
     expect(phases[phases.length - 1]).toBe("completed");
-    
+
     // Verify basis and types for CSV
     const parsingEvents = progressEvents.filter((p) => p.phase === "parsing");
     const lastParsingEvent = parsingEvents[parsingEvents.length - 1];
@@ -52,7 +52,7 @@ describe("ProgressTracker Lifecycle and Features", () => {
     expect(lastParsingEvent.totalBytes).toBe(file.size);
     expect(lastParsingEvent.totalRows).toBeUndefined();
     expect(lastParsingEvent.processedBytes).toBeGreaterThan(0);
-    
+
     const finalEvent = progressEvents[progressEvents.length - 1];
     expect(finalEvent.percentage).toBe(1);
     expect(finalEvent.processedBytes).toBe(file.size);
@@ -75,7 +75,7 @@ describe("ProgressTracker Lifecycle and Features", () => {
     expect(phases[0]).toBe("initializing");
     expect(phases[phases.length - 1]).toBe("failed");
     expect(phases).not.toContain("parsing");
-    
+
     const finalEvent = progressEvents[progressEvents.length - 1];
     expect(finalEvent.processedRows).toBe(0);
   });
@@ -121,9 +121,11 @@ describe("ProgressTracker Lifecycle and Features", () => {
       // Cancellation throws
     }
 
-    const cancelledEvents = progressEvents.filter((p) => p.phase === "cancelled");
+    const cancelledEvents = progressEvents.filter(
+      (p) => p.phase === "cancelled",
+    );
     expect(cancelledEvents.length).toBe(1);
-    
+
     const finalEvent = progressEvents[progressEvents.length - 1];
     expect(finalEvent.phase).toBe("cancelled"); // No further progress emitted after cancel
   });
@@ -140,17 +142,16 @@ describe("ProgressTracker Lifecycle and Features", () => {
     });
 
     instance.pause();
-    
+
     // Wait a bit to ensure it doesn't process chunks while paused
     await new Promise((r) => setTimeout(r, 20));
-    
+
     const countWhilePaused = progressEvents.length;
-    
+
     instance.resume();
     await instance.result;
 
     const countAfterResume = progressEvents.length;
     expect(countAfterResume).toBeGreaterThan(countWhilePaused);
   });
-
 });

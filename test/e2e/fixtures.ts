@@ -27,12 +27,22 @@ if (typeof globalThis !== "undefined" && !(globalThis as any).FileReader) {
   (globalThis as any).FileReader = PolyfillFileReader;
 }
 
-export function generateCSV(headers: string[], rows: any[][], filename = "test.csv"): File {
-  const content = [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
+export function generateCSV(
+  headers: string[],
+  rows: any[][],
+  filename = "test.csv",
+): File {
+  const content = [headers.join(","), ...rows.map((row) => row.join(","))].join(
+    "\n",
+  );
   return new File([content], filename, { type: "text/csv" });
 }
 
-export function generateExcel(headers: string[], rows: any[][], filename = "test.xlsx"): File {
+export function generateExcel(
+  headers: string[],
+  rows: any[][],
+  filename = "test.xlsx",
+): File {
   const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Sheet1");

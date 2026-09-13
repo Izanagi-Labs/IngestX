@@ -8,19 +8,22 @@ vi.unmock("../src/core/parser/ExcelParser/excel.worker.ts?worker&inline");
 
 import ExcelWorker from "../src/core/parser/ExcelParser/excel.worker.ts?worker&inline";
 
-test('unmocked ExcelWorker', () => {
-    console.log("ExcelWorker is:", ExcelWorker);
-    
-    let called = false;
-    vi.stubGlobal("Worker", class {
+test("unmocked ExcelWorker", () => {
+  console.log("ExcelWorker is:", ExcelWorker);
+
+  let called = false;
+  vi.stubGlobal(
+    "Worker",
+    class {
       constructor() {
         called = true;
       }
-    });
-    
-    try {
-      new ExcelWorker();
-    } catch(e) {}
-    
-    expect(called).toBe(true);
+    },
+  );
+
+  try {
+    new ExcelWorker();
+  } catch (e) {}
+
+  expect(called).toBe(true);
 });

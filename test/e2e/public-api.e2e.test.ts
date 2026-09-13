@@ -32,7 +32,7 @@ describe("E2E: Public API Runtime", () => {
       [
         ["Alice", 30],
         ["Bob", 25],
-      ]
+      ],
     );
 
     const ingestion = ingestAlias({
@@ -42,7 +42,7 @@ describe("E2E: Public API Runtime", () => {
     });
 
     const { data, error, status } = await ingestion.result;
-    
+
     console.log("public-api data:", JSON.stringify(data, null, 2));
     if (error) {
       console.log("public-api error:", JSON.stringify(error, null, 2));

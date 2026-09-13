@@ -39,7 +39,7 @@ export class IngestionController {
     ) {
       return;
     }
-    
+
     this.status = IngestionStatus.Cancelled;
 
     for (const listener of this.cancelListeners) {

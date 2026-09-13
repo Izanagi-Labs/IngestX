@@ -115,4 +115,7 @@ export type ParserOptions = Pick<
   "worker" | "chunkSize" | "byteChunkSize"
 >;
 
-export type ParserFactory = (file: File, options?: ParserOptions) => import("../parser/types").Parser;
+export type ParserFactory = (
+  file: File,
+  options?: ParserOptions,
+) => import("../parser/types").Parser;

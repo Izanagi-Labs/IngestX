@@ -7,7 +7,7 @@ export function createParser(
   file: File,
   options?: Pick<IngestOptions<any>, "worker" | "chunkSize" | "byteChunkSize">,
 ): Parser {
-  const fileName = (file && typeof file.name === "string") ? file.name : "";
+  const fileName = file && typeof file.name === "string" ? file.name : "";
   const extension = fileName.split(".").pop()?.toLowerCase();
 
   switch (extension) {

@@ -9,7 +9,7 @@ if (!(globalThis as any).workerScope) {
       if (mock && mock.onmessage) {
         mock.onmessage({ data });
       }
-    }
+    },
   };
   (globalThis as any).self = (globalThis as any).workerScope;
   // Evaluate the worker logic once
@@ -21,12 +21,12 @@ vi.mock("@/src/core/parser/ExcelParser/excel.worker.ts?worker&inline", () => {
   return {
     default: class MockWorker {
       onmessage: any;
-      
+
       constructor() {
         // Attach this instance to the singleton scope
         (globalThis as any).workerScope.currentMock = this;
       }
-      
+
       postMessage(data: any) {
         setTimeout(() => {
           if ((globalThis as any).workerScope.onmessage) {
@@ -34,12 +34,12 @@ vi.mock("@/src/core/parser/ExcelParser/excel.worker.ts?worker&inline", () => {
           }
         }, 0);
       }
-      
+
       terminate() {
         if ((globalThis as any).workerScope.currentMock === this) {
           (globalThis as any).workerScope.currentMock = null;
         }
       }
-    }
+    },
   };
 });

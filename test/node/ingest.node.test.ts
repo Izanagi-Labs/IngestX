@@ -119,12 +119,12 @@ describe("Node Ingestion E2E", () => {
   it("fails for unsupported file extensions", async () => {
     const txtPath = path.join(testDir, "test.txt");
     fs.writeFileSync(txtPath, "dummy content");
-    
+
     const instance = ingest({
       filePath: txtPath,
       columns,
     });
-    
+
     const result = await instance.result;
     expect(result.status).toBe(IngestionStatus.Failed);
     expect(result.error?.message).toContain("Unsupported file type: txt");

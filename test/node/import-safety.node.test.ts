@@ -6,19 +6,23 @@ import path from "path";
 describe("Node Import Safety", () => {
   it("can import the built node module in a pure Node process without DOM/Vite leaks", () => {
     // This test ensures the built node artifact doesn't crash when imported in a bare node process.
-    
+
     // First, ensure the build exists, else we can't test it.
     // If not built, we skip or fail depending on CI environment, but since this is local testing, we assume build runs first.
     const builtPath = path.resolve(__dirname, "../../dist/node.js");
     if (!fs.existsSync(builtPath)) {
-      console.warn("Skipping import-safety test because dist/node.js does not exist yet. Run `npm run build` first.");
+      console.warn(
+        "Skipping import-safety test because dist/node.js does not exist yet. Run `npm run build` first.",
+      );
       return;
     }
 
     const testScriptPath = path.resolve(__dirname, "temp-import-test.js");
-    
+
     // Create a script that imports the module and asserts no window/document exists.
-    fs.writeFileSync(testScriptPath, `
+    fs.writeFileSync(
+      testScriptPath,
+      `
       // Strict verification of pure node context
       if (typeof window !== "undefined") {
         console.error("FAIL: window is defined");
@@ -40,7 +44,8 @@ describe("Node Import Safety", () => {
         console.error("FAIL: Error importing:", err);
         process.exit(1);
       });
-    `);
+    `,
+    );
 
     try {
       const output = execSync(`node ${testScriptPath}`, { encoding: "utf-8" });

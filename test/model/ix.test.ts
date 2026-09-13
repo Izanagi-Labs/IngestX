@@ -50,7 +50,7 @@ describe("ix Schema Factory", () => {
       name: "Active",
       schema: ix.boolean(),
     };
-    
+
     expect(true).toBe(true);
   });
 });

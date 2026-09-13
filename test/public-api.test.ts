@@ -7,7 +7,7 @@ import * as IngestX from "@/src/index";
 describe("Public API Boundary", () => {
   it("exports only intended public runtime APIs", () => {
     const exportedKeys = Object.keys(IngestX).sort();
-    
+
     // Parser classes and internal controllers MUST NOT be exported
     expect(exportedKeys).not.toContain("CSVParser");
     expect(exportedKeys).not.toContain("ExcelParser");
@@ -18,13 +18,10 @@ describe("Public API Boundary", () => {
     expect(exportedKeys).not.toContain("NumberSchema");
     expect(exportedKeys).not.toContain("BooleanSchema");
     expect(exportedKeys).not.toContain("BaseSchema");
-    
-    expect(exportedKeys).toEqual([
-      "IngestionErrorType",
-      "IngestionStatus",
-      "ingest",
-      "ix"
-    ].sort());
+
+    expect(exportedKeys).toEqual(
+      ["IngestionErrorType", "IngestionStatus", "ingest", "ix"].sort(),
+    );
   });
 
   it("integrates createParser and coreIngest correctly via the public ingest() API", async () => {
@@ -35,7 +32,7 @@ describe("Public API Boundary", () => {
       file,
       columns: [
         { key: "a", name: "a", schema: IngestX.ix.string() },
-        { key: "b", name: "b", schema: IngestX.ix.string() }
+        { key: "b", name: "b", schema: IngestX.ix.string() },
       ],
       collectResults: true,
     });
@@ -50,4 +47,3 @@ describe("Public API Boundary", () => {
     expect(data.validRows[0]).toEqual({ a: "1", b: "2" });
   });
 });
-

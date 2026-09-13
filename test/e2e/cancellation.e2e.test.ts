@@ -61,11 +61,11 @@ describe("E2E: Cancellation", () => {
     const { status } = await ingestion.result;
 
     expect(status).toBe(IngestionStatus.Cancelled);
-    
+
     // Exactly one terminal event of phase 'cancelled'
     const cancelledEvents = events.filter((e) => e.phase === "cancelled");
     expect(cancelledEvents.length).toBe(1);
-    
+
     // No completed event after cancellation
     const completedEvents = events.filter((e) => e.phase === "completed");
     expect(completedEvents.length).toBe(0);
@@ -78,13 +78,13 @@ describe("E2E: Cancellation", () => {
 
     const file = generateCSV(["ID"], [[1], [2]]);
     const ingestion = ingest({ file, columns });
-    
+
     const { status } = await ingestion.result;
     expect(status).toBe(IngestionStatus.Completed);
 
     // Cancel after completed
     ingestion.cancel();
-    
+
     // State should remain COMPLETED according to lifecycle contract
     expect(ingestion.status).toBe(IngestionStatus.Completed);
   });

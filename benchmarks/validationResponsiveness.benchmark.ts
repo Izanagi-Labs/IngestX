@@ -47,8 +47,9 @@ class PolyfillFileReader {
   public onerror: ((ev: any) => void) | null = null;
 
   public readAsText(file: File | any) {
-    if (typeof file.text === 'function') {
-      file.text()
+    if (typeof file.text === "function") {
+      file
+        .text()
         .then((text: string) => {
           this.result = text;
           if (this.onload) this.onload({ target: this });
@@ -80,26 +81,69 @@ const schemas = {
     { key: "name", displayNames: ["name"], type: "string" as const },
   ],
   multiple: [
-    { key: "id", displayNames: ["id"], type: "number" as const, schema: new NumberSchema().min(0).max(1000000) },
-    { key: "name", displayNames: ["name"], type: "string" as const, schema: new StringSchema().min(2).max(100) },
-    { key: "email", displayNames: ["email"], type: "string" as const, schema: new StringSchema().regex(/^[^@]+@[^@]+\.[^@]+$/) },
-    { key: "age", displayNames: ["age"], type: "number" as const, schema: new NumberSchema().min(18).max(99) },
+    {
+      key: "id",
+      displayNames: ["id"],
+      type: "number" as const,
+      schema: new NumberSchema().min(0).max(1000000),
+    },
+    {
+      key: "name",
+      displayNames: ["name"],
+      type: "string" as const,
+      schema: new StringSchema().min(2).max(100),
+    },
+    {
+      key: "email",
+      displayNames: ["email"],
+      type: "string" as const,
+      schema: new StringSchema().regex(/^[^@]+@[^@]+\.[^@]+$/),
+    },
+    {
+      key: "age",
+      displayNames: ["age"],
+      type: "number" as const,
+      schema: new NumberSchema().min(18).max(99),
+    },
   ],
   regexHeavy: [
-    { key: "email", displayNames: ["email"], type: "string" as const, schema: new StringSchema().regex(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/) },
-    { key: "status", displayNames: ["status"], type: "string" as const, schema: new StringSchema().regex(/^(ACTIVE|INACTIVE|PENDING)$/) },
+    {
+      key: "email",
+      displayNames: ["email"],
+      type: "string" as const,
+      schema: new StringSchema().regex(
+        /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
+      ),
+    },
+    {
+      key: "status",
+      displayNames: ["status"],
+      type: "string" as const,
+      schema: new StringSchema().regex(/^(ACTIVE|INACTIVE|PENDING)$/),
+    },
   ],
   custom: [
-    { key: "name", displayNames: ["name"], type: "string" as const, schema: new StringSchema().custom((val) => [String(val).length > 5, "Too short"]) },
+    {
+      key: "name",
+      displayNames: ["name"],
+      type: "string" as const,
+      schema: new StringSchema().custom((val) => [
+        String(val).length > 5,
+        "Too short",
+      ]),
+    },
   ],
 };
 
 async function runBenchmark(
   rowCount: number,
   chunkSize: number,
-  schemaType: keyof typeof schemas
+  schemaType: keyof typeof schemas,
 ) {
-  const csvContent = generateCsv(rowCount, (i) => `${i},User${i},user${i}@example.com,${20 + (i % 50)},ACTIVE`);
+  const csvContent = generateCsv(
+    rowCount,
+    (i) => `${i},User${i},user${i}@example.com,${20 + (i % 50)},ACTIVE`,
+  );
   const file = new File([csvContent], "test.csv", { type: "text/csv" });
 
   let maxBlockTime = 0;
@@ -131,9 +175,18 @@ async function runBenchmark(
       if (instance.status === "completed") {
         clearInterval(check);
         resolve();
-      } else if (instance.status === "failed" || instance.status === "cancelled" || instance.status === "error") {
+      } else if (
+        instance.status === "failed" ||
+        instance.status === "cancelled" ||
+        instance.status === "error"
+      ) {
         clearInterval(check);
-        reject(new Error("Ingestion did not complete successfully. Status: " + instance.status));
+        reject(
+          new Error(
+            "Ingestion did not complete successfully. Status: " +
+              instance.status,
+          ),
+        );
       }
     }, 10);
   });
@@ -156,23 +209,26 @@ async function runBenchmark(
 
 async function main() {
   console.log("Starting Validation Responsiveness Benchmark...");
-  
-  const scenarios = [
-    { rows: 100000, chunks: [10000, 2000, 1000, 500] },
-  ];
 
-  const schemaTypes = ["lightweight", "multiple", "regexHeavy", "custom"] as const;
+  const scenarios = [{ rows: 100000, chunks: [10000, 2000, 1000, 500] }];
+
+  const schemaTypes = [
+    "lightweight",
+    "multiple",
+    "regexHeavy",
+    "custom",
+  ] as const;
 
   for (const scenario of scenarios) {
     for (const schema of schemaTypes) {
       for (const chunk of scenario.chunks) {
         // Warmup
         await runBenchmark(1000, chunk, schema);
-        
+
         const result = await runBenchmark(scenario.rows, chunk, schema);
         console.log(
           `[${schema}] Rows: ${result.rowCount.toLocaleString()} | Chunk: ${result.chunkSize.toLocaleString()} | ` +
-          `Throughput: ${result.rowsPerSec.toFixed(0)} rows/s | Max Block: ${result.maxBlockTimeMs.toFixed(1)}ms | Duration: ${result.durationMs.toFixed(0)}ms`
+            `Throughput: ${result.rowsPerSec.toFixed(0)} rows/s | Max Block: ${result.maxBlockTimeMs.toFixed(1)}ms | Duration: ${result.durationMs.toFixed(0)}ms`,
         );
       }
     }

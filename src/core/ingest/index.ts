@@ -25,7 +25,7 @@ function getErrorMessage(error: unknown): string {
 async function runIngestion<TRow>(
   controller: IngestionController,
   options: IngestOptions<TRow>,
-  parserFactory: import("./types").ParserFactory
+  parserFactory: import("./types").ParserFactory,
 ): Promise<IngestionResult<TRow>> {
   controller.start();
 
@@ -99,20 +99,20 @@ async function runIngestion<TRow>(
 
         collector.add(validatedChunk);
 
-        const processedRowsInChunk = validatedChunk.validRows.length + validatedChunk.invalidRows.length;
+        const processedRowsInChunk =
+          validatedChunk.validRows.length + validatedChunk.invalidRows.length;
         progressTracker.updateFromChunk(
           processedRowsInChunk,
           parsedChunk.progress,
           parsedChunk.processedBytes,
-          parsedChunk.totalRows
+          parsedChunk.totalRows,
         );
 
         await options.onChunkProcessed?.({
           chunkIndex: chunkIndex++,
           output: validatedChunk,
           progress: parsedChunk.progress,
-          processedRows:
-            parsedChunk.startIndex + processedRowsInChunk,
+          processedRows: parsedChunk.startIndex + processedRowsInChunk,
         });
 
         await cooperativeYield();
@@ -172,7 +172,7 @@ async function runIngestion<TRow>(
 
 export function coreIngest<TRow>(
   options: IngestOptions<TRow>,
-  parserFactory: import("./types").ParserFactory
+  parserFactory: import("./types").ParserFactory,
 ): IngestionInstance<TRow> {
   const controller = new IngestionController();
 

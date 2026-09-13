@@ -11,10 +11,11 @@ Demo:- [ingestx.vercel.app](https://ingestx.vercel.app/)
 - **📊 Format Support:** Seamlessly process CSV and Excel (`.xlsx`, `.xls`) files.
 - **⚡ Chunk-based Processing:** Prevents browser freezes and memory limits by processing huge files in manageable chunks.
 
-| Format | Parsing Model | Memory Characteristics | Large File Guarantee |
-| --- | --- | --- | --- |
-| CSV | Incremental | Bounded by parser/chunk configuration | Designed for very large files |
-| Excel | Workbook materialization followed by incremental row extraction in Worker | O(workbook representation) | 500MB+ not guaranteed |
+| Format | Parsing Model                                                             | Memory Characteristics                | Large File Guarantee          |
+| ------ | ------------------------------------------------------------------------- | ------------------------------------- | ----------------------------- |
+| CSV    | Incremental                                                               | Bounded by parser/chunk configuration | Designed for very large files |
+| Excel  | Workbook materialization followed by incremental row extraction in Worker | O(workbook representation)            | 500MB+ not guaranteed         |
+
 - **🔍 Robust Validation:** Define schemas with strict types (string, number, boolean), regex rules, min/max limits, and custom validation logic.
 - **🔀 Smart Column Mapping:** Automatically map variations of column headers (e.g., `email`, `Email Address`, `User_Email`) to a single key.
 - **⏯️ Execution Control:** Pause, resume, and cancel the ingestion process on the fly.
@@ -37,7 +38,8 @@ const columns: ColumnConfig[] = [
   {
     key: "id",
     name: "User ID",
-    matchHeader: (header) => header.toLowerCase() === "id" || header.toLowerCase() === "user id",
+    matchHeader: (header) =>
+      header.toLowerCase() === "id" || header.toLowerCase() === "user id",
     schema: ix.number().optional(),
   },
   {
@@ -48,7 +50,8 @@ const columns: ColumnConfig[] = [
   },
 ];
 
-const fileInput = document.querySelector<HTMLInputElement>('input[type="file"]');
+const fileInput =
+  document.querySelector<HTMLInputElement>('input[type="file"]');
 
 fileInput?.addEventListener("change", async (e) => {
   const file = (e.target as HTMLInputElement).files?.[0];
@@ -61,7 +64,7 @@ fileInput?.addEventListener("change", async (e) => {
       if (progress.percentage !== undefined) {
         console.log(`Processing... ${(progress.percentage * 100).toFixed(0)}%`);
       }
-    }
+    },
   });
 
   const { data, error } = await ingestion.result;
@@ -82,12 +85,12 @@ fileInput?.addEventListener("change", async (e) => {
 
 The heart of Ingestx is the schema definition. You define exactly what your data should look like.
 
-| Property             | Type                                | Description                                                                    |
-| -------------------- | ----------------------------------- | ------------------------------------------------------------------------------ |
-| `key`                | `string`                            | The final key the data will be mapped to in the resulting object.              |
-| `name`               | `string`                            | A user-friendly name for this column.                                          |
-| `schema`             | `BaseSchema`                        | A schema instance (e.g. `ix.string()`, `ix.number()`)                          |
-| `matchHeader`        | `(header: string) => boolean`       | Function to match variations of column headers.                                |
+| Property      | Type                          | Description                                                       |
+| ------------- | ----------------------------- | ----------------------------------------------------------------- |
+| `key`         | `string`                      | The final key the data will be mapped to in the resulting object. |
+| `name`        | `string`                      | A user-friendly name for this column.                             |
+| `schema`      | `BaseSchema`                  | A schema instance (e.g. `ix.string()`, `ix.number()`)             |
+| `matchHeader` | `(header: string) => boolean` | Function to match variations of column headers.                   |
 
 #### Schema-Specific Options:
 
@@ -126,7 +129,7 @@ const ingestion = ingest({
     if (progress.percentage !== undefined) {
       console.log(`Progress: ${(progress.percentage * 100).toFixed(2)}%`);
     }
-  }
+  },
 });
 ```
 

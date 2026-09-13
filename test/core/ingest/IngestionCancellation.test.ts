@@ -101,7 +101,9 @@ describe("Ingestion Cancellation & Cleanup Flow", () => {
           setTimeout(() => {
             if (!workerOnMessage) return;
             if (msg.type === "init") {
-              workerOnMessage({ data: { type: "ready", headers: ["a"] } } as any);
+              workerOnMessage({
+                data: { type: "ready", headers: ["a"] },
+              } as any);
             } else if (msg.type === "next") {
               // @ts-expect-error - partial message event
               workerOnMessage({

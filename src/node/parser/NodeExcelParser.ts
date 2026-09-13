@@ -88,7 +88,10 @@ export class NodeExcelParser implements Parser {
     this.initParser();
 
     try {
-      while (!this.completed || (this.rows && this.nextRowIndex < this.rows.length)) {
+      while (
+        !this.completed ||
+        (this.rows && this.nextRowIndex < this.rows.length)
+      ) {
         if (this.aborted) {
           return;
         }

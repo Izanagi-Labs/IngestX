@@ -14,7 +14,7 @@ export class ProgressTracker {
     private readonly onProgress: ((progress: Progress) => void) | undefined,
     file: File,
   ) {
-    const fileName = (file && typeof file.name === "string") ? file.name : "";
+    const fileName = file && typeof file.name === "string" ? file.name : "";
     const ext = fileName.split(".").pop()?.toLowerCase();
     if (ext === "csv") {
       this.basis = "bytes";
@@ -51,11 +51,7 @@ export class ProgressTracker {
 
     this.phase = phase;
 
-    if (
-      phase === "completed" ||
-      phase === "cancelled" ||
-      phase === "failed"
-    ) {
+    if (phase === "completed" || phase === "cancelled" || phase === "failed") {
       this.isTerminal = true;
       if (phase === "completed") {
         this.percentage = 1;

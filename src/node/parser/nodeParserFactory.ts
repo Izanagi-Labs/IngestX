@@ -5,7 +5,7 @@ import { NodeExcelParser } from "./NodeExcelParser";
 
 export function nodeParserFactory(
   filePath: string,
-  options?: ParserOptions
+  options?: ParserOptions,
 ): Parser {
   const extension = filePath.split(".").pop()?.toLowerCase();
 
@@ -14,15 +14,12 @@ export function nodeParserFactory(
       return new NodeCsvParser(
         filePath,
         options?.chunkSize,
-        options?.byteChunkSize
+        options?.byteChunkSize,
       );
 
     case "xlsx":
     case "xls":
-      return new NodeExcelParser(
-        filePath,
-        options?.chunkSize
-      );
+      return new NodeExcelParser(filePath, options?.chunkSize);
 
     default:
       throw new Error(`Unsupported file type: ${extension}`);

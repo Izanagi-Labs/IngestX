@@ -28,12 +28,12 @@ describe("E2E: Lifecycle (Pause/Resume & Concurrent)", () => {
       collectResults: true,
       onChunkProcessed: () => {
         chunksProcessed++;
-        
+
         // Pause after the first chunk
         if (chunksProcessed === 1) {
           ingestion.pause();
           wasPaused = true;
-          
+
           // Verify status synchronously changes to PAUSED
           expect(ingestion.status).toBe(IngestionStatus.Paused);
 
@@ -56,7 +56,7 @@ describe("E2E: Lifecycle (Pause/Resume & Concurrent)", () => {
     expect(wasPaused).toBe(true);
     expect(resumed).toBe(true);
     expect(data?.validRowsCount).toBe(totalRows);
-    
+
     // Ensure no rows were lost or duplicated
     expect(data?.validRows.length).toBe(totalRows);
     const firstId = data?.validRows[0].id;

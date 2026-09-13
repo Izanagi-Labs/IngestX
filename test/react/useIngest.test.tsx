@@ -22,7 +22,13 @@ describe("useIngest Hook", () => {
 
   it("should successfully ingest and update state", async () => {
     const { result } = renderHook(() => useIngest());
-    const file = generateCSV(["name", "age"], [["Alice", 30], ["Bob", 25]]);
+    const file = generateCSV(
+      ["name", "age"],
+      [
+        ["Alice", 30],
+        ["Bob", 25],
+      ],
+    );
     console.log("FILE:", file, typeof file.name, file.name);
 
     await act(async () => {
@@ -65,7 +71,7 @@ describe("useIngest Hook", () => {
     const file = generateCSV(["name", "age"], rows);
 
     let promise: Promise<void>;
-    
+
     act(() => {
       promise = result.current.ingest({
         file,
@@ -87,7 +93,13 @@ describe("useIngest Hook", () => {
 
   it("should explicitly reject rapid concurrent ingestion calls", async () => {
     const { result } = renderHook(() => useIngest());
-    const file = generateCSV(["name", "age"], [["Alice", 30], ["Bob", 25]]);
+    const file = generateCSV(
+      ["name", "age"],
+      [
+        ["Alice", 30],
+        ["Bob", 25],
+      ],
+    );
 
     let firstPromise: Promise<void>;
     let secondPromise: Promise<void>;
@@ -101,7 +113,7 @@ describe("useIngest Hook", () => {
     });
 
     await expect(secondPromise!).rejects.toThrow(
-      "An ingestion is already in progress"
+      "An ingestion is already in progress",
     );
 
     await act(async () => {
@@ -113,7 +125,13 @@ describe("useIngest Hook", () => {
 
   it("should handle rapid cancellation safely", async () => {
     const { result } = renderHook(() => useIngest());
-    const file = generateCSV(["name", "age"], [["Alice", 30], ["Bob", 25]]);
+    const file = generateCSV(
+      ["name", "age"],
+      [
+        ["Alice", 30],
+        ["Bob", 25],
+      ],
+    );
 
     let promise: Promise<void>;
     act(() => {
@@ -146,13 +164,17 @@ describe("useIngest Hook", () => {
     // 2. Succeed next
     let promise: Promise<void>;
     act(() => {
-      promise = result.current.ingest({ file: goodFile, columns, collectResults: true });
+      promise = result.current.ingest({
+        file: goodFile,
+        columns,
+        collectResults: true,
+      });
     });
-    
+
     // Immediately after starting, it should be running and error cleared
     expect(result.current.status).toBe(IngestionStatus.Running);
     expect(result.current.error).toBeNull();
-    
+
     await act(async () => {
       await promise;
     });
@@ -178,8 +200,8 @@ describe("useIngest Hook", () => {
       await promise;
     });
 
-    // We can't easily assert the hook state because it unmounted, 
-    // but the promise shouldn't throw an unhandled rejection, 
+    // We can't easily assert the hook state because it unmounted,
+    // but the promise shouldn't throw an unhandled rejection,
     // and no React "state update on unmounted component" errors should appear in console.
     expect(true).toBe(true);
   });

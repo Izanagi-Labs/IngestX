@@ -17,5 +17,3 @@ export interface Parser {
    */
   abort(): void;
 }
-
-
