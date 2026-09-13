@@ -1,5 +1,5 @@
-import { ExcelParser } from "../src/core/parser/ExcelParser";
-import { RowsAndHeaders } from "../src/core/parser";
+import { ExcelParser } from "@/src/core/parser/ExcelParser";
+import { RowsAndHeaders } from "@/src/core/parser";
 
 // A barebones mock worker that doesn't depend on Vitest/JSDOM
 class BenchmarkMockWorker {

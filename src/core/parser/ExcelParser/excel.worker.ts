@@ -1,6 +1,7 @@
 import * as XLSX from "xlsx";
 
-let rows: Record<string, unknown>[] = [];
+let sheet: XLSX.WorkSheet | null = null;
+let range: XLSX.Range | null = null;
 let headers: string[] = [];
 let currentOffset = 0;
 let chunkSize = 0;
@@ -11,7 +12,7 @@ self.onmessage = async (event) => {
 
   try {
     if (message.type === "init") {
-      const { file, chunkSize: size } = message;
+      const { file, rowChunkSize: size } = message;
       chunkSize = size;
       currentOffset = 0;
 
@@ -21,48 +22,82 @@ self.onmessage = async (event) => {
         type: "array",
       });
 
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-      rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
-        defval: "",
-      });
+      const rangeStr = sheet["!ref"];
+      if (!rangeStr) {
+        range = { s: { r: 0, c: 0 }, e: { r: -1, c: 0 } };
+      } else {
+        range = XLSX.utils.decode_range(rangeStr);
+      }
 
-      headers = rows.length ? Object.keys(rows[0]) : [];
+      headers = [];
+      if (range.e.r >= range.s.r) {
+        for (let c = range.s.c; c <= range.e.c; c++) {
+          const cell = sheet[XLSX.utils.encode_cell({ r: range.s.r, c })];
+          headers.push(cell !== undefined ? String(cell.v) : `__EMPTY_${c}`);
+        }
+      }
+
+      currentOffset = range.s.r + 1;
       initialized = true;
 
-      self.postMessage({ type: "ready" });
+      self.postMessage({ type: "ready", headers });
     } else if (message.type === "next") {
-      if (!initialized) return;
+      if (!initialized || !sheet || !range) return;
 
-      if (currentOffset >= rows.length) {
+      if (currentOffset > range.e.r) {
+        // Explicit cleanup for GC before termination
+        sheet = null;
+        range = null;
+        headers = [];
+        initialized = false;
+
         self.postMessage({
           type: "done",
         });
         return;
       }
 
-      const chunk = rows.slice(currentOffset, currentOffset + chunkSize);
+      const parsedRows: Record<string, string>[] = [];
+      const startIndex = currentOffset - (range.s.r + 1);
 
-      const parsedRows = chunk.map((row) => {
-        const result: Record<string, string> = {};
-
-        for (const key in row) {
-          result[key] = String(row[key]);
+      for (
+        let i = 0;
+        i < chunkSize && currentOffset <= range.e.r;
+        currentOffset++
+      ) {
+        let hasValue = false;
+        const rowObj: Record<string, string> = {};
+        for (let c = range.s.c; c <= range.e.c; c++) {
+          const cell = sheet[XLSX.utils.encode_cell({ r: currentOffset, c })];
+          const val = cell !== undefined ? String(cell.w || cell.v) : "";
+          if (val !== "") hasValue = true;
+          rowObj[headers[c - range.s.c]] = val;
         }
 
-        return result;
-      });
+        if (hasValue) {
+          parsedRows.push(rowObj);
+          i++; // only increment chunk counter if row was not empty
+        }
+      }
+
+      const totalRows = Math.max(1, range.e.r - range.s.r);
+      const progress = Math.min(
+        1,
+        (currentOffset - (range.s.r + 1)) / totalRows,
+      );
 
       self.postMessage({
         type: "chunk",
         payload: {
           headers,
           rows: parsedRows,
-          startIndex: currentOffset,
+          startIndex,
+          progress,
+          totalRows,
         },
       });
-
-      currentOffset += chunkSize;
     }
   } catch (error) {
     self.postMessage({

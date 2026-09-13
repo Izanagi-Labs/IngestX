@@ -7,6 +7,8 @@ import { CSVParser } from "../../../src/core/parser/CsvParser";
 import { ExcelParser } from "../../../src/core/parser/ExcelParser";
 import { Parser } from "../../../src/core/parser/types";
 
+vi.unmock("@/src/core/parser/ExcelParser/excel.worker.ts?worker&inline");
+
 describe("Parser Lifecycle Contract", () => {
   describe("Interface Compliance", () => {
     it("CSVParser satisfies Parser", () => {

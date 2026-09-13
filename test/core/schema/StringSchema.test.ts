@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { StringSchema, StringRuleType } from "../../../src/model";
+import { StringSchema, StringRuleType } from "@/src/model";
 
 describe("StringSchema", () => {
   describe("1. Rule Registration", () => {

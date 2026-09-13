@@ -14,14 +14,16 @@ export function validateRow<TRow>(
 
   const validatedData: Record<string, unknown> = {};
   const errors: RowValidationResult<TRow>["errors"] = {};
+  let originalData: Record<string, unknown> | undefined = undefined;
 
   let valid = true;
 
   for (const resolvedColumn of columns) {
     const { column, header } = resolvedColumn;
+    const rawValue = row[header];
 
     const fieldResult = executeRules(
-      row[header],
+      rawValue,
       column.schema._getRules(),
       context,
     );
@@ -31,13 +33,24 @@ export function validateRow<TRow>(
     if (!fieldResult.valid) {
       valid = false;
       errors[column.key] = fieldResult.errors;
+
+      if (!originalData) {
+        originalData = {};
+      }
+      originalData[column.key] = rawValue;
     }
   }
 
-  return {
+  const result: RowValidationResult<TRow> = {
     valid,
     rowIndex,
     data: validatedData as TRow,
     errors,
   };
+
+  if (originalData) {
+    result.originalData = originalData;
+  }
+
+  return result;
 }

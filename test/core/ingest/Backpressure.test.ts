@@ -3,11 +3,16 @@
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import Papa from "papaparse";
-import { ingest } from "../../../src/core/ingest";
-import { IngestionCancelledError } from "../../../src/core/errors";
-import { IngestionStatus } from "../../../src/core/controller";
-import type { BaseSchema } from "../../../src/model/schema/BaseSchema";
-import type { RuleType } from "../../../src/model/schema/types/RuleType";
+import { coreIngest } from "@/src/core/ingest";
+import { createParser } from "@/src/core/parser";
+
+vi.unmock("@/src/core/parser/ExcelParser/excel.worker.ts?worker&inline");
+
+const ingest = (options: any) => coreIngest(options, createParser);
+import { IngestionCancelledError } from "@/src/core/errors";
+import { IngestionStatus } from "@/src/core/controller";
+import type { BaseSchema } from "@/src/model/schema/BaseSchema";
+import type { RuleType } from "@/src/model/schema/types/RuleType";
 
 const mockSchema = {
   _getRules: () => [],
@@ -93,7 +98,7 @@ describe("Ingestion Backpressure", () => {
         setTimeout(() => {
           if (!workerOnMessage) return;
           if (msg.type === "init") {
-            workerOnMessage({ data: { type: "ready" } } as any);
+            workerOnMessage({ data: { type: "ready", headers: ["a"] } } as any);
           } else if (msg.type === "next") {
             requestedCount++;
             if (returnedChunks < 4) {

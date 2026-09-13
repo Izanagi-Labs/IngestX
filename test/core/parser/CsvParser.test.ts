@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { CSVParser } from "../../../src/core/parser/CsvParser";
+import { CSVParser } from "@/src/core/parser/CsvParser";
 
 // Minimal FileReader polyfill to allow PapaParse to read Node's native File objects
 class PolyfillFileReader {
@@ -73,7 +73,8 @@ describe("CSVParser", () => {
     }
     const file = createCsvFile(csv);
     // 30 bytes chunk size will force PapaParse to emit multiple chunks
-    const parser = new CSVParser(file, false, 30);
+    // We set rowChunkSize to 10 so it splits them appropriately too.
+    const parser = new CSVParser(file, false, 10, 30);
 
     const chunks = await consumeAll(parser);
 
@@ -96,7 +97,7 @@ describe("CSVParser", () => {
       csv += `1,2,3\n`;
     }
     const file = createCsvFile(csv);
-    const parser = new CSVParser(file, false, 20);
+    const parser = new CSVParser(file, false, 2, 20);
 
     const chunks = await consumeAll(parser);
     expect(chunks.length).toBeGreaterThan(1);
@@ -233,7 +234,7 @@ describe("CSVParser", () => {
       csv += `${i},val${i}\n`;
     }
     const file = createCsvFile(csv);
-    const parser = new CSVParser(file, false, 30);
+    const parser = new CSVParser(file, false, 10, 30);
     const generator = parser.parse();
 
     const firstChunk = await generator.next();
@@ -253,7 +254,7 @@ describe("CSVParser", () => {
       csv += `${i}\n`;
     }
     const file = createCsvFile(csv);
-    const parser = new CSVParser(file, false, 20);
+    const parser = new CSVParser(file, false, 10, 20);
     const generator = parser.parse();
 
     // Give PapaParse time to parse everything into the internal queue
@@ -278,7 +279,7 @@ describe("CSVParser", () => {
     const file = createCsvFile(csv);
 
     // Chunk size 5 bytes (very small)
-    const parser1 = new CSVParser(file, false, 5);
+    const parser1 = new CSVParser(file, false, 1, 5);
     const chunks1 = await consumeAll(parser1);
     expect(chunks1.length).toBeGreaterThan(1);
 

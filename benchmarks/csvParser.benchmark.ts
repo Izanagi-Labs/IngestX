@@ -1,4 +1,4 @@
-import { CSVParser } from "../src/core/parser/CsvParser";
+import { CSVParser } from "@/src/core/parser/CsvParser";
 
 // Minimal FileReader polyfill to allow PapaParse to read Node's native File objects natively
 class PolyfillFileReader {

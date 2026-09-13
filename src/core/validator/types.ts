@@ -31,6 +31,7 @@ export interface RowValidationResult<TRow = Record<string, unknown>> {
   valid: boolean;
   rowIndex: number;
   data: TRow;
+  originalData?: Record<string, unknown>;
   errors: Record<string, ValidationError<RuleWithValidationType>[]>;
 }
 

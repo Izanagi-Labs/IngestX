@@ -1,7 +1,12 @@
+/**
+ * @vitest-environment jsdom
+ */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { ExcelParser } from "../../../src/core/parser/ExcelParser";
 import { MockWorker } from "./mockWorker";
-import { RowsAndHeaders } from "../../../src/core/parser";
+import { RowsAndHeaders } from "@/src/core/parser";
+
+vi.unmock("@/src/core/parser/ExcelParser/excel.worker.ts?worker&inline");
 
 describe("ExcelParser", () => {
   let activeWorker: MockWorker | null = null;
@@ -55,7 +60,7 @@ describe("ExcelParser", () => {
       expect(activeWorker?.postMessage).toHaveBeenCalledWith({
         type: "init",
         file: mockFile,
-        chunkSize: 10000,
+        rowChunkSize: 10000,
       });
     });
 
@@ -77,7 +82,7 @@ describe("ExcelParser", () => {
         .next()
         .catch(() => {});
       expect(activeWorker?.postMessage).toHaveBeenCalledWith(
-        expect.objectContaining({ chunkSize: 500 }),
+        expect.objectContaining({ rowChunkSize: 500 }),
       );
     });
   });
@@ -636,7 +641,7 @@ describe("ExcelParser", () => {
       await tick();
 
       expect(activeWorker?.postMessage).toHaveBeenCalledWith(
-        expect.objectContaining({ chunkSize: 0 }),
+        expect.objectContaining({ rowChunkSize: 0 }),
       );
     });
 
@@ -730,6 +735,48 @@ describe("ExcelParser", () => {
       ]);
 
       expect((r as any).done).toBe(true);
+    });
+
+    describe("Cancellation via abort()", () => {
+      it("terminates worker and nullifies reference", async () => {
+        const parser = new ExcelParser(mockFile);
+        const generator = parser.parse();
+        generator.next().catch(() => {});
+        await tick();
+
+        expect(activeWorker).not.toBeNull();
+        const terminateSpy = vi.spyOn(activeWorker!, "terminate");
+
+        parser.abort();
+
+        expect(terminateSpy).toHaveBeenCalledTimes(1);
+        expect((parser as any).worker).toBeNull();
+      });
+
+      it("causes generator to finish early", async () => {
+        const parser = new ExcelParser(mockFile);
+        const generator = parser.parse();
+        const p1 = generator.next();
+        await tick();
+
+        parser.abort();
+
+        const result = await p1;
+        expect(result.done).toBe(true);
+      });
+
+      it("ignores chunks arriving after abort", async () => {
+        const parser = new ExcelParser(mockFile);
+        const generator = parser.parse();
+        const p1 = generator.next();
+        await tick();
+
+        parser.abort();
+        activeWorker?.send({ type: "chunk", payload: createDummyChunk(0) });
+
+        const result = await p1;
+        expect(result.done).toBe(true);
+      });
     });
   });
 

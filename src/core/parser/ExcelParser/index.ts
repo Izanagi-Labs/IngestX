@@ -1,100 +1,138 @@
 import { Parser, RowsAndHeaders } from "../types";
+import { IngestionCancelledError } from "../../errors";
+// @ts-ignore - Vite worker import
+import ExcelWorker from "./excel.worker.ts?worker&inline";
 
-const MAX_BUFFERED_CHUNKS = 2;
+const MAX_BUFFERED_CHUNKS = 4;
 
 export class ExcelParser implements Parser {
   private worker: Worker | null = null;
   private isAborted = false;
   private resolveNext: (() => void) | null = null;
 
+  private headersPromise: Promise<string[]>;
+  private resolveHeaders!: (headers: string[]) => void;
+  private rejectHeaders!: (error: unknown) => void;
+  private headersResolvedFlag = false;
+
   constructor(
     private readonly file: File,
-    private readonly chunkSize = 10000,
-  ) {}
+    private readonly rowChunkSize = 10000,
+  ) {
+    this.headersPromise = new Promise((resolve, reject) => {
+      this.resolveHeaders = resolve;
+      this.rejectHeaders = reject;
+    });
+    this.headersPromise.catch(() => {});
+  }
+
+  getHeaders(): Promise<string[]> {
+    this.initParser();
+    return this.headersPromise;
+  }
 
   abort(): void {
     this.isAborted = true;
     if (this.worker) {
       this.worker.terminate();
+      this.worker = null;
     }
     this.resolveNext?.();
+    if (!this.headersResolvedFlag) {
+      this.rejectHeaders(new IngestionCancelledError());
+      this.headersResolvedFlag = true;
+    }
+  }
+
+  private parserInitiated = false;
+  private queue: RowsAndHeaders[] = [];
+  private done = false;
+  private workerError: Error | null = null;
+  private requestedChunks = 0;
+  private receivedChunks = 0;
+
+  private requestMore = () => {
+    if (!this.worker || this.done || this.workerError || this.isAborted) return;
+    const inFlight = this.requestedChunks - this.receivedChunks;
+    const canRequest = MAX_BUFFERED_CHUNKS - this.queue.length - inFlight;
+    for (let i = 0; i < canRequest; i++) {
+      this.worker.postMessage({ type: "next" });
+      this.requestedChunks++;
+    }
+  };
+
+  private initParser(): void {
+    if (this.parserInitiated) return;
+    this.parserInitiated = true;
+
+    this.worker = new ExcelWorker() as Worker;
+
+    if (this.isAborted) {
+      this.worker.terminate();
+      return;
+    }
+
+    this.worker.postMessage({
+      type: "init",
+      file: this.file,
+      rowChunkSize: this.rowChunkSize,
+    });
+
+    this.worker.onmessage = (event) => {
+      const message = event.data;
+
+      switch (message.type) {
+        case "ready":
+          if (!this.headersResolvedFlag) {
+            this.resolveHeaders(message.headers);
+            this.headersResolvedFlag = true;
+          }
+          this.requestMore();
+          break;
+        case "chunk":
+          if (!this.done) {
+            this.receivedChunks++;
+            this.queue.push(message.payload);
+            this.requestMore();
+            this.resolveNext?.();
+            this.resolveNext = null;
+          }
+          break;
+
+        case "done":
+          this.done = true;
+          this.resolveNext?.();
+          this.resolveNext = null;
+          break;
+
+        case "error":
+          this.done = true;
+          this.workerError = new Error(message.error);
+          if (!this.headersResolvedFlag) {
+            this.rejectHeaders(this.workerError);
+            this.headersResolvedFlag = true;
+          }
+          this.resolveNext?.();
+          this.resolveNext = null;
+          break;
+      }
+    };
   }
 
   async *parse(): AsyncGenerator<RowsAndHeaders> {
+    this.initParser();
+
     try {
-      this.worker = new Worker(new URL("./excel.worker.ts", import.meta.url), {
-        type: "module",
-      });
-
-      if (this.isAborted) {
-        this.worker.terminate();
-        return;
-      }
-
-      this.worker.postMessage({
-        type: "init",
-        file: this.file,
-        chunkSize: this.chunkSize,
-      });
-
-      const queue: RowsAndHeaders[] = [];
-      let done = false;
-      let workerError: Error | null = null;
-      let requestedChunks = 0;
-      let receivedChunks = 0;
-
-      const requestMore = () => {
-        if (!this.worker || done || workerError || this.isAborted) return;
-        const inFlight = requestedChunks - receivedChunks;
-        const canRequest = MAX_BUFFERED_CHUNKS - queue.length - inFlight;
-        for (let i = 0; i < canRequest; i++) {
-          this.worker.postMessage({ type: "next" });
-          requestedChunks++;
-        }
-      };
-
-      this.worker.onmessage = (event) => {
-        const message = event.data;
-
-        switch (message.type) {
-          case "ready":
-            requestMore();
-            break;
-          case "chunk":
-            if (!done) {
-              receivedChunks++;
-              queue.push(message.payload);
-              requestMore();
-              this.resolveNext?.();
-              this.resolveNext = null;
-            }
-            break;
-
-          case "done":
-            done = true;
-            this.resolveNext?.();
-            this.resolveNext = null;
-            break;
-
-          case "error":
-            done = true;
-            workerError = new Error(message.error);
-            this.resolveNext?.();
-            this.resolveNext = null;
-            break;
-        }
-      };
-
-      while (!done || queue.length > 0) {
+      while (!this.done || this.queue.length > 0) {
         if (this.isAborted) {
           break;
         }
-        if (workerError) {
-          throw workerError;
+        if (this.workerError) {
+          throw this.workerError;
         }
-        if (queue.length > 0) {
-          yield queue.shift()!;
-          requestMore();
+        if (this.queue.length > 0) {
+          yield this.queue.shift()!;
+          this.requestMore();
         } else {
           await new Promise<void>((resolve) => {
             this.resolveNext = resolve;
@@ -102,8 +140,8 @@ export class ExcelParser implements Parser {
         }
       }
 
-      if (workerError) {
-        throw workerError;
+      if (this.workerError) {
+        throw this.workerError;
       }
     } finally {
       this.abort();

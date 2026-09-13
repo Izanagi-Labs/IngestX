@@ -3,16 +3,21 @@
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import Papa from "papaparse";
-import { ingest } from "../../../src/core/ingest";
+import { coreIngest } from "@/src/core/ingest";
+import { createParser } from "@/src/core/parser";
+const ingest = (options: any) => coreIngest(options, createParser);
 import {
   IngestionCancelledError,
   isIngestionCancelledError,
-} from "../../../src/core/errors";
-import { IngestionErrorType } from "../../../src/core/ingest/types";
-import { IngestionStatus } from "../../../src/core/controller";
+} from "@/src/core/errors";
+import { IngestionController } from "@/src/core/controller/IngestionController";
+import { IngestionErrorType } from "@/src/core/ingest/types";
+import { IngestionStatus } from "@/src/core/controller";
 import type { MockInstance } from "vitest";
-import type { BaseSchema } from "../../../src/model/schema/BaseSchema";
-import type { RuleType } from "../../../src/model/schema/types/RuleType";
+import type { BaseSchema } from "@/src/model/schema/BaseSchema";
+import type { RuleType } from "@/src/model/schema/types/RuleType";
+
+vi.unmock("@/src/core/parser/ExcelParser/excel.worker.ts?worker&inline");
 
 const mockSchema = {
   _getRules: () => [],
@@ -59,15 +64,8 @@ describe("Ingestion Cancellation & Cleanup Flow", () => {
         },
       });
 
-      let r: unknown;
-      try {
-        r = await instance.result;
-        console.error("PROMISE RESOLVED! Result was:", r);
-        expect.fail(`Should have thrown IngestionCancelledError`);
-      } catch (e: unknown) {
-        if (e instanceof Error && e.name === "AssertionError") throw e;
-        expect(e).toBeInstanceOf(IngestionCancelledError);
-      }
+      const result = await instance.result;
+      expect(result.status).toBe(IngestionStatus.Cancelled);
 
       expect(chunksProcessed).toBe(1);
       expect(papaparseAbortSpy).toHaveBeenCalled();
@@ -86,11 +84,8 @@ describe("Ingestion Cancellation & Cleanup Flow", () => {
         },
       });
 
-      try {
-        await instance.result;
-      } catch (e) {
-        expect(e).toBeInstanceOf(IngestionCancelledError);
-      }
+      const result = await instance.result;
+      expect(result.status).toBe(IngestionStatus.Cancelled);
       expect(instance.status).toBe(IngestionStatus.Cancelled);
     });
   });
@@ -106,7 +101,7 @@ describe("Ingestion Cancellation & Cleanup Flow", () => {
           setTimeout(() => {
             if (!workerOnMessage) return;
             if (msg.type === "init") {
-              workerOnMessage({ data: { type: "ready" } } as any);
+              workerOnMessage({ data: { type: "ready", headers: ["a"] } } as any);
             } else if (msg.type === "next") {
               // @ts-expect-error - partial message event
               workerOnMessage({
@@ -142,11 +137,8 @@ describe("Ingestion Cancellation & Cleanup Flow", () => {
         },
       });
 
-      try {
-        await instance.result;
-      } catch (e) {
-        expect(e).toBeInstanceOf(IngestionCancelledError);
-      }
+      const result = await instance.result;
+      expect(result.status).toBe(IngestionStatus.Cancelled);
 
       // Worker should have been terminated
       expect(mockTerminate).toHaveBeenCalled();
@@ -174,12 +166,8 @@ describe("Ingestion Cancellation & Cleanup Flow", () => {
       // It is waiting for the first chunk. We cancel it.
       instance.cancel();
 
-      try {
-        await instance.result;
-        expect.fail("Should throw IngestionCancelledError");
-      } catch (e) {
-        expect(e).toBeInstanceOf(IngestionCancelledError);
-      }
+      const result = await instance.result;
+      expect(result.status).toBe(IngestionStatus.Cancelled);
 
       // The result promise should have resolved (meaning it didn't hang)
       expect(mockTerminate).toHaveBeenCalled();
@@ -213,11 +201,8 @@ describe("Ingestion Cancellation & Cleanup Flow", () => {
         },
       );
 
-      try {
-        await instance.result;
-      } catch (e) {
-        expect(e).toBeInstanceOf(IngestionCancelledError);
-      }
+      const result = await instance.result;
+      expect(result.status).toBe(IngestionStatus.Cancelled);
 
       expect(chunksProcessed).toBe(1); // Second chunk shouldn't be processed
     });

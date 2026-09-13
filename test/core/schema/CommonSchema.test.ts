@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { CommonSchema, CommonRuleType } from "../../../src/model";
+import { CommonSchema, CommonRuleType } from "@/src/model";
 
 class TestSchema extends CommonSchema<any, any> {}
 

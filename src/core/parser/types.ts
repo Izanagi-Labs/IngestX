@@ -2,8 +2,12 @@ export interface RowsAndHeaders {
   headers: string[];
   rows: Record<string, string>[];
   startIndex: number;
+  progress: number;
+  totalRows?: number;
+  processedBytes?: number;
 }
 export interface Parser {
+  getHeaders(): Promise<string[]>;
   parse(): AsyncGenerator<RowsAndHeaders>;
   /**
    * Aborts the parsing operation and releases underlying resources.
@@ -13,3 +17,5 @@ export interface Parser {
    */
   abort(): void;
 }
+
+

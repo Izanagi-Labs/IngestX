@@ -11,24 +11,6 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
-    },
-    "./core": {
-      "types": "./dist/core/index.d.ts",
-      "import": "./dist/core/index.js",
-      "require": "./dist/core/index.cjs"
-    },
-    "./react": {
-      "types": "./dist/react/index.d.ts",
-      "import": "./dist/react/index.js",
-      "require": "./dist/react/index.cjs"
-    },
-    "./node": {
-      "types": "./dist/node/index.d.ts",
-      "import": "./dist/node/index.js",
-      "require": "./dist/node/index.cjs"
-    },
-    "./types": {
-      "types": "./dist/types/index.d.ts"
     }
   },
   "repository": {
@@ -47,8 +29,9 @@
     "format:check": "prettier --check .",
     "benchmark": "npx tsx benchmarks/excelParser.benchmark.ts && npx tsx benchmarks/csvParser.benchmark.ts"
   },
-  "peerDependencies": {
-    "react": ">=18"
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18.0.0"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.1",
@@ -67,11 +50,11 @@
     "typescript": "^5.3.3",
     "vite": "^5.1.0",
     "vite-plugin-dts": "^3.7.2",
-    "vitest": "^1.3.1"
+    "vitest": "^1.3.1",
+    "xlsx": "^0.18.5"
   },
   "dependencies": {
-    "papaparse": "^5.5.3",
-    "xlsx": "^0.18.5"
+    "papaparse": "^5.5.3"
   },
   "files": [
     "dist",

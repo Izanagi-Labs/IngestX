@@ -4,4 +4,5 @@ export enum IngestionStatus {
   Paused = "paused",
   Cancelled = "cancelled",
   Completed = "completed",
+  Failed = "failed",
 }

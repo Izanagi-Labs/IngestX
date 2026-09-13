@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { BooleanSchema, BooleanRuleType } from "../../../src/model";
+import { BooleanSchema, BooleanRuleType } from "@/src/model";
 
 describe("BooleanSchema", () => {
   describe("1. Rule Registration", () => {

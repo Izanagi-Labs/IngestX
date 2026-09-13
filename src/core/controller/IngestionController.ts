@@ -33,6 +33,13 @@ export class IngestionController {
   }
 
   cancel(): void {
+    if (
+      this.status === IngestionStatus.Cancelled ||
+      this.status === IngestionStatus.Completed
+    ) {
+      return;
+    }
+    
     this.status = IngestionStatus.Cancelled;
 
     for (const listener of this.cancelListeners) {
@@ -86,5 +93,9 @@ export class IngestionController {
 
   complete(): void {
     this.status = IngestionStatus.Completed;
+  }
+
+  fail(): void {
+    this.status = IngestionStatus.Failed;
   }
 }

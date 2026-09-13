@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { Column } from "../../../src/model/column/Column";
-import { StringSchema } from "../../../src/model/schema/StringSchema";
-import { NumberSchema } from "../../../src/model/schema/NumberSchema";
-import { BooleanSchema } from "../../../src/model/schema/BooleanSchema";
-import type { ColumnConfig } from "../../../src/model/column/types";
+import { Column } from "@/src/model/column/Column";
+import { StringSchema } from "@/src/model/schema/StringSchema";
+import { NumberSchema } from "@/src/model/schema/NumberSchema";
+import { BooleanSchema } from "@/src/model/schema/BooleanSchema";
+import type { ColumnConfig } from "@/src/model/column/types";
 
 describe("Column", () => {
   const schemas = [
