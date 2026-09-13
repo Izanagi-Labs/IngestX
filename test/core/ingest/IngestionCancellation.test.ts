@@ -6,13 +6,8 @@ import Papa from "papaparse";
 import { coreIngest } from "@/src/core/ingest";
 import { createParser } from "@/src/core/parser";
 const ingest = (options: any) => coreIngest(options, createParser);
-import {
-  IngestionCancelledError,
-  isIngestionCancelledError,
-} from "@/src/core/errors";
-import { IngestionController } from "@/src/core/controller/IngestionController";
 import { IngestionErrorType } from "@/src/core/ingest/types";
-import { IngestionStatus } from "@/src/core/controller";
+import { IngestionStatus } from "@/src/core/controller/types";
 import type { MockInstance } from "vitest";
 import type { BaseSchema } from "@/src/model/schema/BaseSchema";
 import type { RuleType } from "@/src/model/schema/types/RuleType";

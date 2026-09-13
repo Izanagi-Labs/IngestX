@@ -1,6 +1,4 @@
 export class IngestionCancelledError extends Error {
-  readonly code = "INGESTION_CANCELLED";
-
   constructor() {
     super("Ingestion cancelled.");
 

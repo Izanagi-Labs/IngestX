@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { ingest, ix, IngestionStatus } from "@/src/index";
 import type { ColumnConfig } from "@/src/index";
-import { generateExcel, generateHeadersOnlyExcel } from "./fixtures";
+import { generateExcel } from "./fixtures";
 
 describe("E2E: Excel Happy Path", () => {
   it("successfully ingests a valid Excel file", async () => {

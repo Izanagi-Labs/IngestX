@@ -4,7 +4,6 @@ import fs from "fs";
 import path from "path";
 import { ix } from "../../src/model/ix";
 import { IngestionStatus } from "../../src/core/controller/types";
-import { IngestionErrorType } from "../../src/core/ingest/types";
 import * as XLSX from "xlsx";
 
 describe("Node Ingestion E2E", () => {

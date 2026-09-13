@@ -1,11 +1,10 @@
 import { ColumnConfig } from "../../model";
-import { IngestionStatus } from "../controller";
+import { IngestionStatus } from "../controller/types";
 import { RowValidationResult } from "../validator";
 import { HeadersMismatch } from "../headers/types";
 
 export enum IngestionErrorType {
   HEADER_MISMATCH = "HEADER_MISMATCH",
-  PARSER_ERROR = "PARSER_ERROR",
   INGESTION_ERROR = "INGESTION_ERROR",
   COLLECTION_LIMIT_EXCEEDED = "COLLECTION_LIMIT_EXCEEDED",
 }

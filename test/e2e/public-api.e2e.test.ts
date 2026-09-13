@@ -1,6 +1,4 @@
 import { describe, it, expect } from "vitest";
-import { ingest, ix } from "ingestx";
-import type { ColumnConfig } from "ingestx";
 
 // Note: To make this test actually use the "ingestx" module resolution
 // instead of relative imports, we rely on vitest resolving the package

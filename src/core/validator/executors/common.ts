@@ -1,30 +1,7 @@
 import { Rule } from "../../../model/schema/types/Rule";
 import { CommonRuleType, RuleType } from "../../../model/schema/types/RuleType";
-import {
-  RuleExecutionState,
-  ValidationContext,
-  ValidationErrorType,
-} from "../types";
+import { RuleExecutionState, ValidationContext } from "../types";
 import { createError, isEmpty } from "../utils";
-
-export function handleEmptyValue({
-  state,
-  isOptional,
-}: {
-  state: RuleExecutionState;
-  isOptional: boolean;
-}): void {
-  if (isEmpty(state.value)) {
-    if (isOptional) {
-      state.stop = true;
-    } else {
-      state.errors.push(
-        createError(ValidationErrorType.Required, "Value is required"),
-      );
-      state.stop = true;
-    }
-  }
-}
 
 export function executeCommonRule(
   rule: Rule<RuleType>,
@@ -45,7 +22,9 @@ export function executeCommonRule(
       break;
 
     case CommonRuleType.Optional:
-      handleEmptyValue({ state, isOptional: true });
+      if (isEmpty(state.value)) {
+        state.stop = true;
+      }
       break;
 
     case CommonRuleType.Custom:

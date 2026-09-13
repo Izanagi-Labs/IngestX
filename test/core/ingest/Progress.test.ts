@@ -9,7 +9,6 @@ import type { Progress } from "@/src/core/ingest/types";
 import { ColumnConfig } from "@/src/model";
 import type { BaseSchema } from "@/src/model/schema/BaseSchema";
 import type { RuleType } from "@/src/model/schema/types/RuleType";
-import { IngestionStatus } from "@/src/core/controller";
 
 const mockSchema = {
   _getRules: () => [],

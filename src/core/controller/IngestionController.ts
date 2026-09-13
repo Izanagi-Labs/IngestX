@@ -75,20 +75,8 @@ export class IngestionController {
     return this.status;
   }
 
-  get isRunning(): boolean {
-    return this.status === IngestionStatus.Running;
-  }
-
-  get isPaused(): boolean {
-    return this.status === IngestionStatus.Paused;
-  }
-
   get isCancelled(): boolean {
     return this.status === IngestionStatus.Cancelled;
-  }
-
-  get isCompleted(): boolean {
-    return this.status === IngestionStatus.Completed;
   }
 
   complete(): void {

@@ -1,9 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { OutputCollector } from "@/src/core/ingest/OutputCollector";
-import type {
-  ChunkValidationResult,
-  RowValidationError,
-} from "@/src/core/ingest/types";
+import { ChunkValidationResult } from "@/src/core/ingest/types";
 
 describe("OutputCollector", () => {
   const createMockChunk = (

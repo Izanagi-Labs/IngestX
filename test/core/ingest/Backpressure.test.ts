@@ -9,8 +9,6 @@ import { createParser } from "@/src/core/parser";
 vi.unmock("@/src/core/parser/ExcelParser/excel.worker.ts?worker&inline");
 
 const ingest = (options: any) => coreIngest(options, createParser);
-import { IngestionCancelledError } from "@/src/core/errors";
-import { IngestionStatus } from "@/src/core/controller";
 import type { BaseSchema } from "@/src/model/schema/BaseSchema";
 import type { RuleType } from "@/src/model/schema/types/RuleType";
 
