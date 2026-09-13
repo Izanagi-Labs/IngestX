@@ -14,7 +14,8 @@ export class ProgressTracker {
     private readonly onProgress: ((progress: Progress) => void) | undefined,
     file: File,
   ) {
-    const ext = file.name.split(".").pop()?.toLowerCase();
+    const fileName = (file && typeof file.name === "string") ? file.name : "";
+    const ext = fileName.split(".").pop()?.toLowerCase();
     if (ext === "csv") {
       this.basis = "bytes";
       this.totalBytes = file.size;

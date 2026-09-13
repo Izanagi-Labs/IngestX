@@ -13,6 +13,8 @@ export default defineConfig({
     lib: {
       entry: {
         index: resolve(__dirname, "src/index.ts"),
+        node: resolve(__dirname, "src/node/index.ts"),
+        react: resolve(__dirname, "src/react/index.ts"),
       },
       name: "IngestX",
       formats: ["es", "cjs"],
@@ -20,7 +22,7 @@ export default defineConfig({
         `${entryName}.${format === "es" ? "js" : "cjs"}`,
     },
     rollupOptions: {
-      external: ["papaparse"],
+      external: ["papaparse", "react", "react-dom"],
     },
   },
 });
