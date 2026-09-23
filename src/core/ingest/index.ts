@@ -146,7 +146,10 @@ async function runIngestion<TRow>(
     progressTracker.setPhase("failed");
     controller.fail();
 
-    if (error && (error as any).code === "COLLECTION_LIMIT_EXCEEDED") {
+    if (
+      error &&
+      (error as { code?: unknown }).code === "COLLECTION_LIMIT_EXCEEDED"
+    ) {
       return {
         status: controller.getStatus(),
         data: collector.getFinalOutput(),

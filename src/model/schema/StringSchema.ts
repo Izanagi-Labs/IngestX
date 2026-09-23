@@ -1,7 +1,7 @@
 import { StringSchemaRule, StringRuleType } from "./types";
 import { CommonSchema } from "./CommonSchema";
 
-export class StringSchema extends CommonSchema<number, StringSchemaRule> {
+export class StringSchema extends CommonSchema<string, StringSchemaRule> {
   min(value: number, message?: string): this {
     return this.addRule({ type: StringRuleType.Min, value, message });
   }
@@ -10,7 +10,7 @@ export class StringSchema extends CommonSchema<number, StringSchemaRule> {
     return this.addRule({ type: StringRuleType.Max, value, message });
   }
 
-  allowedValues(values: readonly number[], message?: string): this {
+  allowedValues(values: readonly string[], message?: string): this {
     return this.addRule({
       type: StringRuleType.AllowedValues,
       value: values,

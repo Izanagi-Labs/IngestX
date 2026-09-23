@@ -1,5 +1,5 @@
 import { test } from "vitest";
-import ExcelWorker from "@src/core/parser/ExcelParser/excel.worker.ts?worker&inline";
+import ExcelWorker from "@/src/core/parser/ExcelParser/excel.worker.ts?worker&inline";
 
 test("what is ExcelWorker", () => {
   console.log("ExcelWorker is:", ExcelWorker);

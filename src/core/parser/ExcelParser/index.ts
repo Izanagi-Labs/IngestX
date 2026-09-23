@@ -1,6 +1,6 @@
 import { Parser, RowsAndHeaders } from "../types";
 import { IngestionCancelledError } from "../../errors";
-// @ts-ignore - Vite worker import
+// @ts-expect-error - Vite worker import
 import ExcelWorker from "./excel.worker.ts?worker&inline";
 
 const MAX_BUFFERED_CHUNKS = 4;

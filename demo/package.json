@@ -13,7 +13,7 @@
     "@mui/icons-material": "^9.0.1",
     "@mui/material": "^9.0.1",
     "@mui/x-data-grid": "^9.3.0",
-    "@parallelbytes/ingestx": "^1.0.3",
+    "@parallelbytes/ingestx": "file:../parallelbytes-ingestx-1.0.4.tgz",
     "@types/react-syntax-highlighter": "^15.5.13",
     "@vercel/analytics": "^2.0.1",
     "react": "^19.2.6",

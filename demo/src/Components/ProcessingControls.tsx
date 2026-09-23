@@ -1,196 +1,73 @@
-import {
-  Box,
-  Typography,
-  Button,
-  LinearProgress,
-  Checkbox,
-  FormControlLabel,
-  CircularProgress,
-} from "@mui/material";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import PauseIcon from "@mui/icons-material/Pause";
-import CloseIcon from "@mui/icons-material/Close";
+import React from "react";
+import { IngestionStatus } from "@parallelbytes/ingestx";
+import type { useIngest } from "@parallelbytes/ingestx/react";
 
 interface ProcessingControlsProps {
-  asyncProcessing: boolean;
-  onToggleAsync: (val: boolean) => void;
-  isProcessing: boolean;
-  isPaused: boolean;
-  progress: number;
-  onStart: () => void;
+  status: IngestionStatus;
+  progress: ReturnType<typeof useIngest>["progress"];
   onPause: () => void;
   onResume: () => void;
   onCancel: () => void;
-  file: File | null;
-  isCompleted: boolean;
 }
 
-export default function ProcessingControls({
-  asyncProcessing,
-  onToggleAsync,
-  isProcessing,
-  isPaused,
-  progress,
-  onStart,
-  onPause,
-  onResume,
-  onCancel,
-  file,
-  isCompleted,
-}: ProcessingControlsProps) {
-  // For a real app, you might mock the total record count or read it early.
-  // We'll just show the progress percentage for simplicity.
-  const statusText = isCompleted
-    ? "Completed"
-    : isPaused
-      ? "Paused"
-      : isProcessing
-        ? "Processing..."
-        : "Ready";
+export const ProcessingControls: React.FC<ProcessingControlsProps> = ({ 
+  status, progress, onPause, onResume, onCancel 
+}) => {
+  if (status === IngestionStatus.Idle || status === IngestionStatus.Completed || status === IngestionStatus.Failed || status === IngestionStatus.Cancelled) {
+    return null; 
+  }
 
+  const isRunning = status === IngestionStatus.Running;
+  const isPaused = status === IngestionStatus.Paused;
+
+  const percent = progress?.phase === "completed" ? 100 : (progress as unknown as Record<string, unknown>)?.progressPercentage as number ?? 0;
+  const processed = progress?.processedRows ?? 0;
+
+  // Simulate bounded chunk visualization based on progress percentage
+  // We want 15 chunks visually
+  const totalVisChunks = 15;
+  const completedVisChunks = Math.floor((percent / 100) * totalVisChunks);
+  
+  const chunkElements = Array.from({ length: totalVisChunks }).map((_, i) => {
+    let stateClass = "";
+    if (i < completedVisChunks) stateClass = "completed";
+    else if (i === completedVisChunks && isRunning) stateClass = "current";
+    return <div key={i} className={`chunk-box ${stateClass}`} />;
+  });
+  
   return (
-    <Box>
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={asyncProcessing}
-            onChange={(e) => onToggleAsync(e.target.checked)}
-            color="primary"
-          />
-        }
-        label={
-          <Typography sx={{ fontWeight: "bold" }}>
-            Enable Async Processing
-          </Typography>
-        }
-        sx={{ mb: 2 }}
-      />
+    <div className="processing-panel">
+      <div className="playground-heading" style={{ border: 'none', padding: 0, marginBottom: '1rem' }}>Processing</div>
+      
+      <div className="processing-header">
+        <div className="processing-title">{isPaused ? 'Paused' : 'Processing'}</div>
+        <div className="processing-percent">{percent.toFixed(0)}%</div>
+      </div>
+      
+      <div className="progress-track">
+        <div className={`progress-bar ${isPaused ? 'paused' : ''}`} style={{ width: `${percent}%` }} />
+      </div>
 
-      {asyncProcessing && (
-        <Box sx={{ bgcolor: "#f4f9fd", p: 3, borderRadius: 2 }}>
-          <Box sx={{ display: "flex", alignItems: "center", mb: 2, gap: 2 }}>
-            <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-              Current Status:
-            </Typography>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              {isProcessing && !isPaused && <CircularProgress size={16} />}
-              <Typography variant="body2" color="text.secondary">
-                {statusText}
-              </Typography>
-            </Box>
-          </Box>
+      <div className="processing-metrics">
+        <strong>{processed.toLocaleString()}</strong> rows processed
+      </div>
 
-          <LinearProgress
-            variant="determinate"
-            value={progress}
-            sx={{ height: 10, borderRadius: 5, mb: 2 }}
-          />
+      <div className="chunk-visualization">
+        <span>Chunks</span>
+        <div className="chunk-boxes">
+          {chunkElements}
+        </div>
+      </div>
 
-          <Box sx={{ display: "flex", gap: 4, mb: 3 }}>
-            <Typography variant="body2">
-              Processed: <strong>{progress.toFixed(0)}%</strong>
-            </Typography>
-          </Box>
-
-          <Box sx={{ display: "flex", gap: 2 }}>
-            {!isProcessing && !isPaused && !isCompleted && (
-              <Button
-                variant="contained"
-                startIcon={<PlayArrowIcon />}
-                onClick={onStart}
-                disabled={!file}
-                fullWidth
-                sx={{ py: 1.5, height: 48, fontWeight: "bold" }}
-              >
-                START
-              </Button>
-            )}
-
-            {isProcessing && !isPaused && (
-              <Button
-                variant="contained"
-                color="secondary"
-                startIcon={<PauseIcon />}
-                onClick={onPause}
-                fullWidth
-                sx={{
-                  py: 1.5,
-                  height: 48,
-                  fontWeight: "bold",
-                  bgcolor: "#0d47a1",
-                  "&:hover": { bgcolor: "#002171" },
-                }}
-              >
-                PAUSE
-              </Button>
-            )}
-
-            {isPaused && (
-              <Button
-                variant="contained"
-                startIcon={<PlayArrowIcon />}
-                onClick={onResume}
-                fullWidth
-                sx={{ py: 1.5, height: 48, fontWeight: "bold" }}
-              >
-                RESUME
-              </Button>
-            )}
-
-            {isCompleted && (
-              <Button
-                variant="contained"
-                startIcon={<PlayArrowIcon />}
-                onClick={onStart}
-                disabled={!file}
-                fullWidth
-                sx={{ py: 1.5, height: 48, fontWeight: "bold" }}
-              >
-                RESTART
-              </Button>
-            )}
-
-            <Button
-              variant="outlined"
-              color="error"
-              startIcon={<CloseIcon />}
-              onClick={onCancel}
-              disabled={!isProcessing && !isPaused}
-              sx={{
-                px: 4,
-                py: 1.5,
-                height: 48,
-                fontWeight: "bold",
-                bgcolor: "white",
-                "&.Mui-disabled": { bgcolor: "#f5f5f5" },
-              }}
-            >
-              CANCEL
-            </Button>
-          </Box>
-        </Box>
-      )}
-
-      {!asyncProcessing && (
-        <Box sx={{ mt: 2 }}>
-          <Button
-            variant="contained"
-            startIcon={
-              isProcessing ? (
-                <CircularProgress size={20} color="inherit" />
-              ) : (
-                <PlayArrowIcon />
-              )
-            }
-            onClick={onStart}
-            disabled={!file || isProcessing}
-            fullWidth
-            sx={{ py: 1.5, height: 48, fontWeight: "bold" }}
-          >
-            {isProcessing ? "Processing..." : "PROCESS IMMEDIATELY"}
-          </Button>
-        </Box>
-      )}
-    </Box>
+      <div className="processing-controls">
+        {isRunning && (
+          <button className="btn-control" onClick={onPause}>Pause</button>
+        )}
+        {isPaused && (
+          <button className="btn-control" onClick={onResume}>Resume</button>
+        )}
+        <button className="btn-control" onClick={onCancel} style={{ color: 'var(--color-error)' }}>Cancel</button>
+      </div>
+    </div>
   );
-}
+};

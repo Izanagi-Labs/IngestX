@@ -13,12 +13,12 @@
       "require": "./dist/index.cjs"
     },
     "./node": {
-      "types": "./dist/node.d.ts",
+      "types": "./dist/node/index.d.ts",
       "import": "./dist/node.js",
       "require": "./dist/node.cjs"
     },
     "./react": {
-      "types": "./dist/react.d.ts",
+      "types": "./dist/react/index.d.ts",
       "import": "./dist/react.js",
       "require": "./dist/react.cjs"
     }
@@ -37,6 +37,7 @@
     "demo": "cd demo && yarn dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "lint:check": "eslint .",
     "benchmark": "npx tsx benchmarks/excelParser.benchmark.ts && npx tsx benchmarks/csvParser.benchmark.ts"
   },
   "sideEffects": false,

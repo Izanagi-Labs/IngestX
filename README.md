@@ -79,6 +79,43 @@ fileInput?.addEventListener("change", async (e) => {
 });
 ```
 
+### Quick Start (Node.js)
+
+```ts
+import { ingest, ix } from "@parallelbytes/ingestx/node";
+import type { ColumnConfig } from "@parallelbytes/ingestx";
+
+const columns: ColumnConfig[] = [
+  {
+    key: "email",
+    name: "Email Address",
+    matchHeader: (header) => header.toLowerCase().includes("email"),
+    schema: ix.string().regex(/@/),
+  },
+];
+
+async function run() {
+  const ingestion = ingest({
+    filePath: "./data.csv",
+    columns,
+    onProgress: (progress) => {
+      console.log(`Phase: ${progress.phase}`);
+    },
+  });
+
+  const { data, error } = await ingestion.result;
+
+  if (error) {
+    console.error("Ingestion failed:", error.message);
+    return;
+  }
+
+  console.log(`✅ Valid Rows: ${data.validRowsCount}`);
+}
+
+run();
+```
+
 ## Core Configuration
 
 ### `ColumnConfig`

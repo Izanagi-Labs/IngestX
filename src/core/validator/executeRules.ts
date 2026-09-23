@@ -101,14 +101,14 @@ export function executeRules(
         case StringRuleType.Max:
         case StringRuleType.Regex:
         case StringRuleType.AllowedValues:
-          executeStringRule(rule, state, context);
+          executeStringRule(rule, state);
           break;
 
         // Number
         case NumberRuleType.Min:
         case NumberRuleType.Max:
         case NumberRuleType.AllowedValues:
-          executeNumberRule(rule, state, context);
+          executeNumberRule(rule, state);
           break;
       }
 

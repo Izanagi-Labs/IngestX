@@ -37,7 +37,10 @@ export function useIngest<TRow = Record<string, unknown>>() {
         return;
       }
 
-      if (activeRun.instance.status === IngestionStatus.Running) {
+      if (
+        activeRun.instance.status === IngestionStatus.Running ||
+        activeRun.instance.status === IngestionStatus.Paused
+      ) {
         activeRun.instance.cancel();
       }
     };
@@ -47,7 +50,11 @@ export function useIngest<TRow = Record<string, unknown>>() {
     async (options: UseIngestOptions<TRow>): Promise<void> => {
       const activeRun = activeRunRef.current;
 
-      if (activeRun && activeRun.instance.status === IngestionStatus.Running) {
+      if (
+        activeRun &&
+        (activeRun.instance.status === IngestionStatus.Running ||
+          activeRun.instance.status === IngestionStatus.Paused)
+      ) {
         throw new Error("An ingestion is already in progress");
       }
 
@@ -112,6 +119,32 @@ export function useIngest<TRow = Record<string, unknown>>() {
     [],
   );
 
+  const pause = useCallback(() => {
+    const activeRun = activeRunRef.current;
+
+    if (!activeRun) {
+      return;
+    }
+
+    if (activeRun.instance.status === IngestionStatus.Running) {
+      activeRun.instance.pause();
+      setStatus(activeRun.instance.status);
+    }
+  }, []);
+
+  const resume = useCallback(() => {
+    const activeRun = activeRunRef.current;
+
+    if (!activeRun) {
+      return;
+    }
+
+    if (activeRun.instance.status === IngestionStatus.Paused) {
+      activeRun.instance.resume();
+      setStatus(activeRun.instance.status);
+    }
+  }, []);
+
   const cancel = useCallback(() => {
     const activeRun = activeRunRef.current;
 
@@ -119,7 +152,10 @@ export function useIngest<TRow = Record<string, unknown>>() {
       return;
     }
 
-    if (activeRun.instance.status !== IngestionStatus.Running) {
+    if (
+      activeRun.instance.status !== IngestionStatus.Running &&
+      activeRun.instance.status !== IngestionStatus.Paused
+    ) {
       return;
     }
 
@@ -132,9 +168,33 @@ export function useIngest<TRow = Record<string, unknown>>() {
      */
   }, []);
 
+  const reset = useCallback(() => {
+    const activeRun = activeRunRef.current;
+
+    if (
+      activeRun &&
+      (activeRun.instance.status === IngestionStatus.Running ||
+        activeRun.instance.status === IngestionStatus.Paused)
+    ) {
+      activeRun.instance.cancel();
+    }
+
+    // Detach the active run completely.
+    // The previous promise will still resolve/reject, but `id !== runId` checks
+    // will safely ignore those updates.
+    activeRunRef.current = null;
+    setStatus(IngestionStatus.Idle);
+    setProgress(null);
+    setResult(null);
+    setError(null);
+  }, []);
+
   return {
     ingest: startIngest,
+    pause,
+    resume,
     cancel,
+    reset,
     status,
     progress,
     result,

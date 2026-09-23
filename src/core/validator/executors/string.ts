@@ -1,12 +1,11 @@
 import { Rule } from "../../../model/schema/types/Rule";
 import { RuleType, StringRuleType } from "../../../model/schema/types/RuleType";
-import { RuleExecutionState, ValidationContext } from "../types";
+import { RuleExecutionState } from "../types";
 import { createError } from "../utils";
 
 export function executeStringRule(
   rule: Rule<RuleType>,
   state: RuleExecutionState,
-  _context: ValidationContext,
 ): void {
   let currentValue = state.value as string;
   const isCaseSensitive = state.caseSensitive ?? false;

@@ -58,3 +58,6 @@ export type {
   ProgressBasis,
 } from "../core/ingest/types";
 export type { ColumnConfig } from "../model";
+export { ix } from "../model/ix";
+export { IngestionStatus } from "../core/controller/types";
+export { IngestionErrorType } from "../core/ingest/types";

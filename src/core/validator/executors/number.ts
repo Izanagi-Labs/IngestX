@@ -1,16 +1,11 @@
 import { Rule } from "../../../model/schema/types/Rule";
 import { RuleType, NumberRuleType } from "../../../model/schema/types/RuleType";
-import {
-  RuleExecutionState,
-  ValidationContext,
-  ValidationErrorType,
-} from "../types";
+import { RuleExecutionState, ValidationErrorType } from "../types";
 import { createError } from "../utils";
 
 export function executeNumberRule(
   rule: Rule<RuleType>,
   state: RuleExecutionState,
-  _context: ValidationContext,
 ): void {
   let stringifiedValue = state.value as string;
   const trim = state.trim ?? false;

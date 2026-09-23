@@ -9,10 +9,10 @@ export class IngestionCancelledError extends Error {
 }
 
 export function isIngestionCancelledError(
-  error: any,
+  error: unknown,
 ): error is IngestionCancelledError {
-  return (
+  return Boolean(
     error instanceof IngestionCancelledError ||
-    (error && error.name === "IngestionCancelledError")
+    (error && (error as { name?: string }).name === "IngestionCancelledError")
   );
 }

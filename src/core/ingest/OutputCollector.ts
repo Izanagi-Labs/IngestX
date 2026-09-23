@@ -6,7 +6,7 @@ import type {
 
 import { CollectionLimitExceededError } from "../errors";
 
-export class OutputCollector<TRow = Record<string, any>> {
+export class OutputCollector<TRow = Record<string, unknown>> {
   private totalRows = 0;
   private validRowsCount = 0;
   private invalidRowsCount = 0;
@@ -49,7 +49,7 @@ export class OutputCollector<TRow = Record<string, any>> {
             const receivedValue =
               invalid.originalData && columnKey in invalid.originalData
                 ? invalid.originalData[columnKey]
-                : (invalid.data as Record<string, any>)[columnKey];
+                : (invalid.data as Record<string, unknown>)[columnKey];
 
             this.rowWiseErrors.push({
               rowIndex: invalid.rowIndex,

@@ -110,7 +110,7 @@ export type FinalOutput<TRow = Record<string, unknown>> = {
 };
 
 export type ParserOptions = Pick<
-  IngestOptions<any>,
+  IngestOptions<unknown>,
   "worker" | "chunkSize" | "byteChunkSize"
 >;
 

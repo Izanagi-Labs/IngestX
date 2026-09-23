@@ -6,6 +6,7 @@ const MAX_BUFFERED_CHUNKS = 2;
 
 export class CSVParser implements Parser {
   private isAborted = false;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private papaParser: any = null;
   private resolveNext: (() => void) | null = null;
 

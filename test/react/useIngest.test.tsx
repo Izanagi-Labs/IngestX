@@ -19,7 +19,303 @@ describe("useIngest Hook", () => {
     expect(result.current.result).toBeNull();
     expect(result.current.error).toBeNull();
   });
+  it("should support pause and resume", async () => {
+    const { result } = renderHook(() => useIngest());
+    const rows = Array(100).fill(["A", 1]);
+    const file = generateCSV(["name", "age"], rows);
 
+    let promise: Promise<void>;
+    let chunksProcessed = 0;
+
+    act(() => {
+      promise = result.current.ingest({
+        file,
+        columns,
+        chunkSize: 10,
+        onChunkProcessed: () => {
+          chunksProcessed++;
+          if (chunksProcessed === 2) {
+            result.current.pause();
+          }
+        },
+      });
+    });
+
+    // Wait until pause takes effect
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    
+    expect(result.current.status).toBe(IngestionStatus.Paused);
+
+    act(() => {
+      result.current.resume();
+    });
+
+    expect(result.current.status).toBe(IngestionStatus.Running);
+
+    await act(async () => {
+      await promise;
+    });
+
+    expect(result.current.status).toBe(IngestionStatus.Completed);
+  });
+
+  it("should safely ignore repeated pause and resume calls", async () => {
+    const { result } = renderHook(() => useIngest());
+    const rows = Array(10).fill(["A", 1]);
+    const file = generateCSV(["name", "age"], rows);
+
+    act(() => {
+      result.current.pause(); // Idle -> pause (safe no-op)
+    });
+
+    let promise: Promise<void>;
+    act(() => {
+      promise = result.current.ingest({
+        file,
+        columns,
+        chunkSize: 5,
+        onChunkProcessed: () => {
+          result.current.pause();
+          result.current.pause(); // Repeated pause
+        },
+      });
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(result.current.status).toBe(IngestionStatus.Paused);
+
+    act(() => {
+      result.current.resume();
+      result.current.resume(); // Repeated resume
+    });
+
+    await act(async () => {
+      await promise;
+    });
+
+    act(() => {
+      result.current.resume(); // Completed -> resume (safe no-op)
+      result.current.pause(); // Completed -> pause (safe no-op)
+    });
+
+    expect(result.current.status).toBe(IngestionStatus.Completed);
+  });
+
+  it("should allow cancellation while paused", async () => {
+    const { result } = renderHook(() => useIngest());
+    const rows = Array(100).fill(["A", 1]);
+    const file = generateCSV(["name", "age"], rows);
+
+    let promise: Promise<void>;
+
+    act(() => {
+      promise = result.current.ingest({
+        file,
+        columns,
+        chunkSize: 10,
+        onChunkProcessed: () => {
+          result.current.pause();
+        },
+      });
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(result.current.status).toBe(IngestionStatus.Paused);
+
+    act(() => {
+      result.current.cancel();
+    });
+
+    await act(async () => {
+      await promise;
+    });
+
+    expect(result.current.status).toBe(IngestionStatus.Cancelled);
+  });
+
+  it("should reject new ingestions while paused", async () => {
+    const { result } = renderHook(() => useIngest());
+    const rows = Array(100).fill(["A", 1]);
+    const file = generateCSV(["name", "age"], rows);
+
+    let promise: Promise<void>;
+
+    act(() => {
+      promise = result.current.ingest({
+        file,
+        columns,
+        chunkSize: 10,
+        onChunkProcessed: () => {
+          result.current.pause();
+        },
+      });
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(result.current.status).toBe(IngestionStatus.Paused);
+
+    let secondPromise: Promise<void>;
+    act(() => {
+      secondPromise = result.current.ingest({ file, columns });
+    });
+
+    await expect(secondPromise!).rejects.toThrow("An ingestion is already in progress");
+
+    act(() => {
+      result.current.cancel();
+    });
+
+    await act(async () => {
+      await promise;
+    });
+  });
+
+  it("should cancel on unmount when paused", async () => {
+    const { result, unmount } = renderHook(() => useIngest());
+    const rows = Array(100).fill(["A", 1]);
+    const file = generateCSV(["name", "age"], rows);
+
+    let promise: Promise<void>;
+
+    act(() => {
+      promise = result.current.ingest({
+        file,
+        columns,
+        chunkSize: 10,
+        onChunkProcessed: () => {
+          result.current.pause();
+        },
+      });
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(result.current.status).toBe(IngestionStatus.Paused);
+
+    unmount();
+
+    await act(async () => {
+      await promise;
+    });
+
+    expect(true).toBe(true); // Should not throw unhandled rejection
+  });
+
+  it("should reset state safely from completed", async () => {
+    const { result } = renderHook(() => useIngest());
+    const file = generateCSV(["name", "age"], [["Alice", 30]]);
+
+    let promise: Promise<void>;
+    act(() => {
+      promise = result.current.ingest({ file, columns, collectResults: true });
+    });
+
+    await act(async () => {
+      await promise;
+    });
+
+    expect(result.current.status).toBe(IngestionStatus.Completed);
+    expect(result.current.result).not.toBeNull();
+
+    act(() => {
+      result.current.reset();
+    });
+
+    expect(result.current.status).toBe(IngestionStatus.Idle);
+    expect(result.current.result).toBeNull();
+  });
+
+  it("should reset state safely while running", async () => {
+    const { result } = renderHook(() => useIngest());
+    const rows = Array(100).fill(["A", 1]);
+    const file = generateCSV(["name", "age"], rows);
+
+    let promise: Promise<void>;
+    act(() => {
+      promise = result.current.ingest({ file, columns });
+    });
+
+    expect(result.current.status).toBe(IngestionStatus.Running);
+
+    act(() => {
+      result.current.reset();
+    });
+
+    expect(result.current.status).toBe(IngestionStatus.Idle);
+
+    await act(async () => {
+      await promise;
+    });
+
+    // Still idle, no late resolve updates
+    expect(result.current.status).toBe(IngestionStatus.Idle);
+  });
+
+  it("should reset state safely while paused", async () => {
+    const { result } = renderHook(() => useIngest());
+    const rows = Array(100).fill(["A", 1]);
+    const file = generateCSV(["name", "age"], rows);
+
+    let promise: Promise<void>;
+    act(() => {
+      promise = result.current.ingest({
+        file,
+        columns,
+        chunkSize: 10,
+        onChunkProcessed: () => {
+          result.current.pause();
+        },
+      });
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(result.current.status).toBe(IngestionStatus.Paused);
+
+    act(() => {
+      result.current.reset();
+    });
+
+    expect(result.current.status).toBe(IngestionStatus.Idle);
+
+    await act(async () => {
+      await promise;
+    });
+
+    expect(result.current.status).toBe(IngestionStatus.Idle);
+  });
+
+  it("should support streaming without memory accumulation", async () => {
+    const { result } = renderHook(() => useIngest());
+    const rows = Array(50).fill(["A", 1]);
+    const file = generateCSV(["name", "age"], rows);
+
+    let processedChunks = 0;
+
+    let promise: Promise<void>;
+    act(() => {
+      promise = result.current.ingest({
+        file,
+        columns,
+        chunkSize: 10,
+        collectResults: false,
+        onChunkProcessed: (chunk) => {
+          processedChunks++;
+          expect(chunk.output.validRows.length).toBeGreaterThan(0);
+        },
+      });
+    });
+
+    await act(async () => {
+      await promise;
+    });
+
+    expect(result.current.status).toBe(IngestionStatus.Completed);
+    expect(processedChunks).toBe(5); // 50 rows / 10 chunkSize = 5 chunks
+
+    // Verify memory was not accumulated
+    expect(result.current.result).not.toBeNull();
+    expect(result.current.result?.validRowsCount).toBe(50);
+    expect(result.current.result?.validRows.length).toBe(0);
+  });
   it("should successfully ingest and update state", async () => {
     const { result } = renderHook(() => useIngest());
     const file = generateCSV(

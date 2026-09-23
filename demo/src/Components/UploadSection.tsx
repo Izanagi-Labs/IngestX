@@ -1,84 +1,107 @@
-import React, { useCallback, useRef } from "react";
-import { Box, Typography } from "@mui/material";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import React, { useRef } from "react";
+import { generateValidCsv, generateInvalidCsv, downloadFile } from "../utils/generateSampleCsv";
 
 interface UploadSectionProps {
-  onFileDrop: (file: File) => void;
+  onFileSelect: (file: File) => void;
+  disabled: boolean;
   selectedFile: File | null;
+  onClear: () => void;
 }
 
-export default function UploadSection({
-  onFileDrop,
-  selectedFile,
-}: UploadSectionProps) {
+export const UploadSection: React.FC<UploadSectionProps> = ({ onFileSelect, disabled, selectedFile, onClear }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-  }, []);
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        onFileDrop(e.dataTransfer.files[0]);
-      }
-    },
-    [onFileDrop],
-  );
-
-  const handleClick = useCallback(() => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      onFileSelect(file);
     }
-  }, []);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
-  const handleFileChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files && e.target.files.length > 0) {
-        onFileDrop(e.target.files[0]);
-      }
-      // Reset the input value so selecting the same file again works
-      e.target.value = "";
-    },
-    [onFileDrop],
-  );
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (!disabled && !selectedFile) {
+      e.currentTarget.classList.add('drag-over');
+    }
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    if (disabled || selectedFile) return;
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      onFileSelect(file);
+    }
+  };
 
   return (
-    <Box
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-      onClick={handleClick}
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        border: "2px dashed #90caf9",
-        borderRadius: 2,
-        p: 6,
-        textAlign: "center",
-        bgcolor: "#f5f5f5",
-        cursor: "pointer",
-        "&:hover": { bgcolor: "#e3f2fd" },
-      }}
-    >
-      <CloudUploadIcon sx={{ fontSize: 48, color: "#1976d2", mb: 2 }} />
-      <Typography variant="h6" gutterBottom>
-        Drag and drop your file here, or click to select
-      </Typography>
-      <Typography color="text.secondary">
-        {selectedFile
-          ? `Selected: ${selectedFile.name}`
-          : "Supports CSV and Excel files"}
-      </Typography>
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        style={{ display: "none" }}
-        accept=".csv, .xlsx, .xls"
-      />
-    </Box>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div 
+        className={`upload-surface ${disabled ? 'disabled' : ''}`}
+        style={{ flexGrow: 1 }}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        onClick={() => !disabled && !selectedFile && fileInputRef.current?.click()}
+      >
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          style={{ display: 'none' }} 
+          accept=".csv,.xlsx" 
+          onChange={handleFileChange}
+          disabled={disabled || selectedFile !== null}
+        />
+        
+        {selectedFile ? (
+          <div className="file-selected">
+            <div className="file-name">{selectedFile.name}</div>
+            <div className="file-meta">
+              {(selectedFile.size / 1024 / 1024).toFixed(2)} MB • {selectedFile.name.endsWith('.csv') ? 'CSV' : 'Excel'}
+            </div>
+            {!disabled && (
+              <button className="file-remove" onClick={(e) => { e.stopPropagation(); onClear(); }}>
+                Remove file
+              </button>
+            )}
+          </div>
+        ) : (
+          <div>
+            <div className="upload-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            </div>
+            <div className="upload-title">Drop a file</div>
+            <div className="upload-subtitle">CSV or XLSX</div>
+            <button className="upload-browse-btn" onClick={(e) => { 
+              e.stopPropagation(); 
+              if (!disabled) fileInputRef.current?.click(); 
+            }}>Browse files</button>
+          </div>
+        )}
+      </div>
+
+      <div className="sample-files">
+        <span style={{ color: 'var(--text-secondary)' }}>Try a sample:</span>
+        <button className="sample-link" onClick={() => downloadFile(generateValidCsv(), "valid_customers.csv")}>
+          Valid CSV
+        </button>
+        <button className="sample-link" onClick={() => downloadFile(generateInvalidCsv(), "invalid_customers.csv")}>
+          Invalid CSV
+        </button>
+      </div>
+    </div>
   );
-}
+};
