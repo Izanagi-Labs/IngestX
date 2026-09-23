@@ -38,7 +38,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint:check": "eslint .",
-    "benchmark": "npx tsx benchmarks/excelParser.benchmark.ts && npx tsx benchmarks/csvParser.benchmark.ts"
+    "benchmark": "npx tsx benchmarks/excelParser.benchmark.ts && npx tsx benchmarks/csvParser.benchmark.ts",
+    "web:dev": "pnpm --filter web dev",
+    "web:build": "pnpm --filter web build",
+    "web:start": "pnpm --filter web start"
   },
   "sideEffects": false,
   "engines": {
