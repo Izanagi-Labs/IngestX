@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "../components/theme/ThemeProvider";
+import { Header } from "../components/layout/Header";
+import { Footer } from "../components/layout/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,8 +16,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "IngestX",
-  description: "Headless CSV & Excel ingestion for TypeScript",
+  title: {
+    template: "%s | IngestX",
+    default: "IngestX",
+  },
+  description: "Headless, type-safe CSV and Excel ingestion for TypeScript.",
 };
 
 export default function RootLayout({
@@ -23,24 +29,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        <header className="border-b border-gray-200 p-4 flex gap-4 items-center bg-gray-50 text-gray-900">
-          <h1 className="font-bold text-xl"><a href="/">IngestX</a></h1>
-          <nav className="flex gap-6 ml-8 font-medium">
-            <a href="/demo" className="hover:text-blue-600 transition-colors">Demo</a>
-            <a href="/docs" className="hover:text-blue-600 transition-colors">Docs</a>
-            <a href="https://github.com/ParallelBytes/IngestX" className="hover:text-blue-600 transition-colors" target="_blank" rel="noreferrer">GitHub</a>
-          </nav>
-        </header>
-        <main className="min-h-[80vh] p-8 max-w-7xl mx-auto w-full">
-          {children}
-        </main>
-        <footer className="border-t border-gray-200 p-6 mt-12 text-center text-sm text-gray-500 bg-gray-50">
-          © {new Date().getFullYear()} IngestX - High performance headless ingestion.
-        </footer>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Header />
+          <main className="flex-1 flex flex-col w-full">
+            {children}
+          </main>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );
