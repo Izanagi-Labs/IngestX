@@ -1,14 +1,15 @@
 import { Container } from "../../../components/layout/Container";
+import { DemoPlayground } from "../../../components/demo/DemoPlayground";
 
 export const metadata = {
-  title: "Interactive Demo",
+  title: "Interactive Demo - IngestX Playground",
+  description: "Test your schemas against CSV and Excel files in the browser.",
 };
 
 export default function DemoPage() {
   return (
     <Container variant="full" className="py-8">
-      <h1 className="text-2xl font-bold mb-4">Interactive Demo</h1>
-      <p className="text-foreground-muted">Playground — Phase 5</p>
+      <DemoPlayground />
     </Container>
   );
 }
