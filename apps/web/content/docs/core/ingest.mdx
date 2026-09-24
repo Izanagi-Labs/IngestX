@@ -46,7 +46,7 @@ You configure ingestion by passing an options object.
 
 ## 2. Instance (`IngestionInstance`)
 
-The object returned by `ingest()` provides real time control over the active task.
+The object returned by `ingest()` provides lifecycle control over the active task.
 
 ```typescript
 interface IngestionInstance<TRow> {
@@ -73,7 +73,7 @@ interface IngestionInstance<TRow> {
 
 ## 3. Result (`IngestionResult`)
 
-The `result` Promise on the Ingestion Instance resolves when the file has been fully processed, or if a fatal error occurs (like a missing required column).
+The `result` Promise on the Ingestion Instance resolves when the file has been processed, or rejects if a fatal error occurs (like a missing required column).
 
 ```typescript
 interface IngestionResult<TRow> {

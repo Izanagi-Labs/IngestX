@@ -41,7 +41,7 @@ export interface HeaderMismatchError extends IngestionError {
 
 ## Row level Validation Errors
 
-Row validation failures **do not** trigger an `IngestionError`. They are fully expected parts of processing messy spreadsheets.
+Row validation failures **do not** trigger an `IngestionError`. They are expected parts of processing messy spreadsheets.
 
 Instead, when a row fails validation, the final payload pushes the detailed failure into `errorsData.rowWiseErrors`.
 

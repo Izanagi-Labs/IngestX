@@ -5,9 +5,9 @@ description: Implementation details for CSV files
 
 IngestX employs highly optimized parsing techniques explicitly tailored to `.csv` files.
 
-## Streaming vs Buffering
+## Incremental vs Buffered
 
-CSV parsing is fundamentally **chunked and stream like**. Instead of pulling the entire CSV document into memory, the browser (or Node filesystem) streams chunks of bytes.
+CSV parsing is fundamentally **chunk based**. Instead of pulling the entire CSV document into memory at once, the engine reads and processes chunks.
 
 1. The underlying parser reads up to `byteChunkSize` (default: `10MB`) from the file buffer.
 2. It breaks the data into predictable batches defined by `chunkSize` (default: `10,000` rows).
@@ -15,7 +15,7 @@ CSV parsing is fundamentally **chunked and stream like**. Instead of pulling the
 
 ## File Reading Capabilities
 
-- **Browser**: Employs Web Workers (when `worker: true` is configured) to offload the PapaParse engine parsing completely off the main thread.
+- **Browser**: Can employ Web Workers (when `worker: true` is configured) to offload the parsing workload from the main thread.
 - **Node**: Directly hooks into `fs.createReadStream`.
 
 ## Memory Footprint

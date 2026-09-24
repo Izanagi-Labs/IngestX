@@ -32,13 +32,13 @@ Restarts the data flow of a paused ingestion.
 
 ### `cancel()`
 
-Immediately stops all worker processing, terminates active loops, destroys the parser instance, and rejects the pending `result` Promise. 
+Stops ongoing worker processing, terminates loops, aborts the parser instance, and resolves the pending `result` Promise with a cancelled status. 
 
 Once an ingestion is cancelled, it cannot be resumed.
 
 ## Capability Matrix
 
-Depending on the environment adapter you are using, the underlying streaming implementation determines what lifecycle controls are actually supported.
+Depending on the environment adapter you are using, the underlying processing implementation determines what lifecycle controls are supported.
 
 | Capability | Core (Browser) | React Hook | Node |
 |---|---|---|---|
@@ -47,4 +47,4 @@ Depending on the environment adapter you are using, the underlying streaming imp
 | **Cancel** | Supported | Supported | Supported |
 | **Reset** | N/A (Stateless) | Supported | N/A (Stateless) |
 
-> The `reset()` capability is exclusive to the React hook. Because the React hook persists state arrays in the DOM, `reset()` is provided to instantly wipe the old file data and return to the `Idle` state for subsequent uploads.
+> The `reset()` capability is exclusive to the React hook. Because the React hook persists state arrays in the DOM, `reset()` is provided to clear the old file data and return to the `Idle` state for subsequent uploads.

@@ -18,7 +18,7 @@ ingest({
 
 ## The `Progress` Object
 
-The callback is fired with a `Progress` object every time the internal engine finishes parsing or validating a chunk of data.
+The callback is fired with a `Progress` object when the internal engine finishes validating a chunk of data.
 
 ```typescript
 export interface Progress {
@@ -36,7 +36,7 @@ export interface Progress {
 
 - **`initializing`**: The parser has started but hasn't resolved headers yet.
 - **`parsing`**: Chunks are actively being pushed through the validation engine.
-- **`completed`**: The file was fully processed.
+- **`completed`**: The file was processed.
 - **`cancelled`**: The ingestion was aborted via `cancel()`.
 - **`failed`**: A fatal error (e.g. Header Mismatch) destroyed the run.
 
@@ -48,7 +48,7 @@ Calculating an accurate percentage depends entirely on the file format architect
 Because CSVs are streamed without knowing the final row count in advance, percentage is calculated as `processedBytes / totalBytes`.
 
 #### `"rows"` (Excel behavior)
-Because Excel files are fully materialized in memory, the engine knows the exact total row count before validation begins. Percentage is calculated as `processedRows / totalRows`. 
+Because Excel files are fully materialized in memory, the engine determines the total row count before validation begins. Percentage is calculated as `processedRows / totalRows`. 
 
 > [!NOTE]
 > The `percentage` float is normalized between `0` and `1`.

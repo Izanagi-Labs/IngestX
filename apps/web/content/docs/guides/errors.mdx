@@ -20,7 +20,7 @@ try {
   const instance = ingest({ file, columns });
   const result = await instance.result;
 
-  console.log("Success! File parsed perfectly.");
+  console.log("Success! File parsed without fatal errors.");
 } catch (error: any) {
   // error is the rejected IngestionError
 
@@ -32,7 +32,7 @@ try {
   } else if (error.type === IngestionErrorType.COLLECTION_LIMIT_EXCEEDED) {
     alert("This file is too large for memory processing!");
   } else {
-    console.error("The parser failed completely:", error.message);
+    console.error("The parser failed:", error.message);
   }
 }
 ```
@@ -42,7 +42,7 @@ try {
 
 ## Row wise Validation Errors
 
-Row level validation failures **will not trigger a Promise rejection**. The `ingestion.result` will resolve completely normally.
+Row level validation failures **will not trigger a Promise rejection**. The `ingestion.result` will resolve normally.
 
 You must inspect the final payload to determine if any rows failed structural checks.
 

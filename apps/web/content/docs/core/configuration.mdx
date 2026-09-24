@@ -41,7 +41,7 @@ When `duplicatesAllowed: false` is configured for a column:
 
 ## Header Matching
 
-By default, IngestX verifies the structural integrity of the file by attempting to match every provided `ColumnConfig.name` against the exact headers found in the first row of the file.
+By default, IngestX verifies the structural integrity of the file by attempting to match the provided `ColumnConfig.name` against the exact headers found in the first row of the file.
 
 If a required column is missing, ingestion fails immediately with a `HeaderMismatchError`, preventing invalid processing.
 

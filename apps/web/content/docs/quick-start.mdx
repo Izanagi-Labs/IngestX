@@ -69,7 +69,7 @@ async function handleFileUpload(file: File) {
 1. **Mapping**: IngestX reads the header row of the file and matches columns. If required columns are missing, it stops immediately.
 2. **Processing**: It processes the file in chunks to prevent blocking the UI thread.
 3. **Validation**: Every cell is evaluated against the `ix` schema. If a row contains invalid data, it is cleanly separated into `invalidRows`.
-4. **Completion**: The Promise returned by `ingestion.result` resolves with a final data payload containing strict, type safe output.
+4. **Completion**: The Promise returned by `ingestion.result` resolves with a final data payload typed according to your schemas.
 
 ## Next Steps
 

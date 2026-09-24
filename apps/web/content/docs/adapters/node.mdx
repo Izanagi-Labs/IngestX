@@ -23,7 +23,7 @@ The options signature for the Node.js adapter is nearly identical to the core li
 
 ## Node Example
 
-This example demonstrates parsing a backend CSV payload, streaming valid chunks directly to a database without blowing up server memory.
+This example demonstrates parsing a backend CSV payload, writing valid chunks incrementally to a database to help control server memory growth.
 
 ```typescript
 import { ingest } from "@parallelbytes/ingestx/node";
@@ -66,6 +66,6 @@ async function processServerUpload(savedFilePath: string) {
 
 ## Formats Supported
 
-The Node adapter fully supports both formats:
-- **CSV**: Processed incrementally via streaming (`fs.createReadStream`). Highly memory efficient.
+The Node adapter supports both formats:
+- **CSV**: Processed incrementally using `fs.createReadStream`.
 - **Excel**: Supported and processed chunk by chunk natively.

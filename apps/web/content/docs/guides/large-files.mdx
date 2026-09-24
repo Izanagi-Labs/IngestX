@@ -1,15 +1,15 @@
 ---
 title: Processing Large Files
-description: Strategy for handling massive datasets
+description: Strategy for handling large datasets
 ---
 
-When users attempt to upload CSVs or Excel spreadsheets containing millions of rows (often exceeding 500MB+ in size), standard array based processing strategies will catastrophically fail, leading to an `Out of Memory` browser tab crash.
+When users attempt to upload CSVs or Excel spreadsheets containing large datasets, standard array based processing strategies can fail, leading to an `Out of Memory` browser tab crash.
 
 IngestX provides the architectural tools to process these files safely, provided you configure it correctly.
 
 ## 1. Avoid Collecting Results
 
-The absolute most important rule when handling large files is **never** retaining the parsed data in the browser's memory.
+An important strategy when handling large files is avoiding the accumulation of parsed data in the browser's memory.
 
 ```typescript
 // DANGEROUS for large files
@@ -48,8 +48,8 @@ If you are dealing with very heavy files, you may wish to tune the chunk sizes t
 
 Be fully aware of the differences in how formats are handled:
 
-### CSV is infinitely scalable
-Because CSV is flat text, IngestX reads the file as a true byte stream. Processing a 5GB CSV is identical in memory footprint to processing a 1MB CSV. Assuming no cross chunk features (like `duplicatesAllowed: false` uniqueness tracking) are enabled, the memory graph remains completely flat.
+### CSV Supports Incremental Processing
+Because CSV is flat text, IngestX reads the file in chunks. Separately, by configuring `collectResults: false`, you can prevent processed row data from accumulating in the final result. Assuming no cross chunk features (like `duplicatesAllowed: false` uniqueness tracking) are enabled, the result accumulation memory remains constant.
 
 ### Excel is inherently limited
 An Excel file is a ZIP archive containing XML. The Web Worker must read the entire file into a buffer to unzip it. A 500MB Excel file will likely require over 1.5GB of RAM to inflate and parse the XML tree inside the worker. 

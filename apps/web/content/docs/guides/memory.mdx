@@ -3,23 +3,23 @@ title: Memory Management
 description: How IngestX prevents out of memory crashes
 ---
 
-Browser memory is finite. When processing very large spreadsheets, accumulating all data in JavaScript object structures can easily crash the page, forcing the browser to terminate the tab.
+Browser memory is finite. When processing very large spreadsheets, accumulating data in JavaScript object structures can crash the page, forcing the browser to terminate the tab.
 
-IngestX employs chunk based parsing to mitigate this, but it requires correct configuration to be completely safe.
+IngestX employs chunk based parsing to mitigate this, but it requires correct configuration to manage memory effectively.
 
 ## The `collectResults` Danger
 
 By default, `collectResults` is `false`.
 
-If you set `collectResults: true` in your ingestion options, IngestX retains every parsed row in memory, pushing them into the `validRows` and `invalidRows` arrays so that you can access them via `result.data` at the end of the run.
+If you set `collectResults: true` in your ingestion options, IngestX retains parsed rows in memory, pushing them into the `validRows` and `invalidRows` arrays so that you can access them via `result.data` at the end of the run.
 
 **This creates O(N) memory growth.**
 
-For a 10,000 row CSV, this is completely harmless. For a 2,000,000 row CSV, accumulating the rows in memory will likely exceed V8's heap limit and crash the tab.
+For a 10,000 row CSV, this is typically harmless. For very large datasets, accumulating the rows in memory can exceed V8's heap limit and crash the tab.
 
-## Safe Handling for Massive Files
+## Safe Handling for Large Files
 
-To process massive files safely, you must keep `collectResults: false` and instead subscribe to the `onChunkProcessed` callback.
+To process large files safely, keep `collectResults: false` and instead subscribe to the `onChunkProcessed` callback.
 
 ```typescript
 ingest({
@@ -39,13 +39,13 @@ ingest({
 
 Because `collectResults: false` prevents IngestX from retaining the rows internally, the V8 garbage collector will smoothly discard each chunk of rows from memory after your `onChunkProcessed` callback completes.
 
-This enables **infinitely scalable** parsing, achieving flat memory consumption bounded only by your `chunkSize` configuration (assuming no uniqueness tracking is active).
+This allows processing of large datasets without accumulating result memory, constrained primarily by your `chunkSize` configuration (assuming no uniqueness tracking is active).
 
 ## Uniqueness Tracking Overhead
 
 Setting a column to `duplicatesAllowed: false` mandates cross chunk validation. To guarantee uniqueness across an entire spreadsheet, IngestX creates a `Set` to track the distinct, validated values for that column. 
 
-While much smaller than retaining the entire JSON row objects, this fundamentally introduces **O(U)** memory growth (where `U` is the number of distinct valid values). Be extremely mindful of this when enforcing uniqueness constraints on multi million row columns with high cardinality (e.g., massive UUID lists), as the tracking `Set` cannot be garbage collected until the ingestion fully resolves.
+While much smaller than retaining the entire JSON row objects, this fundamentally introduces **O(U)** memory growth (where `U` is the number of distinct valid values). Be extremely mindful of this when enforcing uniqueness constraints on large row columns with high cardinality (e.g., large UUID lists), as the tracking `Set` cannot be garbage collected until the ingestion fully resolves.
 
 ## The Collection Limit Safety Net
 
@@ -60,4 +60,4 @@ ingest({
 })
 ```
 
-If the parser encounters row number 50,001, the ingestion is instantly aborted, and an `IngestionErrorType.COLLECTION_LIMIT_EXCEEDED` error is thrown, sparing the browser from crashing.
+If a chunk is evaluated that would cause the total accumulated valid and invalid rows to exceed `maxCollectedRows` (e.g., 50,000), the ingestion is aborted, and an `IngestionErrorType.COLLECTION_LIMIT_EXCEEDED` error is thrown, sparing the browser from crashing.
