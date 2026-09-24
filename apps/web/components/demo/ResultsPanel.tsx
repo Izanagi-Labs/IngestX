@@ -5,6 +5,7 @@ import { useDemoStore } from "../../store/demoStore";
 export function ResultsPanel() {
   const result = useDemoStore((state) => state.result);
   const status = useDemoStore((state) => state.status);
+  const configuration = useDemoStore((state) => state.configuration);
   const activeTab = useDemoStore((state) => state.activeResultTab);
   const setActiveTab = useDemoStore((state) => state.setActiveResultTab);
   
@@ -22,6 +23,15 @@ export function ResultsPanel() {
 
   const validCount = result.validRows.length;
   const invalidCount = result.invalidRows.length;
+
+  if (!configuration.collectResults) {
+    return (
+      <div className="border border-border rounded-lg p-12 bg-background flex flex-col items-center justify-center text-center">
+        <p className="text-foreground font-medium mb-1">Result Collection Disabled</p>
+        <p className="text-sm text-foreground-muted">Rows were processed but not retained for the results table because 'collectResults' is false.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="border border-border rounded-lg bg-background overflow-hidden flex flex-col">
@@ -51,18 +61,18 @@ export function ResultsPanel() {
               <thead className="text-xs text-foreground-muted uppercase bg-foreground/5 border-b border-border">
                 <tr>
                   <th className="px-4 py-3 font-medium">Row</th>
-                  <th className="px-4 py-3 font-medium">Name</th>
-                  <th className="px-4 py-3 font-medium">Age</th>
-                  <th className="px-4 py-3 font-medium">Email</th>
+                  {result.columns.map(c => (
+                    <th key={c.key} className="px-4 py-3 font-medium">{c.name}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {result.validRows.map((row, i) => (
                   <tr key={i} className="hover:bg-foreground/5 transition-colors">
-                    <td className="px-4 py-3 text-foreground-muted">{row._ixRowIndex}</td>
-                    <td className="px-4 py-3 font-medium">{row.name}</td>
-                    <td className="px-4 py-3">{row.age}</td>
-                    <td className="px-4 py-3 text-foreground-muted">{row.email}</td>
+                    <td className="px-4 py-3 text-foreground-muted">{row._ixRowIndex ?? i}</td>
+                    {result.columns.map(c => (
+                      <td key={c.key} className="px-4 py-3 font-medium">{row[c.key]}</td>
+                    ))}
                   </tr>
                 ))}
               </tbody>
@@ -78,9 +88,9 @@ export function ResultsPanel() {
               <thead className="text-xs text-foreground-muted uppercase bg-foreground/5 border-b border-border">
                 <tr>
                   <th className="px-4 py-3 font-medium">Row</th>
-                  <th className="px-4 py-3 font-medium">Name</th>
-                  <th className="px-4 py-3 font-medium">Age</th>
-                  <th className="px-4 py-3 font-medium">Email</th>
+                  {result.columns.map(c => (
+                    <th key={c.key} className="px-4 py-3 font-medium">{c.name}</th>
+                  ))}
                   <th className="px-4 py-3 font-medium">Errors</th>
                 </tr>
               </thead>
@@ -88,9 +98,9 @@ export function ResultsPanel() {
                 {result.invalidRows.map((row, i) => (
                   <tr key={i} className="hover:bg-foreground/5 transition-colors align-top">
                     <td className="px-4 py-3 text-foreground-muted">{row._ixRowIndex}</td>
-                    <td className="px-4 py-3">{row.data?.name}</td>
-                    <td className="px-4 py-3">{row.data?.age}</td>
-                    <td className="px-4 py-3">{row.data?.email}</td>
+                    {result.columns.map(c => (
+                      <td key={c.key} className="px-4 py-3 font-medium">{row.data?.[c.key]}</td>
+                    ))}
                     <td className="px-4 py-3 text-wrap max-w-sm">
                       <div className="flex flex-col gap-2">
                         {Object.entries(row.errors || {}).map(([key, errors]: [string, any]) => (

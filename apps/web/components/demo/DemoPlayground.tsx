@@ -8,14 +8,23 @@ import { ResultSummary } from "./ResultSummary";
 import { ResultsPanel } from "./ResultsPanel";
 import { useDemoStore } from "../../store/demoStore";
 import { useEffect } from "react";
+import { cancelIngestion } from "../../lib/demo/realIngestion";
 
 export function DemoPlayground() {
   const reset = useDemoStore((state) => state.reset);
 
-  // Clean up mock timeouts when unmounting
+  // Clean up ingestion when unmounting
   useEffect(() => {
-    return () => reset();
+    return () => {
+      cancelIngestion();
+      reset();
+    };
   }, [reset]);
+
+  const handleReset = () => {
+    cancelIngestion();
+    reset();
+  };
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-[1400px] mx-auto">
@@ -27,7 +36,7 @@ export function DemoPlayground() {
           <p className="text-sm text-foreground-muted">Test schemas against CSV and Excel files. (Phase 5 UI Shell)</p>
         </div>
         <button 
-          onClick={reset}
+          onClick={handleReset}
           className="mt-4 sm:mt-0 px-4 py-2 text-sm font-medium rounded border border-border hover:bg-foreground/5 transition-colors"
         >
           Reset Session

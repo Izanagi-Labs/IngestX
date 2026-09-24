@@ -2,12 +2,13 @@
 
 import { Play, Pause, Square, RotateCcw } from "lucide-react";
 import { useDemoStore } from "../../store/demoStore";
-import { runMockIngestion, pauseMockIngestion, resumeMockIngestion, cancelMockIngestion } from "../../lib/demo/mockIngestion";
+import { runIngestion, pauseIngestion, resumeIngestion, cancelIngestion } from "../../lib/demo/realIngestion";
 
 export function RunControls() {
   const status = useDemoStore((state) => state.status);
   const file = useDemoStore((state) => state.file);
   const progress = useDemoStore((state) => state.progress);
+  const error = useDemoStore((state) => state.error);
   
   if (status === "idle") {
     return (
@@ -23,7 +24,7 @@ export function RunControls() {
     return (
       <div className="border border-border rounded-lg p-4 bg-background">
         <button 
-          onClick={runMockIngestion} 
+          onClick={runIngestion} 
           className="w-full py-2 px-4 rounded bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2"
         >
           <Play className="w-4 h-4" />
@@ -51,15 +52,15 @@ export function RunControls() {
 
           <div className="flex gap-2 mt-2">
             {status === "running" ? (
-              <button onClick={pauseMockIngestion} className="flex-1 py-1.5 px-3 rounded bg-foreground/10 hover:bg-foreground/20 flex items-center justify-center gap-2 text-sm font-medium transition-colors">
+              <button onClick={pauseIngestion} className="flex-1 py-1.5 px-3 rounded bg-foreground/10 hover:bg-foreground/20 flex items-center justify-center gap-2 text-sm font-medium transition-colors">
                 <Pause className="w-4 h-4" /> Pause
               </button>
             ) : (
-              <button onClick={resumeMockIngestion} className="flex-1 py-1.5 px-3 rounded bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2 text-sm font-medium transition-colors">
+              <button onClick={resumeIngestion} className="flex-1 py-1.5 px-3 rounded bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2 text-sm font-medium transition-colors">
                 <Play className="w-4 h-4" /> Resume
               </button>
             )}
-            <button onClick={cancelMockIngestion} className="flex-1 py-1.5 px-3 rounded bg-destructive/10 text-destructive hover:bg-destructive/20 flex items-center justify-center gap-2 text-sm font-medium transition-colors">
+            <button onClick={cancelIngestion} className="flex-1 py-1.5 px-3 rounded bg-destructive/10 text-destructive hover:bg-destructive/20 flex items-center justify-center gap-2 text-sm font-medium transition-colors">
               <Square className="w-4 h-4" /> Cancel
             </button>
           </div>
@@ -72,12 +73,32 @@ export function RunControls() {
     return (
       <div className="border border-border rounded-lg p-4 bg-background">
         <button 
-          onClick={runMockIngestion} 
+          onClick={runIngestion} 
           className="w-full py-2 px-4 rounded bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2"
         >
           <RotateCcw className="w-4 h-4" />
           Run Again
         </button>
+      </div>
+    );
+  }
+  
+  if (status === "error") {
+    return (
+      <div className="border border-destructive/50 bg-destructive/10 rounded-lg p-4">
+        <div className="flex flex-col gap-3">
+          <div className="font-semibold text-destructive">Ingestion Error</div>
+          <pre className="text-sm text-foreground/80 whitespace-pre-wrap overflow-auto max-h-40 bg-background/50 p-2 rounded border border-border/50">
+            {error || "An unknown error occurred"}
+          </pre>
+          <button 
+            onClick={runIngestion} 
+            className="w-full py-2 px-4 rounded bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }

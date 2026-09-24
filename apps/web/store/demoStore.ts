@@ -19,6 +19,7 @@ export interface DemoProgress {
 export interface DemoResult {
   validRows: any[];
   invalidRows: any[];
+  columns: { key: string; name: string }[];
 }
 
 export interface DemoState {
