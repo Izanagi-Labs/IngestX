@@ -27,7 +27,17 @@ const config: ColumnConfig = {
 | `name` | `string` | **Yes** | The expected column header in the uploaded spreadsheet. Used for strict matching unless overridden. |
 | `schema` | `BaseSchema` | **Yes** | The `ix` schema evaluating the cells within this column. |
 | `matchHeader` | `(header: string) => boolean` | No | A custom function evaluated against all spreadsheet headers. The parser binds to the *first* header that returns `true`. |
-| `duplicatesAllowed` | `boolean` | No | *(Currently unimplemented in the engine)* Intended to flag row values as invalid if they are not unique within the column across the dataset. Defaults to `true`. |
+| `duplicatesAllowed` | `boolean` | No | If `false`, enforces uniqueness for the column across the entire ingestion. A duplicate evaluates to a row level `duplicate_value` error. See uniqueness semantics below. Defaults to `true`. |
+
+### Uniqueness Semantics (`duplicatesAllowed: false`)
+When `duplicatesAllowed: false` is configured for a column:
+- Uniqueness is tracked across the **entire ingestion instance**, spanning all data chunks.
+- The comparison checks the **final, transformed, and coerced** value yielded by the schema, not the raw spreadsheet string.
+- Any row yielding a duplicated value receives a standard row level `duplicate_value` error (`"Value must be unique."`) and becomes invalid.
+- Values that fail basic schema validation (e.g. type coercion) do not participate in uniqueness tracking.
+- Successfully validated empty, optional, or default values *do* participate in tracking.
+- Comparisons use JavaScript `Set` mechanics (strict equality). To enforce case insensitivity, provide a `.transform(v => v.toLowerCase())` step in your schema.
+- **Memory Complexity**: The engine must store references to every distinct validated value in memory for that column, incurring an **O(U)** memory cost (where U is the number of unique validated values). When `duplicatesAllowed: true`, this cost is 0.
 
 ## Header Matching
 

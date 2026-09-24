@@ -3,7 +3,7 @@ title: Error Types
 description: Public error models
 ---
 
-IngestX explicitly separates **row-level validation failures** (which are collected gracefully) from **fatal ingestion errors** (which destroy the process entirely).
+IngestX explicitly separates **row level validation failures** (which are collected gracefully) from **fatal ingestion errors** (which destroy the process entirely).
 
 ## Fatal Ingestion Errors
 
@@ -39,7 +39,7 @@ export interface HeaderMismatchError extends IngestionError {
 }
 ```
 
-## Row-level Validation Errors
+## Row level Validation Errors
 
 Row validation failures **do not** trigger an `IngestionError`. They are fully expected parts of processing messy spreadsheets.
 

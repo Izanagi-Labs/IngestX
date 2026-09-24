@@ -1,4 +1,4 @@
-import type { RowValidationResult, ValidationContext } from "./types";
+import { RowValidationResult, ValidationContext, ValidationErrorType } from "./types";
 import { executeRules } from "./executeRules";
 import { ResolvedColumn } from "../headers/types";
 
@@ -6,6 +6,7 @@ export function validateRow<TRow>(
   row: Record<string, string>,
   rowIndex: number,
   columns: readonly ResolvedColumn[],
+  uniqueTracker: Map<string, Set<unknown>>,
 ): RowValidationResult<TRow> {
   const context: ValidationContext = {
     rowIndex,
@@ -38,6 +39,31 @@ export function validateRow<TRow>(
         originalData = {};
       }
       originalData[column.key] = rawValue;
+    } else if (column.duplicatesAllowed === false) {
+      let set = uniqueTracker.get(column.key);
+      if (!set) {
+        set = new Set();
+        uniqueTracker.set(column.key, set);
+      }
+      
+      if (set.has(fieldResult.value)) {
+        valid = false;
+        if (!errors[column.key]) {
+          errors[column.key] = [];
+        }
+        
+        errors[column.key].push({
+          rule: ValidationErrorType.DuplicateValue,
+          message: "Value must be unique.",
+        });
+        
+        if (!originalData) {
+          originalData = {};
+        }
+        originalData[column.key] = rawValue;
+      } else {
+        set.add(fieldResult.value);
+      }
     }
   }
 

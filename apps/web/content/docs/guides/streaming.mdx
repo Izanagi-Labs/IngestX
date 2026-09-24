@@ -7,7 +7,7 @@ In the context of IngestX, "streaming" refers to processing data incrementally i
 
 ## Asynchronous Yielding
 
-Because the JavaScript engine is single-threaded, if a library attempts to parse 100,000 rows at once in a `while` loop, the browser will entirely freeze. CSS animations stop, buttons become unresponsive, and users assume the page is broken.
+Because the JavaScript engine is single threaded, if a library attempts to parse 100,000 rows at once in a `while` loop, the browser will entirely freeze. CSS animations stop, buttons become unresponsive, and users assume the page is broken.
 
 IngestX relies on asynchronous generator patterns to yield execution back to the main UI thread constantly.
 
@@ -15,7 +15,7 @@ IngestX relies on asynchronous generator patterns to yield execution back to the
 
 ### True Streaming (CSV)
 
-CSV files support true byte-level streaming. 
+CSV files support true byte level streaming. 
 The internal parser pulls a specific byte range (controlled by `byteChunkSize`), parses it, validates the rows, executes your `onChunkProcessed` callback, and deletes it from memory before requesting the next byte chunk from the file.
 
 ### Chunked Streaming (Excel)

@@ -3,6 +3,7 @@ import { ValidationError } from "../../model/schema/types/ValidationResult";
 
 export enum ValidationErrorType {
   InvalidType = "invalid_type",
+  DuplicateValue = "duplicate_value",
 }
 
 export type RuleWithValidationType = RuleType | ValidationErrorType;

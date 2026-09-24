@@ -1,11 +1,11 @@
 ---
 title: Memory Management
-description: How IngestX prevents out-of-memory crashes
+description: How IngestX prevents out of memory crashes
 ---
 
 Browser memory is finite. When processing very large spreadsheets, accumulating all data in JavaScript object structures can easily crash the page, forcing the browser to terminate the tab.
 
-IngestX employs chunk-based parsing to mitigate this, but it requires correct configuration to be completely safe.
+IngestX employs chunk based parsing to mitigate this, but it requires correct configuration to be completely safe.
 
 ## The `collectResults` Danger
 
@@ -39,7 +39,13 @@ ingest({
 
 Because `collectResults: false` prevents IngestX from retaining the rows internally, the V8 garbage collector will smoothly discard each chunk of rows from memory after your `onChunkProcessed` callback completes.
 
-This enables **infinitely scalable** parsing, achieving O(1) flat memory consumption (only bound by the file chunk size itself).
+This enables **infinitely scalable** parsing, achieving flat memory consumption bounded only by your `chunkSize` configuration (assuming no uniqueness tracking is active).
+
+## Uniqueness Tracking Overhead
+
+Setting a column to `duplicatesAllowed: false` mandates cross chunk validation. To guarantee uniqueness across an entire spreadsheet, IngestX creates a `Set` to track the distinct, validated values for that column. 
+
+While much smaller than retaining the entire JSON row objects, this fundamentally introduces **O(U)** memory growth (where `U` is the number of distinct valid values). Be extremely mindful of this when enforcing uniqueness constraints on multi million row columns with high cardinality (e.g., massive UUID lists), as the tracking `Set` cannot be garbage collected until the ingestion fully resolves.
 
 ## The Collection Limit Safety Net
 

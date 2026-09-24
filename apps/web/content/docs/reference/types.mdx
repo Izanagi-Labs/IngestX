@@ -14,7 +14,7 @@ export interface ColumnConfig {
   key: string;                               // Desired key in the output JSON
   name: string;                              // Exact spreadsheet header name
   schema: BaseSchema<RuleType>;              // e.g. ix.string()
-  duplicatesAllowed?: boolean;               // (Unimplemented) Intended to check for duplicate row values
+  duplicatesAllowed?: boolean;               // If false, ensures row values are unique across chunks
   matchHeader?: (header: string) => boolean; // Custom header fuzzy matching
 }
 ```

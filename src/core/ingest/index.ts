@@ -82,6 +82,8 @@ async function runIngestion<TRow>(
       progressTracker.setPhase("parsing");
       const resolvedColumns = headerResult.columns;
       let chunkIndex = 0;
+      
+      const uniqueTracker = new Map<string, Set<unknown>>();
 
       for await (const parsedChunk of chunks) {
         await controller.waitIfPaused();
@@ -93,6 +95,7 @@ async function runIngestion<TRow>(
           parsedChunk.rows,
           parsedChunk.startIndex,
           resolvedColumns,
+          uniqueTracker,
         );
 
         controller.throwIfCancelled();

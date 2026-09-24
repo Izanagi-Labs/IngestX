@@ -22,7 +22,7 @@ Defines a column that expects string values.
 - `.max(length: number, message?: string)`: Enforces a maximum string length.
 - `.allowedValues(values: string[], message?: string)`: Requires the cell to match one of the provided exact strings.
 - `.regex(pattern: RegExp, message?: string)`: Validates the string against a regular expression.
-- `.caseSensitive(value: boolean)`: Configures whether `.allowedValues()` evaluation should be case-sensitive.
+- `.caseSensitive(value: boolean)`: Configures whether `.allowedValues()` evaluation should be case sensitive.
 
 ```typescript
 ix.string()
@@ -51,7 +51,7 @@ Defines a column that expects boolean values. Since spreadsheets often represent
 **Rules:**
 - `.truthy(values: string[], message?: string)`: Strings that parse to `true`.
 - `.falsy(values: string[], message?: string)`: Strings that parse to `false`.
-- `.caseSensitive(value: boolean)`: Configures whether string matching is case-sensitive.
+- `.caseSensitive(value: boolean)`: Configures whether string matching is case sensitive.
 
 ```typescript
 ix.boolean()

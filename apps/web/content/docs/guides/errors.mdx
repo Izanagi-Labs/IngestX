@@ -3,13 +3,13 @@ title: Error Handling
 description: Handling fatal and structural errors safely
 ---
 
-Because IngestX relies on the browser's Promise architecture, it adheres to standard JavaScript try/catch workflows. 
+Because IngestX relies on the browser's Promise architecture, it adheres to standard JavaScript try/catch workflows.
 
-However, there is a fundamental distinction between catching a fatal error immediately, and inspecting row-wise validation errors after an ingestion completes.
+However, there is a fundamental distinction between catching a fatal error immediately, and inspecting row wise validation errors after an ingestion completes.
 
 ## Catching Fatal Errors
 
-When invoking `ingestion.result`, the Promise will reject if a fatal error occurs (such as a missing required header). 
+When invoking `ingestion.result`, the Promise will reject if a fatal error occurs (such as a missing required header).
 
 The recommended pattern is to `try/catch` the result resolution, and use the exported `IngestionErrorType` enum to determine exactly what went wrong.
 
@@ -19,19 +19,19 @@ import { ingest, IngestionErrorType } from "@parallelbytes/ingestx";
 try {
   const instance = ingest({ file, columns });
   const result = await instance.result;
-  
+
   console.log("Success! File parsed perfectly.");
 } catch (error: any) {
   // error is the rejected IngestionError
 
   if (error.type === IngestionErrorType.HEADER_MISMATCH) {
     console.error("Missing headers:", error.details.missing);
-    alert(`Please fix your spreadsheet. We couldn't find: ${error.details.missing.join(", ")}`);
-  } 
-  else if (error.type === IngestionErrorType.COLLECTION_LIMIT_EXCEEDED) {
+    alert(
+      `Please fix your spreadsheet. We couldn't find: ${error.details.missing.join(", ")}`,
+    );
+  } else if (error.type === IngestionErrorType.COLLECTION_LIMIT_EXCEEDED) {
     alert("This file is too large for memory processing!");
-  } 
-  else {
+  } else {
     console.error("The parser failed completely:", error.message);
   }
 }
@@ -40,9 +40,9 @@ try {
 > [!NOTE]
 > When using the `@parallelbytes/ingestx/react` `useIngest` hook, you don't need a `try/catch` for the ingestion result. The hook catches it internally and populates the reactive `error` state variable instead.
 
-## Row-wise Validation Errors
+## Row wise Validation Errors
 
-Row-level validation failures **will not trigger a Promise rejection**. The `ingestion.result` will resolve completely normally. 
+Row level validation failures **will not trigger a Promise rejection**. The `ingestion.result` will resolve completely normally.
 
 You must inspect the final payload to determine if any rows failed structural checks.
 
@@ -51,9 +51,11 @@ const result = await instance.result;
 
 if (result.data.invalidRowsCount > 0) {
   // Some rows broke schema!
-  
-  result.data.errorsData.rowWiseErrors.forEach(err => {
-    console.warn(`Row ${err.rowIndex} failed on column '${err.columnKey}': ${err.errorMessage}`);
+
+  result.data.errorsData.rowWiseErrors.forEach((err) => {
+    console.warn(
+      `Row ${err.rowIndex} failed on column '${err.columnKey}': ${err.errorMessage}`,
+    );
   });
 }
 ```

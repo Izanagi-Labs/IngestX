@@ -1,9 +1,9 @@
 ---
 title: Node.js Adapter
-description: Server-side file ingestion using Node.js
+description: Server side file ingestion using Node.js
 ---
 
-While the core library uses browser APIs like `File` and Web Workers, the `@parallelbytes/ingestx/node` sub-package uses a purpose-built Node.js parser factory that interacts natively with the file system using Node streams.
+While the core library uses browser APIs like `File` and Web Workers, the `@parallelbytes/ingestx/node` sub package uses a purpose built Node.js parser factory that interacts natively with the file system using Node streams.
 
 > [!NOTE]
 > The Node adapter currently expects a string `filePath` pointing to an existing file on the server. It does not ingest binary memory buffers directly.
@@ -68,4 +68,4 @@ async function processServerUpload(savedFilePath: string) {
 
 The Node adapter fully supports both formats:
 - **CSV**: Processed incrementally via streaming (`fs.createReadStream`). Highly memory efficient.
-- **Excel**: Supported and processed chunk-by-chunk natively.
+- **Excel**: Supported and processed chunk by chunk natively.
