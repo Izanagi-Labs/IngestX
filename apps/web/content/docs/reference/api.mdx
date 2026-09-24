@@ -1,0 +1,49 @@
+---
+title: API Reference
+description: Quick lookups for public APIs
+---
+
+This page provides a quick, human-readable lookup of all exported public APIs across the IngestX suite. For detailed guides, see the relevant conceptual pages in the sidebar.
+
+## `@parallelbytes/ingestx`
+
+The primary browser entry point.
+
+### `ingest`
+- **Kind**: Function
+- **Signature**: `ingest<TRow>(options: IngestOptions<TRow>): IngestionInstance<TRow>`
+- **Description**: The core function to start file processing. Takes a `File` object and returns an interactive ingestion controller.
+
+### `ix`
+- **Kind**: Object
+- **Description**: The schema builder. Exposes `ix.string()`, `ix.number()`, and `ix.boolean()` to define structural validation rules.
+
+### `IngestionStatus`
+- **Kind**: Enum
+- **Description**: Exposes `Idle`, `Running`, `Paused`, `Completed`, `Failed`, and `Cancelled`.
+
+### `IngestionErrorType`
+- **Kind**: Enum
+- **Description**: Exposes `HEADER_MISMATCH`, `COLLECTION_LIMIT_EXCEEDED`, and `INGESTION_ERROR`.
+
+---
+
+## `@parallelbytes/ingestx/react`
+
+The React component adapter.
+
+### `useIngest`
+- **Kind**: React Hook
+- **Signature**: `useIngest<TRow>()`
+- **Description**: Provides reactive state bindings for an ingestion instance, guarding against unmounts and duplicate execution. Returns functions like `ingest()` and `pause()`, alongside variables like `progress` and `result`.
+
+---
+
+## `@parallelbytes/ingestx/node`
+
+The Node.js server environment adapter.
+
+### `ingest`
+- **Kind**: Function
+- **Signature**: `ingest<TRow>(options: NodeIngestOptions<TRow>): IngestionInstance<TRow>`
+- **Description**: A specialized implementation that reads directly from the filesystem using Node streams rather than Web Workers. Requires a `filePath` string instead of a `File` object.

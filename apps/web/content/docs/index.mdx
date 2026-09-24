@@ -1,0 +1,29 @@
+---
+title: Introduction
+description: High-performance CSV and Excel ingestion for React and Node.js
+---
+
+**IngestX** is a headless, schema-driven data ingestion library built for performance. It provides a unified API to process massive CSV and Excel files seamlessly across the browser (React) and the server (Node.js).
+
+If you are building an application where users upload spreadsheet data and you need to reliably validate, parse, and ingest that data without crashing the browser or the server, IngestX is for you.
+
+## Why IngestX?
+
+- **Format Agnostic**: Parse both CSV and Excel (`.xlsx`, `.xls`) files through a single, unified pipeline.
+- **Isomorphic**: Runs identically in the browser (via Web Workers) and Node.js (via Streams/Filesystem), sharing the exact same schema declarations.
+- **Safe by Default**: Fully typed in TypeScript. Rows are strictly validated against your schema. Invalid rows never pollute your valid data output.
+- **High Performance**: Employs chunked processing and web workers in the browser. It will not freeze the main UI thread.
+- **Memory Efficient**: Safely process files hundreds of megabytes in size with constant memory profiles by streaming chunks instead of buffering everything.
+
+## How it Works
+
+IngestX is built on three core concepts:
+
+1. **Columns & Schemas**: You define the expected structure of the incoming data using the `ix` schema builder.
+2. **Parsers**: Depending on the file format (CSV or Excel) and environment (Browser or Node), IngestX initializes the correct parser to read chunks of raw data.
+3. **Ingestion Controller**: The controller manages validation, lifecycle, and progress reporting, streaming results back to you incrementally or all at once.
+
+## What IngestX is Not
+
+- **Not a UI Library**: IngestX is completely headless. It does not provide file upload buttons or data grids. You own your UI.
+- **Not an ORM**: It validates input data and returns structured JavaScript objects; it does not write directly to your database.

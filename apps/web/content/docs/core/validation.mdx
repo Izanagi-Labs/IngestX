@@ -1,0 +1,46 @@
+---
+title: Validation Model
+description: How IngestX evaluates row validity
+---
+
+IngestX applies validation rules independently across every cell in a spreadsheet, guaranteeing structured and predictable data.
+
+## Row Classification
+
+Every row processed by IngestX is classified into one of two output arrays:
+
+1. **`validRows`**: Data mapped exactly to the `key` strings you defined. Every cell passed its schema validations, and all fallback defaults/transformations have been applied.
+2. **`invalidRows`**: The original row object mapping headers directly to the cell values.
+
+This means you never have to iterate through the result dataset to filter out broken rows. The separation is absolute.
+
+## Validation Errors
+
+When a cell violates its schema logic, the entire row is immediately pushed into the `invalidRows` array. 
+
+However, you often need to communicate precisely what failed back to the user. IngestX records this highly granular validation failure state and returns it within the `errorsData` object.
+
+```typescript
+type ErrorsData = {
+  rowWiseErrors: Array<{
+    rowIndex: number;       // The specific row in the chunk
+    columnKey: string;      // The defined ColumnConfig key
+    receivedValue: unknown; // The raw spreadsheet value
+    errorMessage: string;   // E.g. "String must be at least 3 characters"
+  }>;
+};
+```
+
+This array permits you to render inline data-grids pointing a red outline explicitly to the broken cell in the UI, improving user correction speeds.
+
+## Execution Order
+
+The execution pipeline for a cell behaves sequentially:
+
+1. **Extraction**: The raw text value is pulled from the spreadsheet cell.
+2. **Trimming**: If `.trim()` was declared in the schema, it executes.
+3. **Optional Check**: If the string is empty and `.optional()` is declared, it passes instantly.
+4. **Default Check**: If the string is empty and `.default(value)` is declared, it is populated.
+5. **Type Parsing**: The value is cast to the schema type (e.g. attempting to convert the string to a Number).
+6. **Validation Rules**: Declared rules (`.min()`, `.regex()`) are executed sequentially. The first rule to fail halts validation for this cell and throws the associated error message.
+7. **Transformation**: If all validation passes and a `.transform(fn)` exists, the function is executed to produce the final value.

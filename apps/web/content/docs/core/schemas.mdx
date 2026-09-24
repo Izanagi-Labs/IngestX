@@ -1,0 +1,100 @@
+---
+title: Schemas
+description: The ix schema builder
+---
+
+The `ix` schema builder allows you to declaratively define how inbound spreadsheet data should be validated and transformed. If a row fails to satisfy the schema, it is marked as invalid, ensuring that only pristine data reaches your backend.
+
+```typescript
+import { ix } from "@parallelbytes/ingestx";
+```
+
+## Schema Types
+
+IngestX supports three primary cell data types.
+
+### `ix.string()`
+
+Defines a column that expects string values.
+
+**Rules:**
+- `.min(length: number, message?: string)`: Requires a minimum string length.
+- `.max(length: number, message?: string)`: Enforces a maximum string length.
+- `.allowedValues(values: string[], message?: string)`: Requires the cell to match one of the provided exact strings.
+- `.regex(pattern: RegExp, message?: string)`: Validates the string against a regular expression.
+- `.caseSensitive(value: boolean)`: Configures whether `.allowedValues()` evaluation should be case-sensitive.
+
+```typescript
+ix.string()
+  .min(2, "Name too short")
+  .allowedValues(["Pending", "Approved", "Rejected"])
+  .caseSensitive(false)
+```
+
+### `ix.number()`
+
+Defines a column that expects numeric values. IngestX handles the conversion of raw string cells into numbers implicitly.
+
+**Rules:**
+- `.min(value: number, message?: string)`: Requires a minimum numeric value.
+- `.max(value: number, message?: string)`: Enforces a maximum numeric value.
+- `.allowedValues(values: number[], message?: string)`: Restricts to an exact set of numbers.
+
+```typescript
+ix.number().min(0).max(100)
+```
+
+### `ix.boolean()`
+
+Defines a column that expects boolean values. Since spreadsheets often represent booleans using varied strings, you must explicitly declare which strings resolve to `true` or `false`.
+
+**Rules:**
+- `.truthy(values: string[], message?: string)`: Strings that parse to `true`.
+- `.falsy(values: string[], message?: string)`: Strings that parse to `false`.
+- `.caseSensitive(value: boolean)`: Configures whether string matching is case-sensitive.
+
+```typescript
+ix.boolean()
+  .truthy(["Yes", "Y", "True", "1"])
+  .falsy(["No", "N", "False", "0"])
+  .caseSensitive(false)
+```
+
+## Common Rules
+
+The following rules can be chained onto **any** schema type (`string`, `number`, or `boolean`).
+
+### `.optional()`
+By default, all schemas are **required**. If a cell is empty (or missing), validation fails. Appending `.optional()` allows empty cells to pass validation.
+
+```typescript
+ix.string().optional()
+```
+
+### `.default(value)`
+If an empty cell is encountered, it will be populated with the default value instead of failing validation. (This implicitly makes the cell optional).
+
+```typescript
+ix.number().default(0)
+```
+
+### `.transform(fn)`
+Allows you to execute arbitrary synchronous data transformations on the cell value after it has been parsed but before final validation outputs.
+
+```typescript
+ix.string().transform((val) => val.toUpperCase())
+```
+
+### `.trim()`
+Automatically trims whitespace from the beginning and end of the string representation of the cell value before further validation rules apply.
+
+```typescript
+ix.string().trim()
+```
+
+### `.custom(fn, message?)`
+Injects custom validation logic. The function should accept the typed cell value and return `true` (valid) or `false` (invalid).
+
+```typescript
+ix.string().custom((val) => val.startsWith("ID-"), "Must start with ID-")
+```

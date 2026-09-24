@@ -1,0 +1,60 @@
+---
+title: Progress Tracking
+description: Understanding the ingestion progress callback
+---
+
+IngestX is designed to provide granular updates about active ingestion jobs so you can drive UI components like progress bars and time-remaining estimators.
+
+When configuring an ingestion, provide an `onProgress` callback to receive continuous updates.
+
+```typescript
+ingest({
+  // ...
+  onProgress: (progress) => {
+    console.log(`${progress.percentage * 100}% Complete`);
+  }
+})
+```
+
+## The `Progress` Object
+
+The callback is fired with a `Progress` object every time the internal engine finishes parsing or validating a chunk of data.
+
+```typescript
+export interface Progress {
+  phase: "initializing" | "parsing" | "completed" | "cancelled" | "failed";
+  processedRows: number;
+  totalRows?: number;
+  processedBytes?: number;
+  totalBytes?: number;
+  percentage?: number;
+  basis: "bytes" | "rows" | "indeterminate";
+}
+```
+
+### Phases
+
+- **`initializing`**: The parser has started but hasn't resolved headers yet.
+- **`parsing`**: Chunks are actively being pushed through the validation engine.
+- **`completed`**: The file was fully processed.
+- **`cancelled`**: The ingestion was aborted via `cancel()`.
+- **`failed`**: A fatal error (e.g. Header Mismatch) destroyed the run.
+
+### Progress Basis
+
+Calculating an accurate percentage depends entirely on the file format architecture. The `basis` property explains how the percentage is derived.
+
+#### `"bytes"` (CSV behavior)
+Because CSVs are streamed without knowing the final row count in advance, percentage is calculated as `processedBytes / totalBytes`.
+
+#### `"rows"` (Excel behavior)
+Because Excel files are fully materialized in memory, the engine knows the exact total row count before validation begins. Percentage is calculated as `processedRows / totalRows`. 
+
+> [!NOTE]
+> The `percentage` float is normalized between `0` and `1`.
+
+## Callback Frequency
+
+The `onProgress` callback executes immediately after a data chunk is passed through the validation schema. Therefore, the frequency of updates is heavily dictated by your configured `chunkSize`. 
+
+Smaller chunk sizes yield smoother progress bars but incur slightly more event-loop overhead.

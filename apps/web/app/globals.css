@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
 
 @theme {
   --color-background: var(--background);
@@ -36,6 +38,23 @@
   --border: #e4e4e7;
   --border-strong: #d4d4d8;
 
+  /* Fumadocs variables mapped to IngestX */
+  --color-fd-background: var(--background);
+  --color-fd-foreground: var(--foreground);
+  --color-fd-primary: var(--primary);
+  --color-fd-primary-foreground: #ffffff;
+  --color-fd-border: var(--border);
+  --color-fd-muted: var(--surface-muted);
+  --color-fd-muted-foreground: var(--foreground-muted);
+  --color-fd-card: var(--surface);
+  --color-fd-card-foreground: var(--foreground);
+  --color-fd-popover: var(--surface);
+  --color-fd-popover-foreground: var(--foreground);
+  --color-fd-secondary: var(--surface-muted);
+  --color-fd-secondary-foreground: var(--foreground-muted);
+  --color-fd-accent: var(--primary-subtle);
+  --color-fd-accent-foreground: var(--primary-hover);
+
   /* Indigo/blue brand for IngestX */
   --primary: #4f46e5; 
   --primary-hover: #4338ca;
@@ -59,6 +78,23 @@
   --foreground-subtle: #52525b;
   --border: #27272a;
   --border-strong: #3f3f46;
+
+  /* Fumadocs dark mapping */
+  --color-fd-background: var(--background);
+  --color-fd-foreground: var(--foreground);
+  --color-fd-primary: var(--primary);
+  --color-fd-primary-foreground: #ffffff;
+  --color-fd-border: var(--border);
+  --color-fd-muted: var(--surface-muted);
+  --color-fd-muted-foreground: var(--foreground-muted);
+  --color-fd-card: var(--surface);
+  --color-fd-card-foreground: var(--foreground);
+  --color-fd-popover: var(--surface);
+  --color-fd-popover-foreground: var(--foreground);
+  --color-fd-secondary: var(--surface-muted);
+  --color-fd-secondary-foreground: var(--foreground-muted);
+  --color-fd-accent: var(--primary-subtle);
+  --color-fd-accent-foreground: var(--primary-hover);
 
   --primary: #6366f1;
   --primary-hover: #818cf8;

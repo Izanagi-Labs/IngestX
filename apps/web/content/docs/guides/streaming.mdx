@@ -1,0 +1,48 @@
+---
+title: Streaming processing
+description: Understanding how IngestX moves data
+---
+
+In the context of IngestX, "streaming" refers to processing data incrementally in chunks, rather than waiting for an entire file to load into memory.
+
+## Asynchronous Yielding
+
+Because the JavaScript engine is single-threaded, if a library attempts to parse 100,000 rows at once in a `while` loop, the browser will entirely freeze. CSS animations stop, buttons become unresponsive, and users assume the page is broken.
+
+IngestX relies on asynchronous generator patterns to yield execution back to the main UI thread constantly.
+
+## CSV vs Excel Differences
+
+### True Streaming (CSV)
+
+CSV files support true byte-level streaming. 
+The internal parser pulls a specific byte range (controlled by `byteChunkSize`), parses it, validates the rows, executes your `onChunkProcessed` callback, and deletes it from memory before requesting the next byte chunk from the file.
+
+### Chunked Streaming (Excel)
+
+Excel files (`.xlsx`) are ZIP archives. It is impossible to evaluate row 10,000 without extracting the entire archive and parsing the massive XML tree.
+
+IngestX delegates this heavy XML parsing to a Web Worker, protecting the main thread. However, the Worker must read the entire file into a buffer. Once parsed, the worker streams the evaluated rows back to the main thread validation engine in predictable chunks (controlled by `chunkSize`).
+
+## The `onChunkProcessed` Backpressure
+
+The `onChunkProcessed` callback supports Promises for a reason.
+
+If your callback is executing an HTTP POST request to a backend, IngestX will intelligently pause the internal parsing loop while it waits for your Promise to resolve.
+
+```typescript
+ingest({
+  file,
+  columns,
+  onChunkProcessed: async (chunk) => {
+    // IngestX pauses reading the file while this awaits!
+    await fetch("/api/upload", {
+      method: "POST",
+      body: JSON.stringify(chunk.output.validRows)
+    });
+    // Now IngestX resumes reading the next file chunk.
+  }
+})
+```
+
+This acts as a natural **backpressure mechanism**. If you have a slow network connection, IngestX throttles parsing to match your upload speed, guaranteeing that your memory isn't flooded with an overwhelming backlog of rows waiting for HTTP requests to finish.

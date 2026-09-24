@@ -1,0 +1,50 @@
+---
+title: Lifecycle
+description: Controlling the state of an active ingestion
+---
+
+When `ingest()` is called (or `ingest` inside the `useIngest` hook), the engine transitions into various lifecycle states.
+
+The `IngestionStatus` enum dictates the exact state of the process:
+
+- `Idle`: Initial state.
+- `Running`: Actively evaluating rows.
+- `Paused`: Reading paused, awaiting resumption.
+- `Completed`: The entire file finished without a fatal error.
+- `Failed`: A fatal parser error or Header Mismatch destroyed the run.
+- `Cancelled`: Manually aborted via `.cancel()`.
+
+## Core Controls
+
+The `IngestionInstance` returned by the core library exposes lifecycle functions to control the state transition. 
+
+These exact same functions are also returned by the React adapter.
+
+### `pause()`
+
+Temporarily halts the reading of the file. 
+
+If a chunk of rows is already in the queue or actively undergoing schema validation, that chunk will finish processing. Future chunks are suppressed until resumed.
+
+### `resume()`
+
+Restarts the data flow of a paused ingestion.
+
+### `cancel()`
+
+Immediately stops all worker processing, terminates active loops, destroys the parser instance, and rejects the pending `result` Promise. 
+
+Once an ingestion is cancelled, it cannot be resumed.
+
+## Capability Matrix
+
+Depending on the environment adapter you are using, the underlying streaming implementation determines what lifecycle controls are actually supported.
+
+| Capability | Core (Browser) | React Hook | Node |
+|---|---|---|---|
+| **Pause** | Supported | Supported | Supported |
+| **Resume** | Supported | Supported | Supported |
+| **Cancel** | Supported | Supported | Supported |
+| **Reset** | N/A (Stateless) | Supported | N/A (Stateless) |
+
+> The `reset()` capability is exclusive to the React hook. Because the React hook persists state arrays in the DOM, `reset()` is provided to instantly wipe the old file data and return to the `Idle` state for subsequent uploads.

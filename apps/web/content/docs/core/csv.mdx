@@ -1,0 +1,28 @@
+---
+title: CSV Processing
+description: Implementation details for CSV files
+---
+
+IngestX employs highly optimized parsing techniques explicitly tailored to `.csv` files.
+
+## Streaming vs Buffering
+
+CSV parsing is fundamentally **chunked and stream-like**. Instead of pulling the entire CSV document into memory, the browser (or Node filesystem) streams chunks of bytes.
+
+1. The underlying parser reads up to `byteChunkSize` (default: `10MB`) from the file buffer.
+2. It breaks the data into predictable batches defined by `chunkSize` (default: `10,000` rows).
+3. The chunk is yielded asynchronously back to the controller, allowing the main thread (React UI) to render frame updates and keep the user interface responsive.
+
+## File Reading Capabilities
+
+- **Browser**: Employs Web Workers (when `worker: true` is configured) to offload the PapaParse engine parsing completely off the main thread.
+- **Node**: Directly hooks into `fs.createReadStream`.
+
+## Memory Footprint
+
+For large CSV datasets, use `collectResults: false` to avoid accumulating processed rows in memory. IngestX processes the file incrementally, so memory usage does not grow with the number of collected result rows.
+
+## Edge Cases
+
+- **Empty Files**: If a CSV is entirely empty, IngestX resolves the ingestion cleanly with 0 rows processed.
+- **Missing Required Headers**: Detected instantaneously on the first read. The remainder of the file is immediately aborted to save processing time.

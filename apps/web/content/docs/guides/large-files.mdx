@@ -1,0 +1,57 @@
+---
+title: Processing Large Files
+description: Strategy for handling massive datasets
+---
+
+When users attempt to upload CSVs or Excel spreadsheets containing millions of rows (often exceeding 500MB+ in size), standard array-based processing strategies will catastrophically fail, leading to an `Out of Memory` browser tab crash.
+
+IngestX provides the architectural tools to process these files safely, provided you configure it correctly.
+
+## 1. Avoid Collecting Results
+
+The absolute most important rule when handling large files is **never** retaining the parsed data in the browser's memory.
+
+```typescript
+// DANGEROUS for large files
+const ingestion = ingest({
+  file,
+  columns,
+  collectResults: true 
+});
+```
+
+Instead, you must set `collectResults: false` and rely on the `onChunkProcessed` callback to process data iteratively and allow the Garbage Collector to destroy the chunks.
+
+```typescript
+// SAFE for large files
+const ingestion = ingest({
+  file,
+  columns,
+  collectResults: false,
+  onChunkProcessed: async (chunk) => {
+    // 1. Await an HTTP request pushing this chunk to your server
+    await syncToBackend(chunk.output.validRows);
+    
+    // 2. Once this function completes, the chunk is GC'd!
+  }
+});
+```
+
+## 2. Configure Chunk Sizes
+
+If you are dealing with very heavy files, you may wish to tune the chunk sizes to optimize the event loop.
+
+- **`chunkSize` (default: 10,000)**: Controls the number of rows evaluated in a single tick. If your backend is slow to ingest batched HTTP requests, consider lowering this to `1000`.
+- **`byteChunkSize` (default: 10MB)**: Controls the size of the FileReader buffer for CSVs. This is an optimal balance between I/O reads and memory. You rarely need to change this.
+
+## 3. CSV vs Excel Constraints
+
+Be fully aware of the differences in how formats are handled:
+
+### CSV is infinitely scalable
+Because CSV is flat text, IngestX reads the file as a true byte stream. Processing a 5GB CSV is identical in memory footprint to processing a 1MB CSV. The memory graph remains completely flat.
+
+### Excel is inherently limited
+An Excel file is a ZIP archive containing XML. The Web Worker must read the entire file into a buffer to unzip it. A 500MB Excel file will likely require over 1.5GB of RAM to inflate and parse the XML tree inside the worker. 
+
+If your users need to ingest files larger than 100MB, you should explicitly instruct them to export the document as a `.csv` file first.

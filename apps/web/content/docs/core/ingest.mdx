@@ -1,0 +1,110 @@
+---
+title: Ingest
+description: The core ingestion API
+---
+
+The `ingest()` function is the primary entry point for the `@parallelbytes/ingestx` browser package. It orchestrates file parsing, validation, chunk processing, and lifecycle management.
+
+## Signature
+
+```typescript
+import { ingest } from "@parallelbytes/ingestx";
+import type { IngestOptions, IngestionInstance } from "@parallelbytes/ingestx";
+
+function ingest<TRow>(options: IngestOptions<TRow>): IngestionInstance<TRow>;
+```
+
+## How It Works
+
+Calling `ingest()` immediately kicks off the asynchronous processing pipeline. It returns an **Ingestion Instance** containing lifecycle methods to control the ingestion and a Promise that resolves with the final outcome.
+
+There are three distinct layers to understand:
+
+1. **Options**: The configuration you pass into `ingest()`.
+2. **Instance**: The active, observable object returned immediately.
+3. **Result**: The finalized data output after processing completes.
+
+---
+
+## 1. Options (`IngestOptions`)
+
+You configure ingestion by passing an options object.
+
+| Option | Type | Required | Description |
+|---|---|---|---|
+| `file` | `File` | Yes | The target spreadsheet file object. |
+| `columns` | `ColumnConfig[]` | Yes | Array of schemas dictating how columns are bound and validated. |
+| `worker` | `boolean` | No | Enables Web Worker parsing for CSVs (default: `false`). Excel parsing uses workers automatically. |
+| `chunkSize` | `number` | No | Number of rows processed per chunk (default: `10000`). |
+| `byteChunkSize` | `number` | No | Target byte size for file chunking (default: `10485760` / 10MB). |
+| `collectResults` | `boolean` | No | Whether to retain all processed rows in memory (default: `false`). See [Memory Management](/docs/guides/memory). |
+| `maxCollectedRows` | `number` | No | Hard upper bound on retained rows. Halts ingestion if exceeded. |
+| `onProgress` | `Function` | No | Callback fired as rows/bytes are processed. |
+| `onChunkProcessed`| `Function` | No | Callback fired after each batch of rows is parsed and validated. |
+
+---
+
+## 2. Instance (`IngestionInstance`)
+
+The object returned by `ingest()` provides real-time control over the active task.
+
+```typescript
+interface IngestionInstance<TRow> {
+  // Current state (e.g., 'running', 'paused', 'completed')
+  get status(): IngestionStatus;
+
+  // Resolves when complete or failed
+  result: Promise<IngestionResult<TRow>>;
+
+  // Lifecycle controls
+  pause(): void;
+  resume(): void;
+  cancel(): void;
+}
+```
+
+### Lifecycle Controls
+
+- `pause()`: Halts reading new chunks. The current active chunk will finish processing.
+- `resume()`: Resumes reading file chunks.
+- `cancel()`: Immediately halts processing and rejects the `result` Promise.
+
+---
+
+## 3. Result (`IngestionResult`)
+
+The `result` Promise on the Ingestion Instance resolves when the file has been fully processed, or if a fatal error occurs (like a missing required column).
+
+```typescript
+interface IngestionResult<TRow> {
+  status: IngestionStatus;
+  data: FinalOutput<TRow>;
+  error: IngestionError | HeaderMismatchError | null;
+}
+```
+
+### `FinalOutput` Data Structure
+
+If `collectResults: true` is configured, `data.validRows` and `data.invalidRows` will be populated with the full dataset.
+
+```typescript
+type FinalOutput<TRow> = {
+  totalRows: number;
+  validRowsCount: number;
+  invalidRowsCount: number;
+
+  // Populated only if `collectResults: true`
+  validRows: TRow[];
+  invalidRows: TRow[];
+  
+  // Detailed validation failures for specific cells
+  errorsData: {
+    rowWiseErrors: Array<{
+      rowIndex: number;
+      columnKey: string;
+      receivedValue: unknown;
+      errorMessage: string;
+    }>;
+  };
+};
+```
