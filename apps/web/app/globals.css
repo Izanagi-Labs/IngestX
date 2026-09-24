@@ -78,3 +78,46 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), sans-serif;
 }
+
+.pipeline-particle {
+  @apply absolute w-2 h-2 rounded-full bg-primary opacity-0 shadow-sm;
+}
+.particle-1 {
+  animation: pipeline-in 3s linear infinite;
+  animation-delay: 0s;
+}
+.particle-2 {
+  animation: pipeline-in 3s linear infinite;
+  animation-delay: 1.5s;
+}
+.particle-3 {
+  animation: pipeline-out 3s linear infinite;
+  animation-delay: 1s;
+}
+.particle-4 {
+  animation: pipeline-out 3s linear infinite;
+  animation-delay: 2.5s;
+}
+
+@keyframes pipeline-in {
+  0% { left: calc(50% - 10rem); opacity: 0; }
+  10% { opacity: 1; }
+  40% { left: calc(50% - 6.5rem); opacity: 1; }
+  50% { opacity: 0; }
+  100% { left: calc(50% - 6.5rem); opacity: 0; }
+}
+
+@keyframes pipeline-out {
+  0% { left: calc(50% + 6rem); opacity: 0; }
+  10% { opacity: 1; }
+  40% { left: calc(50% + 9.5rem); opacity: 1; }
+  50% { opacity: 0; }
+  100% { left: calc(50% + 9.5rem); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pipeline-particle {
+    animation: none !important;
+    display: none !important;
+  }
+}

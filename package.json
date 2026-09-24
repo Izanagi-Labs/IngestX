@@ -34,7 +34,7 @@
     "build": "vite build",
     "dev": "vite build --watch",
     "test": "vitest",
-    "demo": "cd demo && yarn dev",
+    "demo": "cd apps/web && yarn dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint:check": "eslint .",

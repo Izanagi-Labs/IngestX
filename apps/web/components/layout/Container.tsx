@@ -1,15 +1,16 @@
 import * as React from "react";
 
 export interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "standard" | "wide" | "full";
+  variant?: "content" | "standard" | "wide" | "full";
 }
 
 export const Container = React.forwardRef<HTMLDivElement, ContainerProps>(
   ({ className = "", variant = "standard", ...props }, ref) => {
     const variants = {
-      standard: "max-w-4xl", // docs/articles
-      wide: "max-w-7xl",     // marketing
-      full: "max-w-full",    // demo
+      content: "max-w-3xl",  // ~768px for readable articles
+      standard: "max-w-6xl", // ~1152px for general content
+      wide: "max-w-7xl",     // ~1280px for landing pages
+      full: "max-w-full",    // unrestricted
     };
 
     return (

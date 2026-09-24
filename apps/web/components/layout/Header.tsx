@@ -10,6 +10,8 @@ export function Header() {
             <Link href="/" className="flex items-center space-x-2">
               <span className="font-bold inline-block text-lg text-foreground">IngestX</span>
             </Link>
+          </div>
+          <div className="flex items-center gap-6">
             <nav className="hidden md:flex gap-6">
               <Link
                 href="/docs"
@@ -32,8 +34,6 @@ export function Header() {
                 GitHub
               </a>
             </nav>
-          </div>
-          <div className="flex items-center gap-2">
             <ThemeToggle />
           </div>
         </div>
