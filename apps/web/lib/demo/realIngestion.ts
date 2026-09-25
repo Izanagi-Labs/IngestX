@@ -12,10 +12,9 @@ export async function runIngestion() {
   activeRunId++;
   const runId = activeRunId;
 
-  // Clear previous state
+  // Clear previous state, but keep old result until new one succeeds
   store.setStatus("running");
   store.setProgress({ processed: 0, valid: 0, invalid: 0, progressPercentage: 0 });
-  store.setResult(null);
   store.setError(null);
 
   let columns;

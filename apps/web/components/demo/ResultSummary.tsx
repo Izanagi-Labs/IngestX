@@ -27,7 +27,7 @@ export function ResultSummary() {
         <span className="text-xs text-foreground-muted font-semibold uppercase tracking-wider mb-1">Invalid</span>
         <span className="text-2xl font-bold text-red-500">{progress.invalid.toLocaleString()}</span>
       </div>
-      {status === "completed" && result && (
+      {result && (
         <>
           <div className="flex-1 p-4 flex flex-col items-center justify-center">
             <span className="text-xs text-foreground-muted font-semibold uppercase tracking-wider mb-1">Success Rate</span>

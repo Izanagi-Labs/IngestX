@@ -55,6 +55,10 @@ export function CodeExample() {
                   {"  "}&#125;<br/>
                   &#125;);<br/>
                   <br/>
+                  <span className="text-[#8b949e]">{"// Pause and resume on demand"}</span><br/>
+                  ingestion.<span className="text-[#d2a8ff]">pause</span>();<br/>
+                  ingestion.<span className="text-[#d2a8ff]">resume</span>();<br/>
+                  <br/>
                   <span className="text-[#ff7b72]">const</span> &#123; data, error &#125; = <span className="text-[#ff7b72]">await</span> ingestion.result;<br/>
                 </code>
               </pre>

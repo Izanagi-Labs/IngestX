@@ -46,16 +46,18 @@ export function ResultsPanel() {
     return filtered;
   }, [result, activeTab, searchQuery, errorFilter]);
 
-  if (status !== "completed" || !result) {
-    if (status === "idle" || status === "ready") {
-      return (
-        <div className="border border-border rounded-lg p-12 bg-background flex flex-col items-center justify-center text-center">
-          <p className="text-foreground font-medium mb-1">No results yet</p>
-          <p className="text-sm text-foreground-muted">Choose a file and run ingestion to inspect the output.</p>
-        </div>
-      );
-    }
-    return null;
+  if (!result) {
+    if (status === "error") return null;
+    return (
+      <div className="border border-border rounded-lg p-12 bg-background flex flex-col items-center justify-center text-center">
+        <p className="text-foreground font-medium mb-1">
+          {status === "running" ? "Processing..." : "No results yet"}
+        </p>
+        <p className="text-sm text-foreground-muted">
+          {status === "running" ? "Please wait while ingestion completes." : "Choose a file and run ingestion to inspect the output."}
+        </p>
+      </div>
+    );
   }
 
   if (!configuration.collectResults) {

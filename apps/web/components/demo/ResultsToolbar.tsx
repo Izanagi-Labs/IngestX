@@ -78,7 +78,7 @@ export function ResultsToolbar() {
       <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
         <button
           onClick={() => downloadValidCsv(result)}
-          disabled={result.validRows.length === 0}
+          disabled={result.validRows.length === 0 || store.status === "running"}
           className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded border border-border bg-background hover:bg-foreground/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
         >
           <Download className="w-3.5 h-3.5" />
@@ -86,7 +86,7 @@ export function ResultsToolbar() {
         </button>
         <button
           onClick={() => downloadInvalidCsv(result)}
-          disabled={result.invalidRows.length === 0}
+          disabled={result.invalidRows.length === 0 || store.status === "running"}
           className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded border border-destructive/20 text-destructive bg-destructive/5 hover:bg-destructive/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
         >
           <Download className="w-3.5 h-3.5" />
