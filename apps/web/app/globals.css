@@ -1,0 +1,159 @@
+@import "tailwindcss";
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-foreground-subtle: var(--foreground-subtle);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-subtle: var(--primary-subtle);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-info: var(--info);
+  
+  --color-code-background: var(--code-background);
+  --color-code-border: var(--code-border);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #09090b;
+  --surface: #ffffff;
+  --surface-muted: #f4f4f5;
+  --foreground-muted: #52525b;
+  --foreground-subtle: #a1a1aa;
+  --border: #e4e4e7;
+  --border-strong: #d4d4d8;
+
+  /* Fumadocs variables mapped to IngestX */
+  --color-fd-background: var(--background);
+  --color-fd-foreground: var(--foreground);
+  --color-fd-primary: var(--primary);
+  --color-fd-primary-foreground: #ffffff;
+  --color-fd-border: var(--border);
+  --color-fd-muted: var(--surface-muted);
+  --color-fd-muted-foreground: var(--foreground-muted);
+  --color-fd-card: var(--surface);
+  --color-fd-card-foreground: var(--foreground);
+  --color-fd-popover: var(--surface);
+  --color-fd-popover-foreground: var(--foreground);
+  --color-fd-secondary: var(--surface-muted);
+  --color-fd-secondary-foreground: var(--foreground-muted);
+  --color-fd-accent: var(--primary-subtle);
+  --color-fd-accent-foreground: var(--primary-hover);
+
+  /* Indigo/blue brand for IngestX */
+  --primary: #4f46e5; 
+  --primary-hover: #4338ca;
+  --primary-subtle: #e0e7ff;
+
+  --success: #16a34a;
+  --warning: #ca8a04;
+  --error: #dc2626;
+  --info: #2563eb;
+
+  --code-background: #f4f4f5;
+  --code-border: #e4e4e7;
+}
+
+.dark {
+  --background: #09090b;
+  --foreground: #fafafa;
+  --surface: #18181b;
+  --surface-muted: #27272a;
+  --foreground-muted: #a1a1aa;
+  --foreground-subtle: #52525b;
+  --border: #27272a;
+  --border-strong: #3f3f46;
+
+  /* Fumadocs dark mapping */
+  --color-fd-background: var(--background);
+  --color-fd-foreground: var(--foreground);
+  --color-fd-primary: var(--primary);
+  --color-fd-primary-foreground: #ffffff;
+  --color-fd-border: var(--border);
+  --color-fd-muted: var(--surface-muted);
+  --color-fd-muted-foreground: var(--foreground-muted);
+  --color-fd-card: var(--surface);
+  --color-fd-card-foreground: var(--foreground);
+  --color-fd-popover: var(--surface);
+  --color-fd-popover-foreground: var(--foreground);
+  --color-fd-secondary: var(--surface-muted);
+  --color-fd-secondary-foreground: var(--foreground-muted);
+  --color-fd-accent: var(--primary-subtle);
+  --color-fd-accent-foreground: var(--primary-hover);
+
+  --primary: #6366f1;
+  --primary-hover: #818cf8;
+  --primary-subtle: #312e81;
+
+  --success: #22c55e;
+  --warning: #eab308;
+  --error: #ef4444;
+  --info: #3b82f6;
+
+  --code-background: #18181b;
+  --code-border: #27272a;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), sans-serif;
+}
+
+.pipeline-particle {
+  @apply absolute w-2 h-2 rounded-full bg-primary opacity-0 shadow-sm;
+}
+.particle-1 {
+  animation: pipeline-in 3s linear infinite;
+  animation-delay: 0s;
+}
+.particle-2 {
+  animation: pipeline-in 3s linear infinite;
+  animation-delay: 1.5s;
+}
+.particle-3 {
+  animation: pipeline-out 3s linear infinite;
+  animation-delay: 1s;
+}
+.particle-4 {
+  animation: pipeline-out 3s linear infinite;
+  animation-delay: 2.5s;
+}
+
+@keyframes pipeline-in {
+  0% { left: calc(50% - 10rem); opacity: 0; }
+  10% { opacity: 1; }
+  40% { left: calc(50% - 6.5rem); opacity: 1; }
+  50% { opacity: 0; }
+  100% { left: calc(50% - 6.5rem); opacity: 0; }
+}
+
+@keyframes pipeline-out {
+  0% { left: calc(50% + 6rem); opacity: 0; }
+  10% { opacity: 1; }
+  40% { left: calc(50% + 9.5rem); opacity: 1; }
+  50% { opacity: 0; }
+  100% { left: calc(50% + 9.5rem); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pipeline-particle {
+    animation: none !important;
+    display: none !important;
+  }
+}

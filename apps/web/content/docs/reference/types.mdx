@@ -1,0 +1,105 @@
+---
+title: Types Reference
+description: Structural typings for public payloads
+---
+
+All interfaces listed here are officially exported from `@parallelbytes/ingestx` and are safe for external use. 
+
+## `ColumnConfig`
+
+Defines how a spreadsheet column is bound and evaluated.
+
+```typescript
+export interface ColumnConfig {
+  key: string;                               // Desired key in the output JSON
+  name: string;                              // Exact spreadsheet header name
+  schema: BaseSchema<RuleType>;              // e.g. ix.string()
+  duplicatesAllowed?: boolean;               // If false, ensures row values are unique across chunks
+  matchHeader?: (header: string) => boolean; // Custom header fuzzy matching
+}
+```
+
+## `IngestOptions`
+
+Passed into the `ingest()` function.
+
+```typescript
+export interface IngestOptions<TRow> {
+  file: File;
+  columns: ColumnConfig[];
+  worker?: boolean;
+  chunkSize?: number;
+  byteChunkSize?: number;
+  collectResults?: boolean;
+  maxCollectedRows?: number;
+  onChunkProcessed?(data: ChunkResult<TRow>): void | Promise<void>;
+  onProgress?: (progress: Progress) => void;
+}
+```
+
+## `IngestionResult`
+
+The final structure resolved by the `result` Promise.
+
+```typescript
+export interface IngestionResult<TRow> {
+  status: IngestionStatus;
+  data: FinalOutput<TRow>;
+  error: IngestionError | HeaderMismatchError | null;
+}
+```
+
+## `FinalOutput`
+
+The structure of the data object.
+
+```typescript
+export type FinalOutput<TRow> = {
+  totalRows: number;
+  validRowsCount: number;
+  invalidRowsCount: number;
+  validRows: TRow[];
+  invalidRows: TRow[];
+  errorsData: {
+    rowWiseErrors: Array<{
+      rowIndex: number;
+      columnKey: string;
+      receivedValue: unknown;
+      errorMessage: string;
+    }>;
+  };
+};
+```
+
+## `ChunkResult`
+
+The payload provided to the `onChunkProcessed` backpressure callback.
+
+```typescript
+export interface ChunkResult<TRow> {
+  chunkIndex: number;
+  totalChunks?: number;
+  output: {
+    validRows: TRow[];
+    invalidRows: TRow[];
+  };
+  progress: number;
+  processedRows: number;
+}
+```
+
+## `Progress`
+
+The payload emitted by `onProgress` callbacks and the React hook state.
+
+```typescript
+export interface Progress {
+  phase: "initializing" | "parsing" | "completed" | "cancelled" | "failed";
+  processedRows: number;
+  totalRows?: number;
+  processedBytes?: number;
+  totalBytes?: number;
+  percentage?: number;
+  basis: "bytes" | "rows" | "indeterminate";
+}
+```

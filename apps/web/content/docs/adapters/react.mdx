@@ -1,0 +1,110 @@
+---
+title: React Adapter
+description: Using IngestX deeply within React
+---
+
+If you are building a React application, the core `@parallelbytes/ingestx` library directly. However, wiring up state, progress indicators, and cancellation logic manually can require boilerplate.
+
+The `@parallelbytes/ingestx/react` sub package provides a specialized `useIngest` hook that manages the entire lifecycle of an ingestion internally, exposing reactive state variables ready to map directly to your UI.
+
+## Import
+
+```tsx
+import { useIngest } from "@parallelbytes/ingestx/react";
+```
+
+## `useIngest` Hook
+
+The hook takes no initial arguments. It returns a tuple of state variables and control functions.
+
+```tsx
+const {
+  ingest,       // Function to start ingestion
+  pause,        // Function to pause active ingestion
+  resume,       // Function to resume paused ingestion
+  cancel,       // Function to halt ingestion
+  reset,        // Function to clear results/errors to initial state
+  status,       // Current IngestionStatus
+  progress,     // Current Progress object
+  result,       // FinalOutput when completed
+  error,        // IngestionError when failed
+} = useIngest<MyDataRow>();
+```
+
+## Example Implementation
+
+This practical component demonstrates how to bind an `<input type="file">` to the `useIngest` hook, visualizing progress and handling both successful parsing and validation failures.
+
+```tsx
+import React from 'react';
+import { useIngest } from '@parallelbytes/ingestx/react';
+import { ix } from '@parallelbytes/ingestx';
+import type { ColumnConfig } from '@parallelbytes/ingestx';
+
+const columns: ColumnConfig[] = [
+  { key: "id", name: "User ID", schema: ix.string() },
+  { key: "age", name: "Age", schema: ix.number().min(18) }
+];
+
+export function IngestionComponent() {
+  const { ingest, status, progress, result, error, cancel, reset } = useIngest();
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      await ingest({
+        file,
+        columns,
+        collectResults: true, // We want the data returned into the `result` state
+        chunkSize: 5000,
+      });
+    } catch (err) {
+      console.error("Ingestion failed to start:", err);
+    }
+  };
+
+  return (
+    <div className="p-4 border rounded shadow">
+      <h2 className="text-xl mb-4">Upload Users</h2>
+
+      {status === 'idle' && (
+        <input type="file" accept=".csv,.xlsx" onChange={handleFileChange} />
+      )}
+
+      {status === 'running' && progress && (
+        <div>
+          <p>Processing: {(progress.percentage ?? 0 * 100).toFixed(0)}%</p>
+          <p>Rows: {progress.processedRows}</p>
+          <button onClick={cancel} className="text-red-500">Cancel</button>
+        </div>
+      )}
+
+      {status === 'completed' && result && (
+        <div>
+          <h3 className="text-green-600">Complete!</h3>
+          <p>Valid Rows: {result.validRowsCount}</p>
+          <p>Invalid Rows: {result.invalidRowsCount}</p>
+          <button onClick={reset}>Upload Another</button>
+        </div>
+      )}
+
+      {status === 'failed' && error && (
+        <div className="text-red-600">
+          <h3>Error: {error.type}</h3>
+          <p>{error.message}</p>
+          <button onClick={reset}>Try Again</button>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+## Concurrency Guards
+
+The `useIngest` hook is designed to safely handle React component unmounts and prevent overlapping runs:
+
+1. **Unmount Safety**: If the component unmounts while ingestion is running, the hook automatically invokes `cancel()` internally.
+2. **Single Run**: If `ingest()` is called while a run is already active (e.g. `status === 'running'`), it throws an error immediately to prevent concurrent state pollution.

@@ -1,0 +1,71 @@
+---
+title: Node.js Adapter
+description: Server side file ingestion using Node.js
+---
+
+While the core library uses browser APIs like `File` and Web Workers, the `@parallelbytes/ingestx/node` sub package uses a purpose built Node.js parser factory that interacts natively with the file system using Node streams.
+
+> [!NOTE]
+> The Node adapter currently expects a string `filePath` pointing to an existing file on the server. It does not ingest binary memory buffers directly.
+
+## Import
+
+```typescript
+import { ingest } from "@parallelbytes/ingestx/node";
+```
+
+## Configuration
+
+The options signature for the Node.js adapter is nearly identical to the core library, with two notable exceptions:
+
+1. `file` is replaced with `filePath` (an absolute or relative string path).
+2. `worker` is intentionally excluded, as parsing is handled via Node streams instead of Web Workers.
+
+## Node Example
+
+This example demonstrates parsing a backend CSV payload, writing valid chunks incrementally to a database to help control server memory growth.
+
+```typescript
+import { ingest } from "@parallelbytes/ingestx/node";
+import { ix } from "@parallelbytes/ingestx";
+import type { ColumnConfig } from "@parallelbytes/ingestx";
+
+const columns: ColumnConfig[] = [
+  { key: "email", name: "Email Address", schema: ix.string() },
+  { key: "score", name: "Score", schema: ix.number() }
+];
+
+async function processServerUpload(savedFilePath: string) {
+  const instance = ingest({
+    filePath: savedFilePath,
+    columns,
+    // Extremely Important: Keep false for large files
+    collectResults: false, 
+    onChunkProcessed: async (chunk) => {
+      // Stream rows into the DB in batches
+      if (chunk.output.validRows.length > 0) {
+        await database.insertMany(chunk.output.validRows);
+      }
+
+      // Log validation failures for auditing
+      if (chunk.output.invalidRows.length > 0) {
+        console.warn(`${chunk.output.invalidRows.length} invalid rows found in chunk.`);
+      }
+    }
+  });
+
+  const result = await instance.result;
+
+  if (result.status === "completed") {
+    console.log(`Finished processing: ${result.data.totalRows} rows.`);
+  } else {
+    console.error("Ingestion halted:", result.error);
+  }
+}
+```
+
+## Formats Supported
+
+The Node adapter supports both formats:
+- **CSV**: Processed incrementally using `fs.createReadStream`.
+- **Excel**: Supported and processed chunk by chunk natively.

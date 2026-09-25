@@ -1,0 +1,63 @@
+---
+title: Memory Management
+description: How IngestX prevents out of memory crashes
+---
+
+Browser memory is finite. When processing very large spreadsheets, accumulating data in JavaScript object structures can crash the page, forcing the browser to terminate the tab.
+
+IngestX employs chunk based parsing to mitigate this, but it requires correct configuration to manage memory effectively.
+
+## The `collectResults` Danger
+
+By default, `collectResults` is `false`.
+
+If you set `collectResults: true` in your ingestion options, IngestX retains parsed rows in memory, pushing them into the `validRows` and `invalidRows` arrays so that you can access them via `result.data` at the end of the run.
+
+**This creates O(N) memory growth.**
+
+For a 10,000 row CSV, this is typically harmless. For very large datasets, accumulating the rows in memory can exceed V8's heap limit and crash the tab.
+
+## Safe Handling for Large Files
+
+To process large files safely, keep `collectResults: false` and instead subscribe to the `onChunkProcessed` callback.
+
+```typescript
+ingest({
+  file,
+  columns,
+  collectResults: false,
+  onChunkProcessed: async (chunk) => {
+    // This callback is invoked every time a batch of rows completes validation.
+    
+    // We can confidently upload this chunk to our server over HTTP.
+    await postToMyBackend("/api/upload", chunk.output.validRows);
+
+    // After this callback finishes, the chunk is discarded from memory!
+  }
+})
+```
+
+Because `collectResults: false` prevents IngestX from retaining the rows internally, the V8 garbage collector will smoothly discard each chunk of rows from memory after your `onChunkProcessed` callback completes.
+
+This allows processing of large datasets without accumulating result memory, constrained primarily by your `chunkSize` configuration (assuming no uniqueness tracking is active).
+
+## Uniqueness Tracking Overhead
+
+Setting a column to `duplicatesAllowed: false` mandates cross chunk validation. To guarantee uniqueness across an entire spreadsheet, IngestX creates a `Set` to track the distinct, validated values for that column. 
+
+While much smaller than retaining the entire JSON row objects, this fundamentally introduces **O(U)** memory growth (where `U` is the number of distinct valid values). Be extremely mindful of this when enforcing uniqueness constraints on large row columns with high cardinality (e.g., large UUID lists), as the tracking `Set` cannot be garbage collected until the ingestion fully resolves.
+
+## The Collection Limit Safety Net
+
+If you absolutely must use `collectResults: true`, you can protect your users from malicious or accidental massive uploads by defining a `maxCollectedRows` ceiling.
+
+```typescript
+ingest({
+  file,
+  columns,
+  collectResults: true,
+  maxCollectedRows: 50000 
+})
+```
+
+If a chunk is evaluated that would cause the total accumulated valid and invalid rows to exceed `maxCollectedRows` (e.g., 50,000), the ingestion is aborted, and an `IngestionErrorType.COLLECTION_LIMIT_EXCEEDED` error is thrown, sparing the browser from crashing.

@@ -1,0 +1,78 @@
+---
+title: Quick Start
+description: Get up and running with IngestX in a few lines of code
+---
+
+This guide will show you how to set up your first schema and ingest a file using the core browser API. 
+
+## 1. Define your Columns
+
+IngestX relies on a schema definition to understand how to map spreadsheet columns to your data structure. Use the `ix` schema builder to declare your expectations.
+
+```typescript
+import { ix } from "@parallelbytes/ingestx";
+import type { ColumnConfig } from "@parallelbytes/ingestx";
+
+const columns: ColumnConfig[] = [
+  {
+    key: "firstName",
+    name: "First Name",
+    schema: ix.string().trim(),
+  },
+  {
+    key: "age",
+    name: "Age",
+    schema: ix.number().min(18),
+  },
+  {
+    key: "isActive",
+    name: "Active Status",
+    schema: ix.boolean().truthy(["yes", "true", "1"]),
+  }
+];
+```
+
+By default, IngestX matches the `name` property exactly against the header row of the spreadsheet to bind columns.
+
+## 2. Ingest a File
+
+Once your columns are defined, pass them along with a `File` object (usually obtained from an `<input type="file" />`) to the core `ingest` function.
+
+```typescript
+import { ingest } from "@parallelbytes/ingestx";
+
+async function handleFileUpload(file: File) {
+  // Start the ingestion process
+  const ingestion = ingest({
+    file,
+    columns,
+    collectResults: true, // Retain parsed rows in memory
+  });
+
+  // Await the final result
+  const result = await ingestion.result;
+
+  if (result.status === "completed") {
+    console.log("Successfully imported:", result.data.validRowsCount);
+    
+    // validRows matches your schema exactly
+    const data = result.data.validRows;
+    console.log(data[0].firstName); // e.g. "John"
+  } else if (result.status === "failed") {
+    console.error("Ingestion failed:", result.error);
+  }
+}
+```
+
+## How it works
+
+1. **Mapping**: IngestX reads the header row of the file and matches columns. If required columns are missing, it stops immediately.
+2. **Processing**: It processes the file in chunks to prevent blocking the UI thread.
+3. **Validation**: Every cell is evaluated against the `ix` schema. If a row contains invalid data, it is cleanly separated into `invalidRows`.
+4. **Completion**: The Promise returned by `ingestion.result` resolves with a final data payload typed according to your schemas.
+
+## Next Steps
+
+- Explore [Schemas](/docs/core/schemas) to see all validation rules.
+- Using React? Check out the [React Adapter](/docs/adapters/react).
+- Need to ingest large files? Read the [Memory Management](/docs/guides/memory) guide.

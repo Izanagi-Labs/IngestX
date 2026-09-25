@@ -1,0 +1,4 @@
+{
+  "title": "Core",
+  "pages": ["ingest", "schemas", "validation", "csv", "excel", "configuration", "progress", "lifecycle", "errors"]
+}

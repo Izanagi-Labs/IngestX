@@ -1,0 +1,55 @@
+---
+title: Error Types
+description: Public error models
+---
+
+IngestX explicitly separates **row level validation failures** (which are collected gracefully) from **fatal ingestion errors** (which destroy the process entirely).
+
+## Fatal Ingestion Errors
+
+If a fatal error occurs, the `result.status` transitions to `failed`, and `result.error` is populated with an implementation of the `IngestionError` interface.
+
+```typescript
+export interface IngestionError {
+  type: IngestionErrorType;
+  message: string;
+  details?: unknown;
+  cause?: unknown; // The underlying caught Error object
+}
+```
+
+### `IngestionErrorType`
+
+- **`HEADER_MISMATCH`**: The spreadsheet headers structurally failed to map to your `ColumnConfig`.
+- **`COLLECTION_LIMIT_EXCEEDED`**: You exceeded the `maxCollectedRows` configured limit.
+- **`INGESTION_ERROR`**: General parser failure (e.g. invalid zip archive for Excel, or file unreadable).
+
+### `HeaderMismatchError`
+
+If a mismatch occurs, the error type is narrowed. It explicitly lists the required keys it expected to find, the keys that were missing in the spreadsheet, and the unmapped headers it encountered.
+
+```typescript
+export interface HeaderMismatchError extends IngestionError {
+  type: IngestionErrorType.HEADER_MISMATCH;
+  details: {
+    expected: string[];
+    missing: string[];
+    unexpected: string[];
+  };
+}
+```
+
+## Row level Validation Errors
+
+Row validation failures **do not** trigger an `IngestionError`. They are expected parts of processing messy spreadsheets.
+
+Instead, when a row fails validation, the final payload pushes the detailed failure into `errorsData.rowWiseErrors`.
+
+```typescript
+type RowValidationError = {
+  rowIndex: number;
+  columnKey: string;
+  receivedValue: unknown;
+  errorMessage: string; // From ix schema e.g. "Name too short"
+};
+```

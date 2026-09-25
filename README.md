@@ -1,19 +1,24 @@
 # IngestX
 
-The fastest way to import and validate large CSV & Excel files in JavaScript.
+A library to import and validate CSV & Excel files in JavaScript.
 
-Ingestx is designed to handle massive files smoothly by parsing in chunks, offering built-in data validation, schema mapping, and execution control (pause, resume, cancel). Since it's completely headless, you bring your own UI and we handle the heavy lifting!
+Ingestx is designed to handle large files incrementally by parsing in chunks, offering data validation, schema mapping, and execution control. Since it's headless, you bring your own UI and we handle the heavy lifting!
 
 Demo:- [ingestx.vercel.app](https://ingestx.vercel.app/)
 
 ## Features
 
 - **📊 Format Support:** Seamlessly process CSV and Excel (`.xlsx`, `.xls`) files.
-- **⚡ Chunk-based Processing:** Prevents browser freezes and memory limits by processing huge files in manageable chunks.
+- **⚡ Chunk-based Processing:** Helps avoid browser tab crashes and memory limits by evaluating datasets in chunks.
+
+| Format | Parsing Model                                                             | Memory Characteristics                | Large File Guarantee          |
+| ------ | ------------------------------------------------------------------------- | ------------------------------------- | ----------------------------- |
+| CSV    | Incremental                                                               | Bounded by parser/chunk configuration | Designed for very large files |
+| Excel  | Workbook materialization followed by incremental row extraction in Worker | O(workbook representation)            | Memory constrained            |
+
 - **🔍 Robust Validation:** Define schemas with strict types (string, number, boolean), regex rules, min/max limits, and custom validation logic.
 - **🔀 Smart Column Mapping:** Automatically map variations of column headers (e.g., `email`, `Email Address`, `User_Email`) to a single key.
 - **⏯️ Execution Control:** Pause, resume, and cancel the ingestion process on the fly.
-- **⚛️ React Ready:** Comes with a built-in `useIngestion` hook for effortless React integration.
 
 ## Installation
 
@@ -23,70 +28,92 @@ npm install @parallelbytes/ingestx
 yarn add @parallelbytes/ingestx
 ```
 
-## Quick Start (React)
+## Quick Start
 
-Using the `useIngestion` hook is the fastest way to get started in a React application.
+```ts
+import { ingest, ix } from "ingestx";
+import type { ColumnConfig } from "ingestx";
 
-```tsx
-import { useIngestion } from 'ingestx/react';
-import type { ColumnConfig } from 'ingestx';
-
-const columnConfigs: ColumnConfig[] = [
+const columns: ColumnConfig[] = [
   {
-    key: 'id',
-    displayNames: ['id', 'user id'],
-    type: 'number',
-    validationRequired: true,
+    key: "id",
+    name: "User ID",
+    matchHeader: (header) =>
+      header.toLowerCase() === "id" || header.toLowerCase() === "user id",
+    schema: ix.number().optional(),
   },
   {
-    key: 'email',
-    displayNames: ['email', 'email address'],
-    type: 'string',
-    validationRequired: true,
-  },
-  {
-    key: 'isActive',
-    displayNames: ['active', 'is active'],
-    type: 'boolean',
-    trueValues: ['yes', 'true'],
-    falseValues: ['no', 'false'],
+    key: "email",
+    name: "Email Address",
+    matchHeader: (header) => header.toLowerCase().includes("email"),
+    schema: ix.string().regex(/@/),
   },
 ];
 
-export default function Uploader() {
-  const {
-    isProcessing,
-    progress,
-    result,
-    startIngestion,
-    pause,
-    resume,
-    cancel,
-  } = useIngestion({
-    columnConfigs,
-    chunkSize: 1000,
+const fileInput =
+  document.querySelector<HTMLInputElement>('input[type="file"]');
+
+fileInput?.addEventListener("change", async (e) => {
+  const file = (e.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+
+  const ingestion = ingest({
+    file,
+    columns,
+    onProgress: (progress) => {
+      if (progress.percentage !== undefined) {
+        console.log(`Processing... ${(progress.percentage * 100).toFixed(0)}%`);
+      }
+    },
   });
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) startIngestion(file);
-  };
+  const { data, error } = await ingestion.result;
 
-  return (
-    <div>
-      <input type="file" onChange={handleFileUpload} accept=".csv, .xlsx" />
+  if (error) {
+    console.error("Ingestion failed:", error.message);
+    return;
+  }
 
-      {isProcessing && <p>Processing... {progress.toFixed(0)}%</p>}
+  console.log(`✅ Valid Rows: ${data.validRowsCount}`);
+  console.log(`❌ Invalid Rows: ${data.invalidRowsCount}`);
+});
+```
 
-      {result && (
-        <div>
-          <p>✅ Valid Rows: {result.validRowsCount}</p>
-          <p>❌ Invalid Rows: {result.invalidRowsCount}</p>
-        </div>
-      )}
-    </div>
-  );
+### Quick Start (Node.js)
+
+```ts
+import { ingest, ix } from "@parallelbytes/ingestx/node";
+import type { ColumnConfig } from "@parallelbytes/ingestx";
+
+const columns: ColumnConfig[] = [
+  {
+    key: "email",
+    name: "Email Address",
+    matchHeader: (header) => header.toLowerCase().includes("email"),
+    schema: ix.string().regex(/@/),
+  },
+];
+
+async function run() {
+  const ingestion = ingest({
+    filePath: "./data.csv",
+    columns,
+    onProgress: (progress) => {
+      console.log(`Phase: ${progress.phase}`);
+    },
+  });
+
+  const { data, error } = await ingestion.result;
+
+  if (error) {
+    console.error("Ingestion failed:", error.message);
+    return;
+  }
+
+  console.log(`✅ Valid Rows: ${data.validRowsCount}`);
 }
+
+run();
 ```
 
 ## Core Configuration
@@ -95,19 +122,19 @@ export default function Uploader() {
 
 The heart of Ingestx is the schema definition. You define exactly what your data should look like.
 
-| Property             | Type                                | Description                                                                    |
-| -------------------- | ----------------------------------- | ------------------------------------------------------------------------------ |
-| `key`                | `string`                            | The final key the data will be mapped to in the resulting object.              |
-| `displayNames`       | `string[]`                          | Possible header names in the uploaded file to match against.                   |
-| `type`               | `'string' \| 'number' \| 'boolean'` | Expected data type. Ingestx will attempt to coerce and validate.               |
-| `validationRequired` | `boolean`                           | If true, the row becomes invalid if this field is missing or fails validation. |
-| `defaultValue`       | `any`                               | Value to use if the field is empty.                                            |
+| Property      | Type                          | Description                                                       |
+| ------------- | ----------------------------- | ----------------------------------------------------------------- |
+| `key`         | `string`                      | The final key the data will be mapped to in the resulting object. |
+| `name`        | `string`                      | A user-friendly name for this column.                             |
+| `schema`      | `BaseSchema`                  | A schema instance (e.g. `ix.string()`, `ix.number()`)             |
+| `matchHeader` | `(header: string) => boolean` | Function to match variations of column headers.                   |
 
-#### Type-Specific Options:
+#### Schema-Specific Options:
 
-- **String:** `regex`, `allowedValues`
-- **Number:** `min`, `max`, `allowedValues`
-- **Boolean:** `trueValues`, `falseValues` (Strictly maps specific strings to booleans).
+- **ix.string():** `regex`, `allowedValues`, `min`, `max`
+- **ix.number():** `min`, `max`, `allowedValues`
+- **ix.boolean():** (Strictly maps boolean shapes).
+- **Common:** `optional()`, `default(val)`, `transform(fn)`
 
 ### Global Options
 
@@ -115,11 +142,32 @@ You can configure global behavior when initializing the ingestion:
 
 ```ts
 const options = {
-  trimValues: true, // Trims whitespace from all cell values
+  trimValues: true, // Trims whitespace from cell values
   trimHeaders: true, // Trims whitespace from column headers
   caseInsensitiveHeaders: true, // Matches headers ignoring case
-  shouldAccumulateResult: true, // If false, results are flushed per chunk (useful for massive datasets to save memory)
+  shouldAccumulateResult: true, // If false, results are flushed per chunk (useful for large datasets to save memory)
 };
+```
+
+## Progress Tracking
+
+For core ingestion, you can track progress synchronously using the `onProgress` callback:
+
+```ts
+import { ingest } from "ingestx";
+
+const ingestion = ingest({
+  file,
+  columns,
+  onProgress: (progress) => {
+    // Note: CSV exposes byte-based progress (`basis: "bytes"`), while Excel exposes row-based progress (`basis: "rows"`).
+    // CSV ingestion does not expose total row count because determining it would require an additional full-file pass and would undermine the streaming model.
+    console.log(`Phase: ${progress.phase}`);
+    if (progress.percentage !== undefined) {
+      console.log(`Progress: ${(progress.percentage * 100).toFixed(2)}%`);
+    }
+  },
+});
 ```
 
 ## The Output Result

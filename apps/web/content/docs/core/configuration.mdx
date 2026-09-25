@@ -1,0 +1,88 @@
+---
+title: Column Configuration
+description: Configuring columns and mapping headers
+---
+
+When calling `ingest()`, you must provide a configuration object array for the columns you expect to process.
+
+## `ColumnConfig`
+
+The `ColumnConfig` type dictates the relationship between raw spreadsheet headers and your structured output data keys.
+
+```typescript
+import type { ColumnConfig } from "@parallelbytes/ingestx";
+
+const config: ColumnConfig = {
+  key: "userId",
+  name: "User ID",
+  schema: ix.number(),
+};
+```
+
+### Properties
+
+| Property | Type | Required | Description |
+|---|---|---|---|
+| `key` | `string` | **Yes** | The property key that will be used in the final JavaScript object (e.g., `result.data.validRows[0][key]`). |
+| `name` | `string` | **Yes** | The expected column header in the uploaded spreadsheet. Used for strict matching unless overridden. |
+| `schema` | `BaseSchema` | **Yes** | The `ix` schema evaluating the cells within this column. |
+| `matchHeader` | `(header: string) => boolean` | No | A custom function evaluated against all spreadsheet headers. The parser binds to the *first* header that returns `true`. |
+| `duplicatesAllowed` | `boolean` | No | If `false`, enforces uniqueness for the column across the entire ingestion. A duplicate evaluates to a row level `duplicate_value` error. See uniqueness semantics below. Defaults to `true`. |
+
+### Uniqueness Semantics (`duplicatesAllowed: false`)
+When `duplicatesAllowed: false` is configured for a column:
+- Uniqueness is tracked across the **entire ingestion instance**, spanning all data chunks.
+- The comparison checks the **final, transformed, and coerced** value yielded by the schema, not the raw spreadsheet string.
+- Any row yielding a duplicated value receives a standard row level `duplicate_value` error (`"Value must be unique."`) and becomes invalid.
+- Values that fail basic schema validation (e.g. type coercion) do not participate in uniqueness tracking.
+- Successfully validated empty, optional, or default values *do* participate in tracking.
+- Comparisons use JavaScript `Set` mechanics (strict equality). To enforce case insensitivity, provide a `.transform(v => v.toLowerCase())` step in your schema.
+- **Memory Complexity**: The engine must store references to every distinct validated value in memory for that column, incurring an **O(U)** memory cost (where U is the number of unique validated values). When `duplicatesAllowed: true`, this cost is 0.
+
+## Header Matching
+
+By default, IngestX verifies the structural integrity of the file by attempting to match the provided `ColumnConfig.name` against the exact headers found in the first row of the file.
+
+If a required column is missing, ingestion fails immediately with a `HeaderMismatchError`, preventing invalid processing.
+
+### Custom Matching
+
+If your users upload files with slight variations (e.g., "First Name", "FirstName", "first_name"), you can provide a custom matcher:
+
+```typescript
+const columns: ColumnConfig[] = [
+  {
+    key: "firstName",
+    name: "First Name",
+    schema: ix.string(),
+    matchHeader: (rawHeader: string) => {
+      const normalized = rawHeader.toLowerCase().replace(/\s/g, "");
+      return ["firstname", "first", "fname"].includes(normalized);
+    }
+  }
+]
+```
+
+When `matchHeader` is provided, IngestX evaluates it against every column header in the file. If it returns `true`, the column is successfully bound to this schema.
+
+## Strict Header Mismatch
+
+IngestX treats structural inconsistencies as fatal ingestion errors. 
+
+If the parser cannot map every single declared column to a spreadsheet header, it throws an `IngestionErrorType.HEADER_MISMATCH`.
+
+The error details expose exactly what went wrong:
+
+```typescript
+interface HeaderMismatchError {
+  type: IngestionErrorType.HEADER_MISMATCH;
+  message: string;
+  details: {
+    expected: string[];   // All ColumnConfig.names
+    missing: string[];    // Column names that were not found
+    unexpected: string[]; // Spreadsheet headers that had no ColumnConfig mapping
+  }
+}
+```
+
+This strict enforcement is designed to prevent data corruption from users uploading structurally incorrect templates.

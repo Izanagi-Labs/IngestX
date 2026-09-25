@@ -1,0 +1,32 @@
+---
+title: Excel Processing
+description: Implementation details for Excel files
+---
+
+Excel files (`.xlsx`, `.xls`) present fundamentally different architectural challenges compared to CSVs. Unlike flat text CSVs, modern Excel files are zipped archives containing complex XML structures.
+
+## Implementation Details
+
+Because a `.xlsx` file must be unzipped and structurally parsed before rows can be evaluated, incremental byte level reading is not possible. The underlying parsing library must materialize the workbook in memory.
+
+However, IngestX aggressively protects your UI thread and memory limits through the following mechanisms:
+
+### Web Worker Isolation
+
+For browser processing, IngestX **mandates** the use of a Web Worker to parse Excel files. This helps avoid blocking the main UI thread while the archive is unzipped and parsed.
+
+### Intelligent Chunking
+
+Once the workbook is structurally evaluated by the worker, IngestX relies on your configured `chunkSize` (default: `10000`). 
+The worker slices the evaluated data array and pushes it over the `postMessage` boundary to the main thread incrementally. 
+
+This ensures that the validation engine—which executes on the main thread—evaluate rows in discrete asynchronous batches.
+
+## Differences from CSV
+
+- **No Byte Streaming**: You cannot read an Excel file incrementally off the disk byte by byte into the parser. The worker must read the entire file into a buffer to unzip it.
+- **`byteChunkSize` ignored**: The `byteChunkSize` configuration is irrelevant to Excel files.
+- **Memory Footprint**: The memory required to process an Excel file is directly proportional to the size and density of the file. Very large Excel files (e.g., hundreds of megabytes) may cause browser tab crashes due to inherent limitations in JavaScript engines holding the raw array buffers. 
+
+> [!TIP]
+> For datasets exceeding 100MB, we strongly advise users to export their sheets as CSVs to take advantage of incremental CSV chunking.
