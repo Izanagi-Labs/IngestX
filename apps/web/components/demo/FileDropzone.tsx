@@ -132,7 +132,7 @@ export function FileDropzone() {
           <button 
             onClick={() => !disabled && setFile(createSampleFile())}
             disabled={disabled}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary text-white rounded hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Beaker className="w-3.5 h-3.5" />
             Use sample

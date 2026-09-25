@@ -25,7 +25,7 @@ export function RunControls() {
       <div className="border border-border rounded-lg p-4 bg-background">
         <button 
           onClick={runIngestion} 
-          className="w-full py-2 px-4 rounded bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2"
+          className="w-full py-2 px-4 rounded bg-primary text-white hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2"
         >
           <Play className="w-4 h-4" />
           Run Ingestion
@@ -56,7 +56,7 @@ export function RunControls() {
                 <Pause className="w-4 h-4" /> Pause
               </button>
             ) : (
-              <button onClick={resumeIngestion} className="flex-1 py-1.5 px-3 rounded bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2 text-sm font-medium transition-colors">
+              <button onClick={resumeIngestion} className="flex-1 py-1.5 px-3 rounded bg-primary text-white hover:bg-primary/90 flex items-center justify-center gap-2 text-sm font-medium transition-colors">
                 <Play className="w-4 h-4" /> Resume
               </button>
             )}
@@ -74,7 +74,7 @@ export function RunControls() {
       <div className="border border-border rounded-lg p-4 bg-background">
         <button 
           onClick={runIngestion} 
-          className="w-full py-2 px-4 rounded bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2"
+          className="w-full py-2 px-4 rounded bg-primary text-white hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2"
         >
           <RotateCcw className="w-4 h-4" />
           Run Again
@@ -93,7 +93,7 @@ export function RunControls() {
           </pre>
           <button 
             onClick={runIngestion} 
-            className="w-full py-2 px-4 rounded bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2"
+            className="w-full py-2 px-4 rounded bg-primary text-white hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2"
           >
             <RotateCcw className="w-4 h-4" />
             Try Again

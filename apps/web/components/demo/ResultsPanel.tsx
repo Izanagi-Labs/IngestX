@@ -1,14 +1,51 @@
 "use client";
 
 import { useDemoStore } from "../../store/demoStore";
+import { ResultsTabs } from "./ResultsTabs";
+import { ResultsToolbar } from "./ResultsToolbar";
+import { ResultsTable } from "./ResultsTable";
+import { useMemo } from "react";
 
 export function ResultsPanel() {
   const result = useDemoStore((state) => state.result);
   const status = useDemoStore((state) => state.status);
   const configuration = useDemoStore((state) => state.configuration);
   const activeTab = useDemoStore((state) => state.activeResultTab);
-  const setActiveTab = useDemoStore((state) => state.setActiveResultTab);
+  const searchQuery = useDemoStore((state) => state.searchQuery);
+  const errorFilter = useDemoStore((state) => state.errorFilter);
   
+  const filteredData = useMemo(() => {
+    if (!result) return [];
+    
+    let baseData: any[] = [];
+    if (activeTab === "all") {
+      baseData = [...result.validRows, ...result.invalidRows].sort((a, b) => (a._ixRowIndex ?? 0) - (b._ixRowIndex ?? 0));
+    } else if (activeTab === "valid") {
+      baseData = result.validRows;
+    } else {
+      baseData = result.invalidRows;
+    }
+
+    let filtered = baseData;
+
+    if (errorFilter && (activeTab === "invalid" || activeTab === "all")) {
+      filtered = filtered.filter(row => row.errors && row.errors[errorFilter]);
+    }
+
+    if (searchQuery) {
+      const lowerQuery = searchQuery.toLowerCase();
+      filtered = filtered.filter(row => {
+        const rowData = row.data ?? row;
+        return result.columns.some(c => {
+          const val = rowData[c.key];
+          return val !== null && val !== undefined && String(val).toLowerCase().includes(lowerQuery);
+        });
+      });
+    }
+
+    return filtered;
+  }, [result, activeTab, searchQuery, errorFilter]);
+
   if (status !== "completed" || !result) {
     if (status === "idle" || status === "ready") {
       return (
@@ -18,11 +55,8 @@ export function ResultsPanel() {
         </div>
       );
     }
-    return null; // Don't show anything while running/paused, as Summary handles it
+    return null;
   }
-
-  const validCount = result.validRows.length;
-  const invalidCount = result.invalidRows.length;
 
   if (!configuration.collectResults) {
     return (
@@ -35,91 +69,16 @@ export function ResultsPanel() {
 
   return (
     <div className="border border-border rounded-lg bg-background overflow-hidden flex flex-col">
-      <div className="flex border-b border-border bg-foreground/5">
-        <button
-          className={`flex-1 py-3 px-4 text-sm font-semibold transition-colors border-b-2 ${
-            activeTab === "valid" ? "border-primary text-primary" : "border-transparent text-foreground-muted hover:text-foreground"
-          }`}
-          onClick={() => setActiveTab("valid")}
-        >
-          Valid Rows ({validCount})
-        </button>
-        <button
-          className={`flex-1 py-3 px-4 text-sm font-semibold transition-colors border-b-2 ${
-            activeTab === "invalid" ? "border-destructive text-destructive" : "border-transparent text-foreground-muted hover:text-foreground"
-          }`}
-          onClick={() => setActiveTab("invalid")}
-        >
-          Invalid Rows ({invalidCount})
-        </button>
-      </div>
-
-      <div className="p-0 overflow-x-auto">
-        {activeTab === "valid" && (
-          validCount > 0 ? (
-            <table className="w-full text-sm text-left whitespace-nowrap">
-              <thead className="text-xs text-foreground-muted uppercase bg-foreground/5 border-b border-border">
-                <tr>
-                  <th className="px-4 py-3 font-medium">Row</th>
-                  {result.columns.map(c => (
-                    <th key={c.key} className="px-4 py-3 font-medium">{c.name}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {result.validRows.map((row, i) => (
-                  <tr key={i} className="hover:bg-foreground/5 transition-colors">
-                    <td className="px-4 py-3 text-foreground-muted">{row._ixRowIndex ?? i}</td>
-                    {result.columns.map(c => (
-                      <td key={c.key} className="px-4 py-3 font-medium">{row[c.key]}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div className="p-8 text-center text-foreground-muted text-sm">No valid rows</div>
-          )
-        )}
-
-        {activeTab === "invalid" && (
-          invalidCount > 0 ? (
-            <table className="w-full text-sm text-left whitespace-nowrap">
-              <thead className="text-xs text-foreground-muted uppercase bg-foreground/5 border-b border-border">
-                <tr>
-                  <th className="px-4 py-3 font-medium">Row</th>
-                  {result.columns.map(c => (
-                    <th key={c.key} className="px-4 py-3 font-medium">{c.name}</th>
-                  ))}
-                  <th className="px-4 py-3 font-medium">Errors</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {result.invalidRows.map((row, i) => (
-                  <tr key={i} className="hover:bg-foreground/5 transition-colors align-top">
-                    <td className="px-4 py-3 text-foreground-muted">{row._ixRowIndex}</td>
-                    {result.columns.map(c => (
-                      <td key={c.key} className="px-4 py-3 font-medium">{row.data?.[c.key]}</td>
-                    ))}
-                    <td className="px-4 py-3 text-wrap max-w-sm">
-                      <div className="flex flex-col gap-2">
-                        {Object.entries(row.errors || {}).map(([key, errors]: [string, any]) => (
-                          <div key={key} className="bg-destructive/10 border border-destructive/20 rounded p-2 text-xs">
-                            <span className="font-bold text-destructive mr-2">{key}:</span>
-                            <span className="text-foreground">{errors[0]?.message}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div className="p-8 text-center text-foreground-muted text-sm">No validation errors</div>
-          )
+      <div className="flex justify-between items-center bg-foreground/5 border-b border-border px-4 py-2">
+        <span className="text-xs font-semibold text-foreground-muted uppercase tracking-wider">Results Explorer</span>
+        {configuration.maxCollectedRows < (result.validRows.length + result.invalidRows.length) && (
+          <span className="text-xs text-amber-500 font-medium">Partial results shown (collection limit reached)</span>
         )}
       </div>
+      <ResultsTabs />
+      <ResultsToolbar />
+      <ResultsTable data={filteredData} schemaColumns={result.columns} activeTab={activeTab} />
     </div>
   );
 }
+

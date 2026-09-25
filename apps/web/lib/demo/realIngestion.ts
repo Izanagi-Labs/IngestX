@@ -43,12 +43,15 @@ export async function runIngestion() {
     },
   });
 
+  const startTime = performance.now();
+
   try {
     const result = await activeInstance.result;
     
     if (runId !== activeRunId) return;
 
     if (result.status === "completed") {
+      const endTime = performance.now();
       store.setStatus("completed");
       
       const { data } = result;
@@ -89,6 +92,7 @@ export async function runIngestion() {
         validRows: data.validRows,
         invalidRows: mappedInvalidRows,
         columns: columns.map(c => ({ key: c.key, name: c.name })),
+        durationMs: Math.round(endTime - startTime),
       });
     } else if (result.status === "cancelled") {
       store.setStatus("ready");

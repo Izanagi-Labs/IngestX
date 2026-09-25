@@ -20,6 +20,7 @@ export interface DemoResult {
   validRows: any[];
   invalidRows: any[];
   columns: { key: string; name: string }[];
+  durationMs: number;
 }
 
 export interface DemoState {
@@ -30,7 +31,9 @@ export interface DemoState {
   progress: DemoProgress;
   result: DemoResult | null;
   error: string | null;
-  activeResultTab: "valid" | "invalid";
+  activeResultTab: "all" | "valid" | "invalid";
+  searchQuery: string;
+  errorFilter: string;
 
   // Actions
   setFile: (file: File | null) => void;
@@ -40,7 +43,9 @@ export interface DemoState {
   setProgress: (progress: Partial<DemoProgress>) => void;
   setResult: (result: DemoResult | null) => void;
   setError: (error: string | null) => void;
-  setActiveResultTab: (tab: "valid" | "invalid") => void;
+  setActiveResultTab: (tab: "all" | "valid" | "invalid") => void;
+  setSearchQuery: (query: string) => void;
+  setErrorFilter: (filter: string) => void;
   reset: () => void;
 }
 
@@ -76,7 +81,9 @@ const initialState = {
   progress: { processed: 0, valid: 0, invalid: 0, progressPercentage: 0 },
   result: null,
   error: null,
-  activeResultTab: "valid" as "valid" | "invalid",
+  activeResultTab: "all" as "all" | "valid" | "invalid",
+  searchQuery: "",
+  errorFilter: "",
 };
 
 export const useDemoStore = create<DemoState>((set) => ({
@@ -90,5 +97,7 @@ export const useDemoStore = create<DemoState>((set) => ({
   setResult: (result) => set({ result }),
   setError: (error) => set({ error, status: "error" }),
   setActiveResultTab: (activeResultTab) => set({ activeResultTab }),
+  setSearchQuery: (searchQuery) => set({ searchQuery }),
+  setErrorFilter: (errorFilter) => set({ errorFilter }),
   reset: () => set(initialState),
 }));
