@@ -166,7 +166,7 @@ export class NodeExcelParser implements Parser {
       try {
         const fileSize = this.getFileSize();
 
-        this.workbook = XLSX.readFile(this.filePath, {
+        this.workbook = XLSX.read(fs.readFileSync(this.filePath), {
           cellDates: true,
         });
 

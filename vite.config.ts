@@ -22,7 +22,7 @@ export default defineConfig({
         `${entryName}.${format === "es" ? "js" : "cjs"}`,
     },
     rollupOptions: {
-      external: ["papaparse", "react", "react-dom"],
+      external: ["papaparse", "xlsx", "react", "react-dom", "fs", "path", /^node:/],
     },
   },
 });

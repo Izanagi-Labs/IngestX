@@ -11,7 +11,7 @@ export function CodeExample() {
               Developer-first API
             </h2>
             <p className="text-lg text-foreground-muted">
-              IngestX handles the ingestion pipeline so you don't have to repeatedly wire together parsing, validation, and result accumulation.
+              IngestX handles the ingestion pipeline so you don&apos;t have to repeatedly wire together parsing, validation, and result accumulation.
             </p>
             <ul className="space-y-3 mt-4">
               {['Schema-first architecture', 'Fully typed in TypeScript', 'Headless implementation', 'Lightweight footprint'].map((item, idx) => (
@@ -35,14 +35,14 @@ export function CodeExample() {
             <div className="p-4 sm:p-6 overflow-x-auto">
               <pre className="font-mono text-white/90 leading-relaxed">
                 <code>
-                  <span className="text-[#ff7b72]">import</span> &#123; ingest, ix &#125; <span className="text-[#ff7b72]">from</span> <span className="text-[#a5d6ff]">"@parallelbytes/ingestx"</span>;<br/>
+                  <span className="text-[#ff7b72]">import</span> &#123; ingest, ix &#125; <span className="text-[#ff7b72]">from</span> <span className="text-[#a5d6ff]">&quot;@parallelbytes/ingestx&quot;</span>;<br/>
                   <br/>
                   <span className="text-[#8b949e]">{"// Define exactly what your data should look like"}</span><br/>
                   <span className="text-[#ff7b72]">const</span> columns = [<br/>
                   {"  "}&#123;<br/>
-                  {"    "}key: <span className="text-[#a5d6ff]">"email"</span>,<br/>
-                  {"    "}name: <span className="text-[#a5d6ff]">"Email Address"</span>,<br/>
-                  {"    "}<span className="text-[#d2a8ff]">matchHeader</span>: (header) =&gt; header.<span className="text-[#d2a8ff]">toLowerCase</span>().<span className="text-[#d2a8ff]">includes</span>(<span className="text-[#a5d6ff]">"email"</span>),<br/>
+                  {"    "}key: <span className="text-[#a5d6ff]">&quot;email&quot;</span>,<br/>
+                  {"    "}name: <span className="text-[#a5d6ff]">&quot;Email Address&quot;</span>,<br/>
+                  {"    "}<span className="text-[#d2a8ff]">matchHeader</span>: (header) =&gt; header.<span className="text-[#d2a8ff]">toLowerCase</span>().<span className="text-[#d2a8ff]">includes</span>(<span className="text-[#a5d6ff]">&quot;email&quot;</span>),<br/>
                   {"    "}schema: ix.<span className="text-[#d2a8ff]">string</span>().<span className="text-[#d2a8ff]">regex</span>(<span className="text-[#79c0ff]">/@/</span>),<br/>
                   {"  "}&#125;<br/>
                   ];<br/>

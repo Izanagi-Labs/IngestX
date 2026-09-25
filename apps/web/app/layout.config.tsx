@@ -1,5 +1,5 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import { BookIcon, LayoutTemplateIcon } from 'lucide-react';
+
 
 export const baseOptions: BaseLayoutProps = {
   nav: {

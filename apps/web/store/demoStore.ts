@@ -16,9 +16,12 @@ export interface DemoProgress {
   progressPercentage: number;
 }
 
+export type ValidRow = Record<string, unknown> & { _ixRowIndex?: number };
+export type InvalidRow = { _ixRowIndex: number; data: Record<string, unknown>; errors: Record<string, { message: string }[]> };
+
 export interface DemoResult {
-  validRows: any[];
-  invalidRows: any[];
+  validRows: ValidRow[];
+  invalidRows: InvalidRow[];
   columns: { key: string; name: string }[];
   durationMs: number;
 }

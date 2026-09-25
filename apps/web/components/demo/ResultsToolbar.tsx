@@ -3,23 +3,11 @@
 import { Search, Download, Filter } from "lucide-react";
 import { useDemoStore } from "../../store/demoStore";
 import { downloadValidCsv, downloadInvalidCsv } from "../../lib/demo/exportCsv";
-import { useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
 
 export function ResultsToolbar() {
   const store = useDemoStore();
-  const [localSearch, setLocalSearch] = useState(store.searchQuery);
   const result = store.result;
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      store.setSearchQuery(localSearch);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [localSearch]);
-
-  useEffect(() => {
-    setLocalSearch(store.searchQuery);
-  }, [store.searchQuery]);
 
   const errorFields = useMemo(() => {
     if (!result || !result.invalidRows) return [];
@@ -42,13 +30,13 @@ export function ResultsToolbar() {
           <input
             type="text"
             placeholder="Search results..."
-            value={localSearch}
-            onChange={(e) => setLocalSearch(e.target.value)}
+            value={store.searchQuery}
+            onChange={(e) => store.setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-4 py-1.5 text-sm rounded-md border border-border bg-foreground/5 focus:bg-background focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all"
           />
-          {localSearch && (
+          {store.searchQuery && (
             <button
-              onClick={() => setLocalSearch("")}
+              onClick={() => store.setSearchQuery("")}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-foreground-muted hover:text-foreground"
             >
               Clear

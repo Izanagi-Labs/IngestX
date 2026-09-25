@@ -4,22 +4,25 @@ import { useDemoStore } from "../../store/demoStore";
 import { ResultsTabs } from "./ResultsTabs";
 import { ResultsToolbar } from "./ResultsToolbar";
 import { ResultsTable } from "./ResultsTable";
-import { useMemo } from "react";
+import { useMemo, useDeferredValue } from "react";
 
 export function ResultsPanel() {
   const result = useDemoStore((state) => state.result);
   const status = useDemoStore((state) => state.status);
   const configuration = useDemoStore((state) => state.configuration);
   const activeTab = useDemoStore((state) => state.activeResultTab);
-  const searchQuery = useDemoStore((state) => state.searchQuery);
-  const errorFilter = useDemoStore((state) => state.errorFilter);
+  const searchQueryRaw = useDemoStore((state) => state.searchQuery);
+  const errorFilterRaw = useDemoStore((state) => state.errorFilter);
+  
+  const searchQuery = useDeferredValue(searchQueryRaw);
+  const errorFilter = useDeferredValue(errorFilterRaw);
   
   const filteredData = useMemo(() => {
     if (!result) return [];
     
     let baseData: any[] = [];
     if (activeTab === "all") {
-      baseData = [...result.validRows, ...result.invalidRows].sort((a, b) => (a._ixRowIndex ?? 0) - (b._ixRowIndex ?? 0));
+      baseData = [...result.validRows, ...result.invalidRows].sort((a, b) => (Number(a._ixRowIndex) || 0) - (Number(b._ixRowIndex) || 0));
     } else if (activeTab === "valid") {
       baseData = result.validRows;
     } else {

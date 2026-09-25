@@ -2,7 +2,7 @@ import { useDemoStore } from "../../store/demoStore";
 import { ingest, IngestionInstance } from "@parallelbytes/ingestx";
 import { compilePlaygroundSchema, PlaygroundSchemaError } from "./schema/compiler";
 
-let activeInstance: IngestionInstance<any> | null = null;
+let activeInstance: IngestionInstance<Record<string, unknown>> | null = null;
 let activeRunId = 0;
 
 export async function runIngestion() {
@@ -20,9 +20,9 @@ export async function runIngestion() {
   let columns;
   try {
     columns = compilePlaygroundSchema(store.schemaCode);
-  } catch (err: any) {
+  } catch (err: unknown) {
     if (runId !== activeRunId) return;
-    store.setError(err.message);
+    store.setError(err instanceof Error ? err.message : String(err));
     return;
   }
 
@@ -69,7 +69,7 @@ export async function runIngestion() {
       // in rowWiseErrors in the exact same order.
       const uniqueErrorIndices = Array.from(new Set(data.errorsData.rowWiseErrors.map(e => e.rowIndex)));
       
-      const mappedInvalidRows = data.invalidRows.map((row: any, i) => {
+      const mappedInvalidRows = data.invalidRows.map((row: Record<string, unknown>, i) => {
         const rowIndex = uniqueErrorIndices[i] ?? i;
         
         const rowErrors = data.errorsData.rowWiseErrors.filter(e => e.rowIndex === rowIndex);
@@ -99,7 +99,7 @@ export async function runIngestion() {
       let errorMessage = result.error?.message || "Ingestion failed";
       
       if (result.error && "type" in result.error && result.error.type === "HEADER_MISMATCH") {
-        const mismatch = (result.error as any).details;
+        const mismatch = (result.error as { details?: { missing?: string[], unexpected?: string[] } }).details;
         if (mismatch) {
           errorMessage = "Header Mismatch:\n";
           if (mismatch.missing?.length) {
@@ -113,9 +113,9 @@ export async function runIngestion() {
       
       store.setError(errorMessage);
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     if (runId !== activeRunId) return;
-    store.setError(err.message || "Unknown error occurred");
+    store.setError(err instanceof Error ? err.message : "Unknown error occurred");
   } finally {
     if (runId === activeRunId) {
       activeInstance = null;
