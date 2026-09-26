@@ -6,32 +6,32 @@ description: Install the IngestX library
 Install the main package using your preferred package manager.
 
 ```bash
-pnpm add @parallelbytes/ingestx
+pnpm add @izanagi-labs/ingestx
 ```
 
 ```bash
-npm install @parallelbytes/ingestx
+npm install @izanagi-labs/ingestx
 ```
 
 ```bash
-yarn add @parallelbytes/ingestx
+yarn add @izanagi-labs/ingestx
 ```
 
 ## Package Entry Points
 
 IngestX is distributed as a single package with three distinct entry points for different environments:
 
-1. **`@parallelbytes/ingestx`**
+1. **`@izanagi-labs/ingestx`**
    The core ingestion logic and schema builder. Usable directly in modern browser environments.
 
-2. **`@parallelbytes/ingestx/react`**
+2. **`@izanagi-labs/ingestx/react`**
    The React adapter. Exposes the `useIngest` hook to deeply integrate IngestX with the React component lifecycle.
 
-3. **`@parallelbytes/ingestx/node`**
+3. **`@izanagi-labs/ingestx/node`**
    The Node.js adapter. Exposes a specialized `ingest()` function designed to read files from the filesystem efficiently using Node streams.
 
 > [!NOTE]
-> All entry points are provided by the `@parallelbytes/ingestx` package. You do not need to install separate adapter packages.
+> All entry points are provided by the `@izanagi-labs/ingestx` package. You do not need to install separate adapter packages.
 
 ## Requirements
 

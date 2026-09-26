@@ -39,8 +39,8 @@ export function Hero() {
             
             <div className="flex items-center gap-4 text-sm mt-4">
               <code className="relative rounded-md bg-code-background border border-code-border px-4 py-2.5 font-mono text-sm text-foreground flex items-center justify-between min-w-[280px]">
-                <span>pnpm add @parallelbytes/ingestx</span>
-                <CopyButton value="pnpm add @parallelbytes/ingestx" className="ml-4 -mr-2" />
+                <span>pnpm add @izanagi-labs/ingestx</span>
+                <CopyButton value="pnpm add @izanagi-labs/ingestx" className="ml-4 -mr-2" />
               </code>
             </div>
           </div>

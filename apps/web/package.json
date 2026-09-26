@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
-    "@parallelbytes/ingestx": "workspace:*",
+    "@izanagi-labs/ingestx": "workspace:*",
     "@tanstack/react-table": "^8.20.5",
     "@tanstack/react-virtual": "^3.14.13",
     "@uiw/react-codemirror": "^4.25.11",

@@ -35,7 +35,7 @@ export function CodeExample() {
             <div className="p-4 sm:p-6 overflow-x-auto">
               <pre className="font-mono text-white/90 leading-relaxed">
                 <code>
-                  <span className="text-[#ff7b72]">import</span> &#123; ingest, ix &#125; <span className="text-[#ff7b72]">from</span> <span className="text-[#a5d6ff]">&quot;@parallelbytes/ingestx&quot;</span>;<br/>
+                  <span className="text-[#ff7b72]">import</span> &#123; ingest, ix &#125; <span className="text-[#ff7b72]">from</span> <span className="text-[#a5d6ff]">&quot;@izanagi-labs/ingestx&quot;</span>;<br/>
                   <br/>
                   <span className="text-[#8b949e]">{"// Define exactly what your data should look like"}</span><br/>
                   <span className="text-[#ff7b72]">const</span> columns = [<br/>

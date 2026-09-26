@@ -23,7 +23,7 @@ export function FinalCTA() {
         </div>
         <div className="mt-8 pt-8">
           <code className="text-foreground-muted text-sm font-mono">
-            pnpm add @parallelbytes/ingestx
+            pnpm add @izanagi-labs/ingestx
           </code>
         </div>
       </Container>

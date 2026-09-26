@@ -3,14 +3,14 @@ title: React Adapter
 description: Using IngestX deeply within React
 ---
 
-If you are building a React application, the core `@parallelbytes/ingestx` library directly. However, wiring up state, progress indicators, and cancellation logic manually can require boilerplate.
+If you are building a React application, the core `@izanagi-labs/ingestx` library directly. However, wiring up state, progress indicators, and cancellation logic manually can require boilerplate.
 
-The `@parallelbytes/ingestx/react` sub package provides a specialized `useIngest` hook that manages the entire lifecycle of an ingestion internally, exposing reactive state variables ready to map directly to your UI.
+The `@izanagi-labs/ingestx/react` sub package provides a specialized `useIngest` hook that manages the entire lifecycle of an ingestion internally, exposing reactive state variables ready to map directly to your UI.
 
 ## Import
 
 ```tsx
-import { useIngest } from "@parallelbytes/ingestx/react";
+import { useIngest } from "@izanagi-labs/ingestx/react";
 ```
 
 ## `useIngest` Hook
@@ -37,9 +37,9 @@ This practical component demonstrates how to bind an `<input type="file">` to th
 
 ```tsx
 import React from 'react';
-import { useIngest } from '@parallelbytes/ingestx/react';
-import { ix } from '@parallelbytes/ingestx';
-import type { ColumnConfig } from '@parallelbytes/ingestx';
+import { useIngest } from '@izanagi-labs/ingestx/react';
+import { ix } from '@izanagi-labs/ingestx';
+import type { ColumnConfig } from '@izanagi-labs/ingestx';
 
 const columns: ColumnConfig[] = [
   { key: "id", name: "User ID", schema: ix.string() },

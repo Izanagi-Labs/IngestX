@@ -1,5 +1,5 @@
 import { useDemoStore } from "../../store/demoStore";
-import { ingest, IngestionInstance } from "@parallelbytes/ingestx";
+import { ingest, IngestionInstance } from "@izanagi-labs/ingestx";
 import { compilePlaygroundSchema } from "./schema/compiler";
 
 let activeInstance: IngestionInstance<Record<string, unknown>> | null = null;

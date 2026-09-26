@@ -3,13 +3,13 @@ title: Ingest
 description: The core ingestion API
 ---
 
-The `ingest()` function is the primary entry point for the `@parallelbytes/ingestx` browser package. It orchestrates file parsing, validation, chunk processing, and lifecycle management.
+The `ingest()` function is the primary entry point for the `@izanagi-labs/ingestx` browser package. It orchestrates file parsing, validation, chunk processing, and lifecycle management.
 
 ## Signature
 
 ```typescript
-import { ingest } from "@parallelbytes/ingestx";
-import type { IngestOptions, IngestionInstance } from "@parallelbytes/ingestx";
+import { ingest } from "@izanagi-labs/ingestx";
+import type { IngestOptions, IngestionInstance } from "@izanagi-labs/ingestx";
 
 function ingest<TRow>(options: IngestOptions<TRow>): IngestionInstance<TRow>;
 ```

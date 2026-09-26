@@ -23,9 +23,9 @@ Demo:- [ingestx.vercel.app](https://ingestx.vercel.app/)
 ## Installation
 
 ```bash
-npm install @parallelbytes/ingestx
+npm install @izanagi-labs/ingestx
 # or
-yarn add @parallelbytes/ingestx
+yarn add @izanagi-labs/ingestx
 ```
 
 ## Quick Start
@@ -82,8 +82,8 @@ fileInput?.addEventListener("change", async (e) => {
 ### Quick Start (Node.js)
 
 ```ts
-import { ingest, ix } from "@parallelbytes/ingestx/node";
-import type { ColumnConfig } from "@parallelbytes/ingestx";
+import { ingest, ix } from "@izanagi-labs/ingestx/node";
+import type { ColumnConfig } from "@izanagi-labs/ingestx";
 
 const columns: ColumnConfig[] = [
   {

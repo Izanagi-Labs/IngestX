@@ -10,8 +10,8 @@ This guide will show you how to set up your first schema and ingest a file using
 IngestX relies on a schema definition to understand how to map spreadsheet columns to your data structure. Use the `ix` schema builder to declare your expectations.
 
 ```typescript
-import { ix } from "@parallelbytes/ingestx";
-import type { ColumnConfig } from "@parallelbytes/ingestx";
+import { ix } from "@izanagi-labs/ingestx";
+import type { ColumnConfig } from "@izanagi-labs/ingestx";
 
 const columns: ColumnConfig[] = [
   {
@@ -39,7 +39,7 @@ By default, IngestX matches the `name` property exactly against the header row o
 Once your columns are defined, pass them along with a `File` object (usually obtained from an `<input type="file" />`) to the core `ingest` function.
 
 ```typescript
-import { ingest } from "@parallelbytes/ingestx";
+import { ingest } from "@izanagi-labs/ingestx";
 
 async function handleFileUpload(file: File) {
   // Start the ingestion process

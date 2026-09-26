@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as acorn from "acorn";
-import { ix } from "@parallelbytes/ingestx";
-import type { ColumnConfig } from "@parallelbytes/ingestx";
+import { ix } from "@izanagi-labs/ingestx";
+import type { ColumnConfig } from "@izanagi-labs/ingestx";
 
 export class PlaygroundSchemaError extends Error {
   constructor(message: string) {

@@ -14,7 +14,7 @@ When invoking `ingestion.result`, the Promise will reject if a fatal error occur
 The recommended pattern is to `try/catch` the result resolution, and use the exported `IngestionErrorType` enum to determine exactly what went wrong.
 
 ```typescript
-import { ingest, IngestionErrorType } from "@parallelbytes/ingestx";
+import { ingest, IngestionErrorType } from "@izanagi-labs/ingestx";
 
 try {
   const instance = ingest({ file, columns });
@@ -38,7 +38,7 @@ try {
 ```
 
 > [!NOTE]
-> When using the `@parallelbytes/ingestx/react` `useIngest` hook, you don't need a `try/catch` for the ingestion result. The hook catches it internally and populates the reactive `error` state variable instead.
+> When using the `@izanagi-labs/ingestx/react` `useIngest` hook, you don't need a `try/catch` for the ingestion result. The hook catches it internally and populates the reactive `error` state variable instead.
 
 ## Row wise Validation Errors
 
