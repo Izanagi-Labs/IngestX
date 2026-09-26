@@ -1,6 +1,6 @@
 {
   "name": "@izanagi-labs/ingestx",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "packageManager": "pnpm@11.1.2",
   "description": "High performance CSV and Excel ingestion library for React and Node.js",
   "type": "module",
