@@ -26,9 +26,9 @@ export function Header() {
                 Demo
               </Link>
               <a
-                href="https://github.com/ParallelBytes/IngestX"
+                href="https://github.com/Izanagi-Labs/IngestX"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="flex items-center text-sm font-medium text-foreground-muted transition-colors hover:text-foreground"
               >
                 GitHub

@@ -1,5 +1,5 @@
 {
-  "name": "@parallelbytes/ingestx",
+  "name": "@izanagi-labs/ingestx",
   "version": "1.0.4",
   "packageManager": "pnpm@11.1.2",
   "description": "High performance CSV and Excel ingestion library for React and Node.js",
@@ -26,9 +26,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ParallelBytes/IngestX.git"
+    "url": "git+https://github.com/Izanagi-Labs/IngestX.git"
   },
-  "homepage": "https://github.com/ParallelBytes/IngestX#readme",
+  "homepage": "https://github.com/Izanagi-Labs/IngestX#readme",
   "author": "Nikhil Dabhade",
   "license": "MIT",
   "scripts": {

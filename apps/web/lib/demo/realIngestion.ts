@@ -1,6 +1,6 @@
 import { useDemoStore } from "../../store/demoStore";
 import { ingest, IngestionInstance } from "@parallelbytes/ingestx";
-import { compilePlaygroundSchema, PlaygroundSchemaError } from "./schema/compiler";
+import { compilePlaygroundSchema } from "./schema/compiler";
 
 let activeInstance: IngestionInstance<Record<string, unknown>> | null = null;
 let activeRunId = 0;

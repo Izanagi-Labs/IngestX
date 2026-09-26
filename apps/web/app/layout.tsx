@@ -15,11 +15,28 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://ingestx.vercel.app"),
   title: {
     template: "%s | IngestX",
-    default: "IngestX",
+    default: "IngestX - Headless CSV & Excel Ingestion",
   },
-  description: "Headless, type-safe CSV and Excel ingestion for TypeScript.",
+  description: "Headless, type-safe CSV and Excel ingestion for TypeScript, React, and Node.js. High-performance, chunked validation for large files.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "IngestX",
+    description: "Headless, type-safe CSV and Excel ingestion for TypeScript, React, and Node.js.",
+    url: "https://ingestx.vercel.app",
+    siteName: "IngestX",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "IngestX",
+    description: "Headless, type-safe CSV and Excel ingestion for TypeScript.",
+  },
 };
 
 export default function RootLayout({

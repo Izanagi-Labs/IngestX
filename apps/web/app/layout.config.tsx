@@ -16,5 +16,5 @@ export const baseOptions: BaseLayoutProps = {
       url: '/demo',
     },
   ],
-  githubUrl: 'https://github.com/parallelbytes/ingestx',
+  githubUrl: 'https://github.com/Izanagi-Labs/IngestX',
 };

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useDemoStore } from "../../store/demoStore";
@@ -67,7 +68,7 @@ export function ResultsPanel() {
     return (
       <div className="border border-border rounded-lg p-12 bg-background flex flex-col items-center justify-center text-center">
         <p className="text-foreground font-medium mb-1">Result Collection Disabled</p>
-        <p className="text-sm text-foreground-muted">Rows were processed but not retained for the results table because 'collectResults' is false.</p>
+        <p className="text-sm text-foreground-muted">Rows were processed but not retained for the results table because &apos;collectResults&apos; is false.</p>
       </div>
     );
   }

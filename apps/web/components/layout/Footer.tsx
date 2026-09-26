@@ -9,8 +9,8 @@ export function Footer() {
         </div>
         <div className="flex gap-4 text-sm font-medium">
           <Link href="/docs" className="hover:text-foreground transition-colors">Documentation</Link>
-          <a href="https://github.com/ParallelBytes/IngestX" target="_blank" rel="noreferrer" className="hover:text-foreground transition-colors">GitHub</a>
-          <a href="https://www.npmjs.com/package/@parallelbytes/ingestx" target="_blank" rel="noreferrer" className="hover:text-foreground transition-colors">npm</a>
+          <a href="https://github.com/Izanagi-Labs/IngestX" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">GitHub</a>
+          <a href="https://www.npmjs.com/package/@parallelbytes/ingestx" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">npm</a>
         </div>
       </div>
     </footer>

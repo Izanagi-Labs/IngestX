@@ -6,7 +6,6 @@ import { runIngestion, pauseIngestion, resumeIngestion, cancelIngestion } from "
 
 export function RunControls() {
   const status = useDemoStore((state) => state.status);
-  const file = useDemoStore((state) => state.file);
   const progress = useDemoStore((state) => state.progress);
   const error = useDemoStore((state) => state.error);
   
@@ -22,7 +21,8 @@ export function RunControls() {
 
   if (status === "ready") {
     return (
-      <div className="border border-border rounded-lg p-4 bg-background">
+      <div className="border border-border rounded-lg p-4 bg-background" aria-live="polite">
+        <span className="sr-only">Ready to ingest</span>
         <button 
           onClick={runIngestion} 
           className="w-full py-2 px-4 rounded bg-primary text-white hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2"
@@ -36,7 +36,7 @@ export function RunControls() {
   
   if (status === "running" || status === "paused") {
     return (
-      <div className="border border-border rounded-lg p-4 bg-background">
+      <div className="border border-border rounded-lg p-4 bg-background" aria-live="polite">
         <div className="flex flex-col gap-3">
           <div className="flex justify-between items-center text-sm">
             <span className="font-semibold text-foreground">{status === "running" ? "Processing..." : "Paused"}</span>
@@ -71,7 +71,8 @@ export function RunControls() {
 
   if (status === "completed") {
     return (
-      <div className="border border-border rounded-lg p-4 bg-background">
+      <div className="border border-border rounded-lg p-4 bg-background" aria-live="polite">
+        <span className="sr-only">Ingestion completed successfully</span>
         <button 
           onClick={runIngestion} 
           className="w-full py-2 px-4 rounded bg-primary text-white hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2"
@@ -85,7 +86,7 @@ export function RunControls() {
   
   if (status === "error") {
     return (
-      <div className="border border-destructive/50 bg-destructive/10 rounded-lg p-4">
+      <div className="border border-destructive/50 bg-destructive/10 rounded-lg p-4" aria-live="assertive">
         <div className="flex flex-col gap-3">
           <div className="font-semibold text-destructive">Ingestion Error</div>
           <pre className="text-sm text-foreground/80 whitespace-pre-wrap overflow-auto max-h-40 bg-background/50 p-2 rounded border border-border/50">

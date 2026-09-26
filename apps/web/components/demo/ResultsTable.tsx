@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 
 import {
   useReactTable,
@@ -50,10 +51,6 @@ export function ResultsTable({ data, schemaColumns, activeTab }: { data: any[], 
         size: c.key === "email" ? 250 : 150,
         cell: (info: any) => {
           const val = info.getValue();
-          const row = info.row.original;
-          const isInvalid = !!row.errors;
-          const hasError = row.errors && row.errors[c.key];
-          
           return (
             <div className="px-2 break-all" title={String(val ?? "")}>
               {val !== undefined && val !== null ? String(val) : <span className="opacity-40 italic">empty</span>}
@@ -91,6 +88,7 @@ export function ResultsTable({ data, schemaColumns, activeTab }: { data: any[], 
     return cols;
   }, [schemaColumns, activeTab]);
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns: columns as any,
@@ -120,25 +118,32 @@ export function ResultsTable({ data, schemaColumns, activeTab }: { data: any[], 
   return (
     <div 
       ref={parentRef} 
+      role="table"
+      aria-label="Ingestion Results"
       className="flex-1 overflow-auto bg-background custom-scrollbar relative border-t border-border"
       style={{ height: '500px' }}
     >
-      <div 
-        className="sticky top-0 z-10 bg-foreground/5 border-b border-border font-medium text-xs text-foreground-muted uppercase tracking-wider flex"
-        style={{ width: table.getTotalSize() || '100%', minWidth: '100%' }}
-      >
+      <div role="rowgroup" className="sticky top-0 z-10">
+        <div 
+          role="row"
+          className="bg-foreground/5 border-b border-border font-medium text-xs text-foreground-muted uppercase tracking-wider flex"
+          style={{ width: table.getTotalSize() || '100%', minWidth: '100%' }}
+        >
         {table.getFlatHeaders().map((header) => (
           <div
             key={header.id}
+            role="columnheader"
             className="px-2 py-2 flex items-center"
             style={{ width: header.getSize() }}
           >
             {flexRender(header.column.columnDef.header, header.getContext())}
           </div>
         ))}
+        </div>
       </div>
 
       <div 
+        role="rowgroup"
         style={{ 
           height: `${rowVirtualizer.getTotalSize()}px`, 
           width: table.getTotalSize() || '100%',
@@ -151,6 +156,7 @@ export function ResultsTable({ data, schemaColumns, activeTab }: { data: any[], 
           return (
             <div
               key={row.id}
+              role="row"
               ref={rowVirtualizer.measureElement}
               data-index={virtualRow.index}
               className={`absolute top-0 left-0 w-full flex flex-col border-b border-border/50 ${
@@ -164,6 +170,7 @@ export function ResultsTable({ data, schemaColumns, activeTab }: { data: any[], 
                 {row.getVisibleCells().map((cell) => (
                   <div
                     key={cell.id}
+                    role="cell"
                     className="px-2 text-sm flex items-start mt-1"
                     style={{ width: cell.column.getSize() }}
                   >

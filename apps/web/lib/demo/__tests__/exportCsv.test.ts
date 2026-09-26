@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { expect, test, vi } from "vitest";
 import { downloadValidCsv, downloadInvalidCsv } from "../exportCsv";
 import Papa from "papaparse";

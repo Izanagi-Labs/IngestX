@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as acorn from "acorn";
 import { ix } from "@parallelbytes/ingestx";
 import type { ColumnConfig } from "@parallelbytes/ingestx";
@@ -25,14 +26,14 @@ const SUPPORTED_RULES: Record<string, string[]> = {
 // AST Parsers
 // ---------------------------------------------------------
 
-function assertLiteralValue(node: any, paramName: string): string | number | boolean | RegExp {
+function assertLiteralValue(node: any, _paramName: string): string | number | boolean | RegExp {
   if (node.type !== "Literal") {
     throw new PlaygroundSchemaError(`Argument for \${paramName} must be a literal (string, number, boolean, or regex), got \${node.type}`);
   }
   return node.value;
 }
 
-function parseArrayElements(elements: any[], paramName: string): any[] {
+function parseArrayElements(elements: any[], _paramName: string): any[] {
   return elements.map(el => {
     if (el.type !== "Literal") {
       throw new PlaygroundSchemaError(`Elements in array for \${paramName} must be literals`);

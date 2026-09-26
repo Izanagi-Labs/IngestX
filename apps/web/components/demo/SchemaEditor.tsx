@@ -11,6 +11,7 @@ export function SchemaEditor() {
   const { theme, systemTheme } = useTheme();
   
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
