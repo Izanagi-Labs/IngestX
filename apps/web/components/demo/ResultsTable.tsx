@@ -12,11 +12,18 @@ import {
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { XCircle, CheckCircle2 } from "lucide-react";
 
-export function ResultsTable({ data, schemaColumns, activeTab }: { data: any[], schemaColumns: { key: string, name: string }[], activeTab: string }) {
-
+export function ResultsTable({
+  data,
+  schemaColumns,
+  activeTab,
+}: {
+  data: any[];
+  schemaColumns: { key: string; name: string }[];
+  activeTab: string;
+}) {
   const columns = useMemo<ColumnDef<any, any>[]>(() => {
     const cols: ColumnDef<any, any>[] = [];
-    
+
     if (activeTab === "all") {
       cols.push({
         id: "status",
@@ -39,51 +46,70 @@ export function ResultsTable({ data, schemaColumns, activeTab }: { data: any[], 
       size: 60,
       accessorFn: (row: any) => row._ixRowIndex,
       cell: (info: any) => {
-        return <div className="text-right pr-2 text-foreground-muted font-medium">{info.getValue() as number}</div>;
+        return (
+          <div className="text-right pr-2 text-foreground-muted font-medium">
+            {info.row.original._ixRowIndex ?? "-"}
+          </div>
+        );
       },
     });
 
-    schemaColumns.forEach(c => {
+    schemaColumns.forEach((c) => {
       cols.push({
         id: c.key,
-        accessorFn: (row: any) => row.data ? row.data[c.key] : row[c.key],
+        accessorFn: (row: any) => (row.data ? row.data[c.key] : row[c.key]),
         header: c.name,
-        size: c.key === "email" ? 250 : 150,
+        size: 300,
         cell: (info: any) => {
           const val = info.getValue();
           return (
             <div className="px-2 break-all" title={String(val ?? "")}>
-              {val !== undefined && val !== null ? String(val) : <span className="opacity-40 italic">empty</span>}
+              {val !== undefined && val !== null ? (
+                String(val)
+              ) : (
+                <span className="opacity-40 italic">empty</span>
+              )}
             </div>
           );
         },
       });
     });
 
-    cols.push({
-      id: "_errors",
-      header: "Errors",
-      size: 350,
-      cell: ({ row }: any) => {
-        if (!row.original.errors) return null;
-        const errors = row.original.errors;
-        const errorEntries = Object.entries(errors);
-        if (errorEntries.length === 0) return null;
+    const hasErrors = data.some(
+      (r) => r.errors && Object.keys(r.errors).length > 0,
+    );
 
-        return (
-          <div className="flex flex-col gap-1 py-1 px-2 whitespace-normal break-words w-full">
-            {errorEntries.map(([field, fieldErrors]: [string, any]) => (
-              fieldErrors.map((err: any, i: number) => (
-                <div key={`${field}-${i}`} className="text-xs text-foreground-muted flex gap-1">
-                  <span className="font-semibold flex-shrink-0">{field}:</span>
-                  <span>{err.message}</span>
-                </div>
-              ))
-            ))}
-          </div>
-        );
-      },
-    });
+    if (activeTab !== "valid" && hasErrors) {
+      cols.push({
+        id: "_errors",
+        header: "Errors",
+        size: 350,
+        cell: ({ row }: any) => {
+          if (!row.original.errors) return null;
+          const errors = row.original.errors;
+          const errorEntries = Object.entries(errors);
+          if (errorEntries.length === 0) return null;
+
+          return (
+            <div className="flex flex-col gap-1 py-1 px-2 whitespace-normal break-words w-full">
+              {errorEntries.map(([field, fieldErrors]: [string, any]) =>
+                fieldErrors.map((err: any, i: number) => (
+                  <div
+                    key={`${field}-${i}`}
+                    className="text-xs text-foreground-muted flex gap-1"
+                  >
+                    <span className="font-semibold flex-shrink-0">
+                      {field}:
+                    </span>
+                    <span>{err.message}</span>
+                  </div>
+                )),
+              )}
+            </div>
+          );
+        },
+      });
+    }
 
     return cols;
   }, [schemaColumns, activeTab]);
@@ -96,9 +122,9 @@ export function ResultsTable({ data, schemaColumns, activeTab }: { data: any[], 
   });
 
   const parentRef = useRef<HTMLDivElement>(null);
-  
+
   const { rows } = table.getRowModel();
-  
+
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => parentRef.current,
@@ -110,45 +136,54 @@ export function ResultsTable({ data, schemaColumns, activeTab }: { data: any[], 
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-12 text-center border-t border-border">
         <p className="text-foreground font-medium mb-1">No rows to display</p>
-        <p className="text-sm text-foreground-muted">Try adjusting your search or filters.</p>
+        <p className="text-sm text-foreground-muted">
+          Try adjusting your search or filters.
+        </p>
       </div>
     );
   }
 
   return (
-    <div 
-      ref={parentRef} 
+    <div
+      ref={parentRef}
       role="table"
       aria-label="Ingestion Results"
       className="flex-1 overflow-auto bg-background custom-scrollbar relative border-t border-border"
-      style={{ height: '500px' }}
+      style={{ maxHeight: "400px", minHeight: "200px" }}
     >
-      <div role="rowgroup" className="sticky top-0 z-10">
-        <div 
+      <div 
+        role="rowgroup" 
+        className="sticky top-0 z-10 bg-background"
+        style={{ width: table.getTotalSize() || "100%", minWidth: "100%" }}
+      >
+        <div
           role="row"
           className="bg-foreground/5 border-b border-border font-medium text-xs text-foreground-muted uppercase tracking-wider flex"
-          style={{ width: table.getTotalSize() || '100%', minWidth: '100%' }}
+          style={{ width: table.getTotalSize() || "100%", minWidth: "100%" }}
         >
-        {table.getFlatHeaders().map((header) => (
-          <div
-            key={header.id}
-            role="columnheader"
-            className="px-2 py-2 flex items-center"
-            style={{ width: header.getSize() }}
-          >
-            {flexRender(header.column.columnDef.header, header.getContext())}
-          </div>
-        ))}
+          {table.getFlatHeaders().map((header) => (
+            <div
+              key={header.id}
+              role="columnheader"
+              className="px-2 py-2 flex items-center flex-shrink-0"
+              style={{
+                width: header.getSize(),
+                flex: `0 0 ${header.getSize()}px`,
+              }}
+            >
+              {flexRender(header.column.columnDef.header, header.getContext())}
+            </div>
+          ))}
         </div>
       </div>
 
-      <div 
+      <div
         role="rowgroup"
-        style={{ 
-          height: `${rowVirtualizer.getTotalSize()}px`, 
-          width: table.getTotalSize() || '100%',
-          minWidth: '100%',
-          position: 'relative' 
+        style={{
+          height: `${rowVirtualizer.getTotalSize()}px`,
+          width: table.getTotalSize() || "100%",
+          minWidth: "100%",
+          position: "relative",
         }}
       >
         {rowVirtualizer.getVirtualItems().map((virtualRow) => {
@@ -160,7 +195,9 @@ export function ResultsTable({ data, schemaColumns, activeTab }: { data: any[], 
               ref={rowVirtualizer.measureElement}
               data-index={virtualRow.index}
               className={`absolute top-0 left-0 w-full flex flex-col border-b border-border/50 ${
-                (row.original as any).errors ? 'bg-red-500/[0.02]' : 'hover:bg-foreground/5'
+                (row.original as any).errors
+                  ? "bg-red-500/[0.02]"
+                  : "hover:bg-foreground/5"
               }`}
               style={{
                 transform: `translateY(${virtualRow.start}px)`,
@@ -171,8 +208,11 @@ export function ResultsTable({ data, schemaColumns, activeTab }: { data: any[], 
                   <div
                     key={cell.id}
                     role="cell"
-                    className="px-2 text-sm flex items-start mt-1"
-                    style={{ width: cell.column.getSize() }}
+                    className="px-2 text-sm flex items-start mt-1 flex-shrink-0"
+                    style={{
+                      width: cell.column.getSize(),
+                      flex: `0 0 ${cell.column.getSize()}px`,
+                    }}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </div>

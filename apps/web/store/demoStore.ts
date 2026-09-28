@@ -76,7 +76,7 @@ const initialState = {
   schemaCode: defaultSchemaCode,
   configuration: {
     rowChunkSize: 10000,
-    byteChunkSize: 10 * 1024 * 1024, // 10MB
+    byteChunkSize: 1024 * 1024, // 1MB
     collectResults: true,
     maxCollectedRows: 50000,
   },
@@ -98,7 +98,7 @@ export const useDemoStore = create<DemoState>((set) => ({
   setStatus: (status) => set({ status }),
   setProgress: (progress) => set((state) => ({ progress: { ...state.progress, ...progress } })),
   setResult: (result) => set({ result }),
-  setError: (error) => set({ error, status: "error" }),
+  setError: (error) => set((state) => ({ error, status: error ? "error" : state.status })),
   setActiveResultTab: (activeResultTab) => set({ activeResultTab }),
   setSearchQuery: (searchQuery) => set({ searchQuery }),
   setErrorFilter: (errorFilter) => set({ errorFilter }),

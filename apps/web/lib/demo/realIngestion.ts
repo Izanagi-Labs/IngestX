@@ -36,7 +36,7 @@ export async function runIngestion() {
     onProgress: (p) => {
       if (runId !== activeRunId) return;
       useDemoStore.getState().setProgress({
-        progressPercentage: p.percentage || 0,
+        progressPercentage: (p.percentage || 0) * 100,
         processed: p.processedRows,
       });
     },
@@ -69,10 +69,20 @@ export async function runIngestion() {
       // in rowWiseErrors in the exact same order.
       const uniqueErrorIndices = Array.from(new Set(data.errorsData.rowWiseErrors.map(e => e.rowIndex)));
       
+      const errorsByRowIndex = new Map<number, typeof data.errorsData.rowWiseErrors>();
+      for (const e of data.errorsData.rowWiseErrors) {
+        let arr = errorsByRowIndex.get(e.rowIndex);
+        if (!arr) {
+          arr = [];
+          errorsByRowIndex.set(e.rowIndex, arr);
+        }
+        arr.push(e);
+      }
+
       const mappedInvalidRows = data.invalidRows.map((row: Record<string, unknown>, i) => {
         const rowIndex = uniqueErrorIndices[i] ?? i;
         
-        const rowErrors = data.errorsData.rowWiseErrors.filter(e => e.rowIndex === rowIndex);
+        const rowErrors = errorsByRowIndex.get(rowIndex) || [];
         const groupedErrors: Record<string, { message: string }[]> = {};
         
         for (const re of rowErrors) {
@@ -87,8 +97,13 @@ export async function runIngestion() {
         };
       });
 
+      const mappedValidRows = data.validRows.map((row, i) => ({
+        ...row,
+        _ixRowIndex: i + 1,
+      }));
+
       store.setResult({
-        validRows: data.validRows,
+        validRows: mappedValidRows,
         invalidRows: mappedInvalidRows,
         columns: columns.map(c => ({ key: c.key, name: c.name })),
         durationMs: Math.round(endTime - startTime),

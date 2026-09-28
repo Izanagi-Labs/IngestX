@@ -40,7 +40,7 @@ export function RunControls() {
         <div className="flex flex-col gap-3">
           <div className="flex justify-between items-center text-sm">
             <span className="font-semibold text-foreground">{status === "running" ? "Processing..." : "Paused"}</span>
-            <span className="text-foreground-muted">{progress.progressPercentage}%</span>
+            <span className="text-foreground-muted">{progress.progressPercentage.toFixed(2)}%</span>
           </div>
           
           <div className="w-full bg-foreground/10 rounded-full h-2 overflow-hidden">

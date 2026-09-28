@@ -1,7 +1,7 @@
 {
   "name": "@izanagi-labs/ingestx",
   "version": "2.0.0",
-  "packageManager": "pnpm@11.1.2",
+  "packageManager": "pnpm@11.20.0",
   "description": "High performance CSV and Excel ingestion library for React and Node.js",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -35,7 +35,7 @@
     "build": "vite build",
     "dev": "vite build --watch",
     "test": "vitest",
-    "demo": "cd apps/web && yarn dev",
+    "demo": "cd apps/web && pnpm dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint:check": "eslint .",

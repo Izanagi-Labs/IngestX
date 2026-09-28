@@ -38,7 +38,7 @@ export function resolveHeaders(
     (header) => !resolvedHeaderNames.has(header),
   );
 
-  if (missing.length || unexpected.length) {
+  if (missing.length) {
     return {
       columns: [],
       mismatch: {
