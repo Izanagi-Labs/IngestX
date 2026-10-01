@@ -2,6 +2,7 @@ import { RuleType } from "../../model/schema/types/RuleType";
 import { ValidationError } from "../../model/schema/types/ValidationResult";
 
 export enum ValidationErrorType {
+  Required = "required",
   InvalidType = "invalid_type",
   DuplicateValue = "duplicate_value",
 }

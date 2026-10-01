@@ -10,7 +10,9 @@ import {
   FieldValidationResult,
   RuleExecutionState,
   ValidationContext,
+  ValidationErrorType,
 } from "./types";
+import { createError, isEmpty } from "./utils";
 import { executeCommonRule } from "./executors/common";
 import { executeStringRule } from "./executors/string";
 import { executeNumberRule } from "./executors/number";
@@ -72,19 +74,26 @@ export function executeRules(
   }
 
   // ------------------------------------
-  // Phase 3 - Optional
+  // Phase 3 - Required / Optional
   // ------------------------------------
 
   if (!state.stop) {
+    let isOptional = false;
     for (const rule of rules) {
-      if (rule.type !== CommonRuleType.Optional) {
-        continue;
-      }
-
-      executeCommonRule(rule, state, context);
-
-      if (state.stop) {
+      if (rule.type === CommonRuleType.Optional) {
+        isOptional = true;
         break;
+      }
+    }
+
+    if (isEmpty(state.value)) {
+      if (isOptional) {
+        state.stop = true;
+      } else {
+        state.errors.push(
+          createError(ValidationErrorType.Required, "Value is required"),
+        );
+        state.stop = true;
       }
     }
   }
